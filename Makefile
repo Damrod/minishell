@@ -17,7 +17,7 @@ TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))
 
 # Generate the GCC includes parameters by adding -I before each source folder
 # INCLUDES = $(foreach dir, $(SOURCEDIRS), $(addprefix -I, $(dir)))
-INCLUDES = -I $(SOURCEDIR)/incs $(SOURCEDIR)/libft $(SOURCEDIR)/libft/ft_printf/incs
+INCLUDES = -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft -I $(SOURCEDIR)/libft/ft_printf/incs
 # Add this list to VPATH, the place make will look for the source files
 VPATH = $(SOURCEDIRS)
 
