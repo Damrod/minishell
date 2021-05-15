@@ -12,8 +12,8 @@ $(1):
 	$(HIDE)$(MKDIR) $$@ $(ERRIGNORE)
 endef
 
-# Set project directory one level above the Makefile directory. $(CURDIR)
-#is a GNU make variable containing the path to the current working directory
+# $(CURDIR) is a GNU make variable containing the path to the current working
+# directory
 PROJDIR := $(CURDIR)
 SOURCEDIR := $(PROJDIR)/srcs
 BUILDDIR := $(PROJDIR)/bld

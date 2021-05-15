@@ -73,17 +73,3 @@ t_array	*alloc_matrix(size_t m, size_t n, enum e_types tpe, t_byte *str)
 	array->cset = str;
 	return (array);
 }
-
-void	ft_wrtptr(char *c, char *str)
-{
-	size_t	size;
-
-	size = ft_strlen(str);
-	while (size > 0)
-	{
-		*c = *str;
-		c++;
-		str++;
-		size--;
-	}
-}
