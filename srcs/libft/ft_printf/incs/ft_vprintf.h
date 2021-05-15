@@ -1,7 +1,7 @@
 #ifndef FT_VPRINTF_H
 # define FT_VPRINTF_H
 
-# include "../../libft.h"
+# include <libft.h>
 # include "ft_outprintf.h"
 
 int	ft_vprintf(const char *format, va_list ap);

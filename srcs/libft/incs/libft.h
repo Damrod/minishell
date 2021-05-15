@@ -21,7 +21,7 @@
 # include <string.h>
 # include <errno.h>
 # include <stdint.h>
-# include "ft_printf/incs/ft_printf.h"
+# include <ft_printf.h>
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 2048
 # endif

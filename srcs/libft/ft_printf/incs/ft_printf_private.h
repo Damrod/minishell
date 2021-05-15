@@ -5,7 +5,7 @@
 # include <stdbool.h>
 # include <limits.h>
 # include <float.h>
-# include "../../libft.h"
+# include <libft.h>
 
 # define FLAGS_ZEROPAD		0b00000001
 # define FLAGS_LEFT			0b00000010

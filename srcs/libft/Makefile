@@ -57,8 +57,8 @@ INCSPFT	= ft_printf/incs/ft_float1.h ft_printf/incs/ft_gettype.h			   \
 		  ft_printf/incs/ft_float0.h
 TEST	= test
 TEST_B	= test_bonus
-INCS	= libft.h advice.h ft_lstdelmany.h ft_arrkey.h						   \
-		  ft_printf/incs/ft_vprintf.h
+INCS	= incs/libft.h mytinygc/advice.h list/ft_lstdelmany.h				   \
+		  polyarray/ft_arrkey.h ft_printf/incs/ft_vprintf.h
 SRC_T	= main.c
 SRC_TB	= bonus_main.c
 OBJ_T	= ${SRC_T:%.c=%.o}
@@ -75,18 +75,21 @@ RM		= rm -f
 LDLIBS	= -lft
 LDFLAGS	= -L
 DCFLAGS = -shared
+DEPS	= $(OBJS:%.o=%.d)
+
+all : ${NAME}
 
 %.o : %.c
-	${CC} -c ${CFLAGS} $< -o $@
+	${CC} -c ${CFLAGS} -I incs -I ft_printf/incs $< -o $@ -MMD
+
+-include $(DEPS)
 
 ${NAME} : ${OBJS} ${OBJ_PFT} ${INCS}
 	${AR} ${ARFLAGS} $@ $^
 	${INDEXER} ${NAME}
 
-all : ${NAME}
-
 clean :
-	${RM} ${OBJS} ${OBJS_B} ${OBJ_T} ${OBJ_TB} ${OBJ_PFT}
+	${RM} ${OBJS} ${OBJS_B} ${OBJ_T} ${OBJ_TB} ${OBJ_PFT} ${DEPS}
 
 fclean : clean
 	${RM} ${NAME} ${TEST} ${TEST_B}
