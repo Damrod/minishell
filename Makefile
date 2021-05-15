@@ -19,10 +19,12 @@ SOURCEDIR := $(PROJDIR)/srcs
 BUILDDIR := $(PROJDIR)/bld
 NAME = minishell
 # source directories with $(SOURCEDIR) as root
-DIRS = common libft/noassign libft/memory libft/polyarray libft/btree		   \
-	   libft/list libft/mytinygc libft/ctypelibft/allocstr libft/strutils	   \
+LIBFTD = libft/noassign libft/memory libft/polyarray libft/btree			   \
+	   libft/list libft/mytinygc libft/ctype libft/allocstr libft/strutils	   \
 	   libft/atoi libft/output libft/mlx libft/ft_printf libft/ft_printf/srcs  \
 	   libft/string
+DIRS = common
+DIRS += $(LIBFTD)
 SOURCEDIRS = $(foreach dir, $(DIRS), $(addprefix $(SOURCEDIR)/, $(dir)))
 TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))
 # glob sources from sourcedirs. Eventually we should hardcode this
@@ -30,15 +32,15 @@ SOURCES = $(foreach dir,$(SOURCEDIRS),$(wildcard $(dir)/*.c))
 OBJS := $(subst $(SOURCEDIR),$(BUILDDIR),$(SOURCES:%.c=%.o))
 DEPS = $(OBJS:%.o=%.d)
 # look for includes in the source dirs
-INCLUDES = $(foreach dir, $(SOURCEDIRS), $(addprefix -I, $(dir)))
+# INCLUDES = $(foreach dir, $(SOURCEDIRS), $(addprefix -I, $(dir)))
 # hardcoded include paths
 INCLUDES += -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft/incs					   \
 			-I $(SOURCEDIR)/libft/ft_printf/incs
 VPATH = $(SOURCEDIRS)
-
+VPATH += $(TARGETDIRS)
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
-LDLIBS = -lm -lft
+LDLIBS = -lm
 
 RM = rm -rf
 MKDIR = mkdir -p
@@ -57,13 +59,9 @@ all: $(NAME)
 # Generate directory rules
 $(foreach targetdir, $(TARGETDIRS), $(eval $(call generateDirs, $(targetdir))))
 
-srcs/libft/libft.a :
-	make -C srcs/libft
-
-$(NAME): $(TARGETDIRS) $(OBJS) srcs/libft/libft.a
+$(NAME): $(TARGETDIRS) $(OBJS)
 	$(HIDE)echo Linking $@
-	$(HIDE)$(CC) $(CFLAGS) $(OBJS) $(INCLUDES) -o $(NAME) srcs/libft/libft.a   \
-	-Lsrcs/libft $(LDLIBS)
+	$(HIDE)$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDLIBS)
 
 # Include dependencies
 -include $(DEPS)
