@@ -1,42 +1,34 @@
-# Set project directory one level above the Makefile directory. $(CURDIR) is a GNU make variable containing the path to the current working directory
+# Set project directory one level above the Makefile directory. $(CURDIR)
+#is a GNU make variable containing the path to the current working directory
 PROJDIR := $(CURDIR)
 SOURCEDIR := $(PROJDIR)/srcs
 BUILDDIR := $(PROJDIR)/bld
-
-# Name of the final executable
 NAME = minishell
-
-# Decide whether the commands will be shown or not
 VERBOSE = TRUE
 
-# Create the list of directories
+# source directories with $(SOURCEDIR) as root
 DIRS = common libft libft/ft_printf/srcs
 
 SOURCEDIRS = $(foreach dir, $(DIRS), $(addprefix $(SOURCEDIR)/, $(dir)))
 TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))
-
-# Generate the GCC includes parameters by adding -I before each source folder
-# INCLUDES = $(foreach dir, $(SOURCEDIRS), $(addprefix -I, $(dir)))
-INCLUDES = -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft -I $(SOURCEDIR)/libft/ft_printf/incs
-# Add this list to VPATH, the place make will look for the source files
+# look for includes in the source dirs
+INCLUDES = $(foreach dir, $(SOURCEDIRS), $(addprefix -I, $(dir)))
+# hardcoded include paths
+INCLUDES += -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft						   \
+			-I $(SOURCEDIR)/libft/ft_printf/incs
 VPATH = $(SOURCEDIRS)
 
-# Create a list of *.c sources in DIRS
+# glob sources from sourcedirs. Eventually we should hardcode this
 SOURCES = $(foreach dir,$(SOURCEDIRS),$(wildcard $(dir)/*.c))
-
-# Define objects for all sources
 OBJS := $(subst $(SOURCEDIR),$(BUILDDIR),$(SOURCES:%.c=%.o))
-
-# Define dependencies files for all objects
 DEPS = $(OBJS:%.o=%.d)
-
-# Name the compiler
 CC = gcc
+CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 
+# linker libraries
 LDLIBS = -lm
 
 RM = rm -rf
-RMDIR = rm -rf
 MKDIR = mkdir -p
 ERRIGNORE = 2>/dev/null
 SEP=/
@@ -55,14 +47,14 @@ endif
 define generateRules
 $(1)/%.o: %.c
 	@echo Building $$@
-	$(HIDE)$(CC) -c $$(INCLUDES) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD $(LDLIBS)
+	$(HIDE)$(CC) -c $(CFLAGS) $$(INCLUDES) -o $$(subst /,$$(PSEP),$$@) $$(subst /,$$(PSEP),$$<) -MMD $(LDLIBS)
 endef
 
-all: directories $(NAME)
+all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): directories $(OBJS)
 	$(HIDE)echo Linking $@
-	$(HIDE)$(CC) $(OBJS) -o $(NAME) $(LDLIBS)
+	$(HIDE)$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDLIBS)
 
 # Include dependencies
 -include $(DEPS)
@@ -73,11 +65,16 @@ $(foreach targetdir, $(TARGETDIRS), $(eval $(call generateRules, $(targetdir))))
 directories:
 	$(HIDE)$(MKDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
 
-# Remove all objects, dependencies and executable files generated during the build
 clean:
-	$(HIDE)$(RMDIR) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
+	$(HIDE)$(RM) $(subst /,$(PSEP),$(TARGETDIRS)) $(ERRIGNORE)
 	$(HIDE)$(RM) $(NAME) $(ERRIGNORE)
 	@echo Cleaning done !
 
+fclean: clean
+	$(HIDE)$(RM) $(BUILDDIR)
+	$(HIDE)$(RM) $(NAME)
+
+re: fclean all
+
 # Indicate to make which targets are not files
-.PHONY: all clean directories
+.PHONY: all clean fclean re directories
