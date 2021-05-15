@@ -37,7 +37,6 @@ DEPS = $(OBJS:%.o=%.d)
 INCLUDES += -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft/incs					   \
 			-I $(SOURCEDIR)/libft/ft_printf/incs
 VPATH = $(SOURCEDIRS)
-VPATH += $(TARGETDIRS)
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
 LDLIBS = -lm
