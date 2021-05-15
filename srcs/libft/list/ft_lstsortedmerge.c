@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include <libft.h>
 
 static void	ft_sorted_merge2(t_list **a, t_list *b, int (*cmp)(), t_list *ind)
 {

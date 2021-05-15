@@ -1,4 +1,4 @@
-#include "libft.h"
+#include <libft.h>
 
 static t_list	*ft_lstdupclean(t_list **list, void (*dc)(), void (*dn)())
 {

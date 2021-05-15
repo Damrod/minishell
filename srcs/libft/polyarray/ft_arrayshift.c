@@ -1,4 +1,4 @@
-#include "libft.h"
+#include <libft.h>
 
 void	*ft_arrayshift(void *currpos, t_array *arr, int tms)
 {

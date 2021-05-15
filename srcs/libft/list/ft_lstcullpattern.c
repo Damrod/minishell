@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include <libft.h>
 
 int	ft_lstcullpat(t_list **lst, int *mk, void (*dc)(void *), void (*dn)(void *))
 {

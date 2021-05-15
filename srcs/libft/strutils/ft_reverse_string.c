@@ -1,4 +1,4 @@
-#include "libft.h"
+#include <libft.h>
 
 void	ft_reverse_string(char *buf)
 {

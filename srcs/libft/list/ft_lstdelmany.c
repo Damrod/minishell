@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include <libft.h>
 #include "ft_lstdelmany.h"
 
 static void	lstdelmny(t_list **lst, int (*comp)(), t_delfunct *del, void *param)
