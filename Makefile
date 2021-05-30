@@ -22,7 +22,7 @@ NAME = minishell
 LIBFTD = libft/noassign libft/memory libft/polyarray libft/btree			   \
 	   libft/list libft/mytinygc libft/ctype libft/allocstr libft/strutils	   \
 	   libft/atoi libft/output libft/mlx libft/ft_printf libft/ft_printf/srcs  \
-	   libft/string
+	   libft/string libft/list/dllist
 DIRS = common
 DIRS += $(LIBFTD)
 SOURCEDIRS = $(foreach dir, $(DIRS), $(addprefix $(SOURCEDIR)/, $(dir)))
@@ -38,8 +38,8 @@ INCLUDES += -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft/incs					   \
 			-I $(SOURCEDIR)/libft/ft_printf/incs
 VPATH = $(SOURCEDIRS)
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g -fsanitize=address
-LDLIBS = -lm
+CFLAGS = -Wall -Wextra -Werror -g # -fsanitize=address
+LDLIBS = -lm -lncurses
 
 RM = rm -rf
 MKDIR = mkdir -p

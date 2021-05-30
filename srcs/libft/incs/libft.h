@@ -61,6 +61,12 @@ typedef struct s_list {
 	struct s_list	*next;
 }				t_list;
 
+typedef struct s_dlist {
+	void			*content;
+	struct s_dlist	*next;
+	struct s_dlist	*prev;
+}				t_dlist;
+
 typedef struct s_btree {
 	struct s_btree	*left;
 	struct s_btree	*right;
@@ -197,6 +203,21 @@ int		ft_lstdeldup(t_list **list, void (*delnde)(void *));
 int		ft_lst_intcmp(void *data0, void *data1);
 void	**ft_lsttoarr(t_list *list, int *size);
 t_list	*ft_arrtolst(void **array, int size, void *(*alloc)());
+
+// Double linked lists
+
+ssize_t	ft_dlstsize(t_dlist *lst);
+t_dlist	*na_dlstnew(void *content, t_dlist **ret_val);
+void	ft_dlstadd_back(t_dlist **lst, t_dlist *new);
+void	ft_dlstadd_front(t_dlist **lst, t_dlist *new);
+void	ft_dlstpush_front(t_dlist **lst, void *content);
+void	ft_dlstpush_back(t_dlist **lst, void *content);
+t_dlist	*ft_dlstpop_front(t_dlist **lst);
+t_dlist	*ft_dlstpop_back(t_dlist **lst);
+t_dlist	*ft_dlstlast(t_dlist *lst);
+t_dlist	*ft_dlstfirst(t_dlist *lst);
+void	ft_dlstffwd(t_dlist **lst);
+void	ft_dlstrewind(t_dlist **lst);
 
 // my tiny garbage collector
 
