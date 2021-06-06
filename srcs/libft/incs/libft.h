@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aollero- <aollero@gmail.com>               +#+  +:+       +#+        */
+/*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/29 15:12:34 by aollero-          #+#    #+#             */
-/*   Updated: 2020/10/12 18:30:08 by aollero-         ###   ########.fr       */
+/*   Updated: 2021/06/06 19:42:42 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
-# include <mlx.h>
+//# include <mlx.h>
 # include <math.h>
 # include <fcntl.h>
 # include <stdlib.h>
