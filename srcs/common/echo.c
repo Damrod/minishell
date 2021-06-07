@@ -21,7 +21,7 @@ int	ft_echo(char **args)
 	i = 0;
 	while (args[i])
 	{
-		if (ft_strncmp("-n", args[i], 2) == 0)
+		if (ft_strncmp("-n", args[i], 3) == 0)
 		{
 			i++;
 			flag++;

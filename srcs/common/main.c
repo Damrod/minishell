@@ -18,6 +18,9 @@ char	*read_line(t_tab *t)
 
 //	line = NULL;
 	get_next_line(0, &t->line);
+	// creo que este get_next_line debería tener un tamaño de buffer de 1
+	// y debería retornar si pilla algo especial, por ejemplo Ctrl+\, Ctrl + C
+	// o Ctrl+ D
 	return (t->line);
 }
 
@@ -42,8 +45,9 @@ void	ft_alloc_env(t_tab *t, char **env)
 	{
 		j = 0;
 		while (env[i][j])
-			j++;
-		t->our_env[i] = (char *)malloc(sizeof(char *) * (j + 1));
+			j++; // Esto es lo mismo que esto: j = ft_strlen(env[i])
+		t->our_env[i] = (char *)malloc(sizeof(char) * (j + 1));
+		/* sizeof(char) es siempre == 1; y es sizeof(char), no sizeof(char *) */
 		i++;
 	}
 }
@@ -90,7 +94,15 @@ void	ft_miniloop(t_tab *t, t_dlist *lst)
 		//pillar signals
 		t->line = read_line(t);
 		//care quotes
-		t->orders = ft_split(t->line, ';');
+		t->orders = ft_split(t->line, ';'); // si no entiendo mal, la idea es:
+		// un comando compuesto es una secuencia válida de comandos en una
+		// línea, independiendemente de si están separados por | o ;. El | o
+		// ; al final de un comando simple es lo que nos proporciona el tipo
+		// de comando simple que estamos tratando. Nos da la clave sobre cómo
+		// redireccionar input y output, y nos dice qué tiene que hacer la shell
+		// mientras espera que el comando hijo sea ejecutado.
+		// Desde mi punto de vista t_tab->orders debería ser cada uno de los
+		// comandos simples, y cada uno de ellos debería ser un nodo de la lista
 		free(t->line);
 		ft_order_list(t, lst, i);
 	}
