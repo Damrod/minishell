@@ -10,19 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <minishell.h>
 
-int		check_our_implement(t_tab *t)
+int	check_our_implement(t_tab *t)
 {
 	if (!t->tokens[0])
-		return(1);
-	if(ft_strncmp(t->tokens[0], "pwd", 3) == 0 && ft_strlen(t->tokens[0]) == 3)
-		return(ft_pwd());
-	if(ft_strncmp(t->tokens[0], "cd", 2) == 0 && ft_strlen(t->tokens[0]) == 2)
-		return(ft_cd(&t->tokens[1]));
-	if(ft_strncmp(t->tokens[0], "echo", 4) == 0 && ft_strlen(t->tokens[0]) == 4)
-		return(ft_echo(&t->tokens[1]));
-	else 
 		return (1);
-
+	if (ft_strncmp(t->tokens[0], "pwd", 4) == 0)
+		return (ft_pwd());
+	if (ft_strncmp(t->tokens[0], "cd", 3) == 0)
+		return (ft_cd(&t->tokens[1]));
+	if (ft_strncmp(t->tokens[0], "echo", 5) == 0)
+		return (ft_echo(&t->tokens[1]));
+	else
+		return (1);
 }

@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <minishell.h>
 
-#include "minishell.h"
+#include <minishell.h>
 
 char	*ft_strtok(char *str, char *sepa)
 {

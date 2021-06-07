@@ -10,12 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <minishell.h>
 
 int	ft_cd(char **args)
 {
-	char *path;
-	int i;
+	char	*path;
+	int		i;
 
 	path = args[0];
 	i = 1;
@@ -25,7 +25,7 @@ int	ft_cd(char **args)
 		ft_putstr_fd(path, 1);
 		ft_putchar_fd('\n', 1);
 	}
-	else 
+	else
 	{
 		while (args[i])
 		{
@@ -34,5 +34,5 @@ int	ft_cd(char **args)
 				path = ft_strjoin(path, " ");
 		}
 	}
-	return(0);
+	return (0);
 }

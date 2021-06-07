@@ -10,14 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <minishell.h>
 
-char			*ft_strjoin_sl(const char *s1, const char *s2)
+char	*ft_strjoin_sl(const char *s1, const char *s2)
 {
 	int		pos;
 	char	*dest;
 
-	if (!(dest = malloc(ft_strlen(s1) + ft_strlen(s2) + 1)))
+	if (!na_malloc(ft_strlen(s1) + ft_strlen(s2) + 1, (void **)&dest))
 		return (NULL);
 	pos = 0;
 	while (*s1)

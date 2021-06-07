@@ -2,7 +2,7 @@
 define generateRules
 $(1)/%.o: %.c
 	@echo Building $$@
-	$(HIDE)$(CC) -c $(CFLAGS) $$(INCLUDES) -o $$@ $$< -MMD $(LDLIBS)
+	$(HIDE)$(CC) -c $(CFLAGS) $(INCLUDES) -o $$@ $$< -MMD $(LDLIBS)
 endef
 
 # Define the function that will generate each build directory
@@ -21,7 +21,7 @@ NAME = minishell
 # source directories with $(SOURCEDIR) as root
 LIBFTD = libft/noassign libft/memory libft/polyarray libft/btree			   \
 	   libft/list libft/mytinygc libft/ctype libft/allocstr libft/strutils	   \
-	   libft/atoi libft/output libft/mlx libft/ft_printf libft/ft_printf/srcs  \
+	   libft/atoi libft/output libft/ft_printf libft/ft_printf/srcs			   \
 	   libft/string libft/list/dllist
 DIRS = common
 DIRS += $(LIBFTD)

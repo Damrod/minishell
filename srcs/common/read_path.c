@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <minishell.h>
 
-void		check_path(t_tab *t, char **env)
+void	check_path(t_tab *t, char **env)
 {
 	int		i;
 	int		j;
@@ -22,7 +22,7 @@ void		check_path(t_tab *t, char **env)
 	i = 0;
 
 	//exit q hay q gestionar con errno
-	while(t->path[i])
+	while (t->path[i])
 	{
 		if (t->tokens[0] == NULL)
 			break ;
@@ -34,8 +34,9 @@ void		check_path(t_tab *t, char **env)
 			//printf("valor de aux=    %s\n", aux);
 			//printf("valor de tokens=    %s\n", t->tokens[0]);
 			j = execve(tmp, t->tokens, env);
-			if (j < 0)
+			/* if (j < 0) */
 				//printf("%s\n", strerror(errno));
+			(void) j;
 			free(aux);
 			i++;
 		}

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <minishell.h>
 
 char	*read_line(t_tab *t)
 {
@@ -18,7 +18,7 @@ char	*read_line(t_tab *t)
 
 //	line = NULL;
 	get_next_line(0, &t->line);
-	return(t->line);
+	return (t->line);
 }
 
 void	initt(t_tab *t)
@@ -27,38 +27,38 @@ void	initt(t_tab *t)
 	t->path = NULL;
 }
 
-void ft_alloc_env(t_tab *t, char **env)
+void	ft_alloc_env(t_tab *t, char **env)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
-	while(env[i])
+	while (env[i])
 		i++;
 	t->our_env = (char **)malloc(sizeof(char *) * (i + 1));
 	t->our_env[i] = NULL;
 	i = 0;
-	while(env[i])
+	while (env[i])
 	{
 		j = 0;
-		while(env[i][j])
+		while (env[i][j])
 			j++;
 		t->our_env[i] = (char *)malloc(sizeof(char *) * (j + 1));
 		i++;
 	}
 }
 
-void ft_copy_env(t_tab *t, char **env)
+void	ft_copy_env(t_tab *t, char **env)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	ft_alloc_env(t, env);
-	while(env[i])
+	while (env[i])
 	{
 		j = 0;
-		while(env[i][j])
+		while (env[i][j])
 		{
 			t->our_env[i][j] = env[i][j];
 			j++;
@@ -68,26 +68,22 @@ void ft_copy_env(t_tab *t, char **env)
 	}
 }
 
-
-
-///
-
-void ft_order_list(t_tab *t, t_dlist *lst, int i)
+void	ft_order_list(t_tab *t, t_dlist *lst, int i)
 {
 	(void)lst;
-	while(t->orders[i])
+	while (t->orders[i])
 	{
 		//procesado de to
-printf("%s\n", t->orders[i]);
+		printf("%s\n", t->orders[i]);
 		i++;
 	}
 }
 
-void ft_miniloop(t_tab *t, t_dlist *lst)
+void	ft_miniloop(t_tab *t, t_dlist *lst)
 {
-	int i;
+	int	i;
 
-	while(1)
+	while (1)
 	{
 		i = 0;
 		ft_putstr_fd("marishell% ", 1);
@@ -100,7 +96,7 @@ void ft_miniloop(t_tab *t, t_dlist *lst)
 	}
 }
 
-int		main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **env)
 {
 	t_tab	*t;
 	t_dlist	*lst;

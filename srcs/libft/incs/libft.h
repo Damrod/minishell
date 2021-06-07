@@ -12,7 +12,6 @@
 
 #ifndef LIBFT_H
 # define LIBFT_H
-//# include <mlx.h>
 # include <math.h>
 # include <fcntl.h>
 # include <stdlib.h>
@@ -229,11 +228,6 @@ void	my_free(void *ptr);
 void	my_exit(char *error, int errnbr);
 void	ptrlstclear(void);
 void	*my_malloc(size_t size);
-
-// minilibx
-
-void	*my_mlx(void *ptr);
-void	rotvect2(double *vector[2], double len, double angle);
 
 // my polymorphic array type
 
