@@ -143,6 +143,8 @@ int		ft_tolower(int c);
 void	adv_spaces(char **str);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 int		get_next_line(int fd, char **line);
+int		get_next_line_check_input(int fd, char **line, const char *charset,
+			uint16_t cssize);
 void	ft_wrtptr(char *c, char *str);
 char	*align_right(char *field, const char *content);
 void	ft_reverse_string(char *buf);
