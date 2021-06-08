@@ -89,6 +89,25 @@ char *downcast_wstr(const unsigned short *str)
 
 #include <stdbool.h>
 
+char isquote_not_nested_not_escaped(unsigned short c, char is_dblquotes)
+{
+	char			cmp;
+	unsigned short	flag;
+
+	cmp = '\'';
+	flag = FLAG_SNGQUOT;
+	if (is_dblquotes)
+	{
+		cmp = '"';
+		flag = FLAG_DBLQUOT;
+	}
+	if ((((c & 0xFF00) == (FLAG_NOTSPCE | flag))
+	  || ((c & 0xFF00) == FLAG_NOTSPCE))
+	 && ((c & 0xFF) == (short)cmp))
+		return (1);
+	return (0);
+}
+
 unsigned short *get_args(const char *args)
 {
 	size_t len;
@@ -132,12 +151,8 @@ unsigned short *get_args(const char *args)
 			bitmap[i] |= FLAG_DBLQUOT;
 		if (insidesng)
 			bitmap[i] |= FLAG_SNGQUOT;
-		if (((((bitmap[i] & 0xFF00) == (FLAG_DBLQUOT | FLAG_NOTSPCE))
-			  || ((bitmap[i] & 0xFF00) == FLAG_NOTSPCE))
-				&& ((bitmap[i] & 0xFF) == (short)'"'))
-			|| ((((bitmap[i] & 0xFF00) == (FLAG_SNGQUOT | FLAG_NOTSPCE))
-				 || ((bitmap[i] & 0xFF00) == FLAG_NOTSPCE))
-				&& ((bitmap[i] & 0xFF) == (short)'\'')))
+		if (isquote_not_nested_not_escaped(bitmap[i], 0)
+			|| isquote_not_nested_not_escaped(bitmap[i], 1))
 			bitmap[i] |= FLAG_CIGNORE;
 		i++;
 	}
@@ -149,7 +164,9 @@ unsigned short *get_args(const char *args)
 		i++;
 	}
 	check_escaped('\0', 1);
-	return ft_wstrdup(bitmap);
+	unsigned short *ret = ft_wstrdup(bitmap);
+	free (bitmap);
+	return (ret);
 }
 
 int main(int argc, char **argv)
