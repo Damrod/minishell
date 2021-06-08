@@ -12,7 +12,7 @@
 
 #include <minishell.h>
 
-static int			ft_words(char const *s, char c, t_tab *t)
+static int	ft_words(char const *s, char c, t_tab *t)
 {
 	int		w;
 	int		i;
@@ -43,7 +43,7 @@ static int			ft_words(char const *s, char c, t_tab *t)
 	return (w);
 }
 
-static int			ft_letters(const char *s, char c)
+static int	ft_letters(const char *s, char c)
 {
 	int		i;
 	int		l;
@@ -59,15 +59,15 @@ static int			ft_letters(const char *s, char c)
 	return (l);
 }
 
-static char			**prinsplit(char const *s, char c, char **str, int x, t_tab *t)
+static char	**prinsplit(char const *s, char c, char **str, int x, t_tab *t)
 {
 	int		l;
 	int		i;
 	int		j;
 	int		w;
 //	int		k;
-	unsigned int start;
-	size_t len;
+	unsigned int	start;
+	size_t	len;
 
 	(void)t;
 	i = 0;
@@ -116,7 +116,7 @@ static char			**prinsplit(char const *s, char c, char **str, int x, t_tab *t)
 	return (str);
 }
 
-char				**ft_split_com(char const *s, char c, t_tab *t)
+char	**ft_split_com(char const *s, char c, t_tab *t)
 {
 	char	**str;
 	int		x;

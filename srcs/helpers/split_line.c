@@ -12,8 +12,6 @@
 
 #include <minishell.h>
 
-#include <minishell.h>
-
 char	*ft_strtok(char *str, char *sepa)
 {
 	static char	*stock = NULL;
@@ -32,13 +30,13 @@ char	*ft_strtok(char *str, char *sepa)
 		if (i == 0)
 		{
 			j = 0;
-			while(j < len)
+			while (j < len)
 			{
-				if(*stock != sepa[j])
+				if (*stock != sepa[j])
 				{
 					i = 1;
 					ptr = stock;
-					break;
+					break ;
 				}
 				j++;
 			}
@@ -46,14 +44,14 @@ char	*ft_strtok(char *str, char *sepa)
 		if (i == 1)
 		{
 			j = 0;
-			while(j < len)
+			while (j < len)
 			{
-				if(*stock == sepa[j])
+				if (*stock == sepa[j])
 				{
 					*stock = '\0';
 					i = 27;
 					printf("hola\n");
-					break;
+					break ;
 				}
 				j++;
 			}
@@ -61,9 +59,9 @@ char	*ft_strtok(char *str, char *sepa)
 		stock++;
 	}
 	j = 0;
-	while(j < len)
+	while (j < len)
 	{
-		if(*stock == sepa[j])
+		if (*stock == sepa[j])
 		{
 			j = -1;
 			stock++;
@@ -73,9 +71,9 @@ char	*ft_strtok(char *str, char *sepa)
 	return (ptr);
 }
 
-void *ft_realloc(void *ptr, size_t originalsize, size_t newsize)
+void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize)
 {
-	void *newptr;
+	void	*newptr;
 
 	if (newsize == 0)
 	{
@@ -89,12 +87,12 @@ void *ft_realloc(void *ptr, size_t originalsize, size_t newsize)
 	else
 	{
 		newptr = malloc(newsize);
-		if(newptr)
+		if (newptr)
 		{
 			ft_memcpy(newptr, ptr, originalsize);
 			free(ptr);
 		}
-		return(newptr);
+		return (newptr);
 	}
 }
 
@@ -110,17 +108,18 @@ char	**split_line(char *line)
 	sp = NULL;
 	(void)sp;
 	position = 0;
-	if (!(tokens = malloc(buffsize)))
+	if (!na_malloc(buffsize, (void **)&tokens))
 	{
 		ft_putstr_fd("Error malloc\n", 1);
-		return(0);
+		return (NULL);
 	}
 	token = ft_strtok(line, " \n\t\n\a");
 	while (token)
 	{
 		tokens[position] = token;
 		position++;
-		if (position >= buffsize){
+		if (position >= buffsize)
+		{
 			buffsize += 16;
 			tokens = ft_realloc(tokens, buffsize - 16, buffsize);
 			if (!tokens)
