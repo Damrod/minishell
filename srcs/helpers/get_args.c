@@ -142,6 +142,16 @@ void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize)
 	}
 }
 
+void freedblptr(void **ptrs)
+{
+	while (*ptrs)
+	{
+		free (*ptrs);
+		ptrs++;
+	}
+	return ;
+}
+
 unsigned short **get_args(const char *arg)
 {
 	size_t len;
@@ -211,12 +221,21 @@ unsigned short **get_args(const char *arg)
 	check_escaped('\0', 1);
 	size_t originalsize;
 	unsigned short **retreal;
+	unsigned short **tmp2;
 	retreal = NULL;
 	originalsize = 1;
 	i = 0;
 	while(i < len)
 	{
-		retreal = realloc(retreal, (originalsize + 1) * sizeof(*retreal));
+		tmp2 = ft_realloc(retreal, originalsize * sizeof(*retreal),
+			(originalsize + 1) * sizeof(*retreal));
+		if (!tmp2)
+		{
+			freedblptr((void **)retreal);
+			free(retreal);
+			return (NULL);
+		}
+		retreal = tmp2;
 		retreal[originalsize - 1] = ft_wstrdup(&bitmap[i], 1);
 		i += ft_wstrlen(retreal[originalsize - 1], 1);
 		while (!(bitmap[i] & 0xFF00) && bitmap[i])
@@ -232,7 +251,7 @@ int main(int argc, char **argv)
 {
 	unsigned short **str;
 	unsigned short **origstr;
-	char *normalstring;
+	char			*normalstring;
 
 	(void)argc;
 	str = get_args(argv[1]);
@@ -251,3 +270,4 @@ int main(int argc, char **argv)
 
 
 // gcc -L. -lft get_args.c libft.a -I ../incs/ -I ../libft/incs/ -I ../libft/ft_printf/incs/
+// is this a bug ./a.out "\\\' \\\" " ?
