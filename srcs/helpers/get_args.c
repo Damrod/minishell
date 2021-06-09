@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <libft.h>
 
-#define FLAG_ESCAPED (0b10000000 << 8)
-#define FLAG_SNGQUOT (0b01000000 << 8)
-#define FLAG_DBLQUOT (0b00100000 << 8)
-#define FLAG_NOTSPCE (0b00010000 << 8)
-#define FLAG_CIGNORE (0b00001000 << 8)
+#define FLAG_ESCAPED (0b01000000 << 8)
+#define FLAG_SNGQUOT (0b00100000 << 8)
+#define FLAG_DBLQUOT (0b00010000 << 8)
+#define FLAG_NOTSPCE (0b00001000 << 8)
+#define FLAG_CIGNORE (0b00000100 << 8)
 
 char	check_escaped(char c, char reset)
 {
@@ -35,14 +35,18 @@ const unsigned short	*ft_wstrchr(unsigned short c,
 	return (delim);
 }
 
-size_t	ft_wstrlen(const unsigned short *str)
+size_t	ft_wstrlen(const unsigned short *str, char ignore)
 {
 	size_t i;
 	size_t len;
+	unsigned short	bitmask;
 
+	bitmask = 0xFFFFU;
+	if (ignore)
+		bitmask = 0xFF00U;
 	i = 0;
 	len = 0;
-	while (str[i] & 0xFF00U)
+	while (str[i] & bitmask)
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			len++;
@@ -51,18 +55,22 @@ size_t	ft_wstrlen(const unsigned short *str)
 	return (len);
 }
 
-unsigned short	*ft_wstrdup(const unsigned short *str)
+unsigned short	*ft_wstrdup(const unsigned short *str, char ignore)
 {
 	unsigned short	*result;
 	size_t			len;
 	size_t			i;
+	unsigned short	bitmask;
 
-	len = ft_wstrlen(str);
+	len = ft_wstrlen(str, ignore);
 	if (!na_calloc(sizeof(*result), len + 1, (void **)&result))
 		return (NULL);
 	i = 0;
 	len = 0;
-	while (str[i] & 0xFF00U)
+	bitmask = 0xFFFFU;
+	if (ignore)
+		bitmask = 0xFF00U;
+	while (str[i] & bitmask)
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			result[len++] = str[i];
@@ -71,25 +79,26 @@ unsigned short	*ft_wstrdup(const unsigned short *str)
 	return (result);
 }
 
-char *downcast_wstr(const unsigned short *str)
+char *downcast_wstr(const unsigned short *str, char is_low)
 {
 	char	*result;
 	size_t	i;
 
-	if (!na_calloc(sizeof(*result), ft_wstrlen(str) + 1, (void **)&result))
+	if (!na_calloc(sizeof(*result), ft_wstrlen(str, 0) + 1, (void **)&result))
 		return (NULL);
 	i = 0;
 	while (str[i])
 	{
-		result[i] = str[i];
+		if(is_low)
+			result[i] = (char)str[i];
+		else
+			result[i] = (char)(str[i] >> 8);
 		i++;
 	}
 	return (result);
 }
 
-#include <stdbool.h>
-
-char isquote_not_nested_not_escaped(unsigned short c, char is_dblquotes)
+char	isquote_not_nested_not_escaped(unsigned short c, char is_dblquotes)
 {
 	char			cmp;
 	unsigned short	flag;
@@ -108,7 +117,32 @@ char isquote_not_nested_not_escaped(unsigned short c, char is_dblquotes)
 	return (0);
 }
 
-unsigned short *get_args(const char *args)
+void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize)
+{
+	void	*newptr;
+
+	if (newsize == 0)
+	{
+		free(ptr);
+		return (NULL);
+	}
+	else if (!ptr)
+		return (malloc(newsize));
+	else if (newsize <= originalsize)
+		return (ptr);
+	else
+	{
+		newptr = malloc(newsize);
+		if (newptr)
+		{
+			ft_memcpy(newptr, ptr, originalsize);
+			free(ptr);
+		}
+		return (newptr);
+	}
+}
+
+unsigned short *get_args(const char *arg)
 {
 	size_t len;
 	unsigned short *bitmap;
@@ -116,10 +150,16 @@ unsigned short *get_args(const char *args)
 	unsigned int j;
 	char insidedbl;
 	char insidesng;
+	char *args;
+	unsigned short *tmp;
 
+	args = ft_strtrim(arg, " \f\n\r\t\v");
+	len = ft_strlen(args);
 	check_escaped('\0', 1);
-	bitmap = malloc(sizeof(*bitmap) * (ft_strlen(args) + 1));
-	ft_memset(bitmap, '\0', ft_strlen(args) + 1);
+	if (len == 0)
+		return (NULL);
+	if (!na_calloc(len + 1, sizeof(*bitmap), (void **)&bitmap))
+		return NULL;
 	i = 0;
 	j = 0;
 	while (args[i])
@@ -137,6 +177,7 @@ unsigned short *get_args(const char *args)
 		i++;
 		j++;
 	}
+	free(args);
 	len = j;
 	i = 0;
 	insidedbl = 0;
@@ -156,6 +197,10 @@ unsigned short *get_args(const char *args)
 			bitmap[i] |= FLAG_CIGNORE;
 		i++;
 	}
+	tmp = ft_wstrdup(bitmap, 0);
+	free(bitmap);
+	bitmap = tmp;
+	len = ft_wstrlen(bitmap, 0);
 	i = 0;
 	while (i < len)
 	{
@@ -164,7 +209,21 @@ unsigned short *get_args(const char *args)
 		i++;
 	}
 	check_escaped('\0', 1);
-	unsigned short *ret = ft_wstrdup(bitmap);
+	/* size_t originalsize = 2; */
+	/* unsigned short **retreal; */
+	/* if (!na_calloc(2, sizeof(*retreal), (void **)&retreal)) */
+	/* 	return (NULL); */
+	/* retreal[originalsize - 1] = ft_wstrdup(bitmap); */
+	/* while(i < len) */
+	/* { */
+	/* 	if ((bitmap[i] & 0xFF00) != 0) */
+	/* 	{ */
+	/* 		ret */
+	/* 	} */
+	/* } */
+	/* char * normalstring = downcast_wstr(bitmap, 0); */
+	/* char **retreal = ft_split(normalstring, '0'); */
+	unsigned short *ret = ft_wstrdup(bitmap, 1);
 	free (bitmap);
 	return (ret);
 }
@@ -175,7 +234,7 @@ int main(int argc, char **argv)
 	char *normalstring;
 	(void)argc;
 	str = get_args(argv[1]);
-	normalstring = downcast_wstr(str);
+	normalstring = downcast_wstr(str, 1);
 	ft_printf("---%s---\n", normalstring);
 	free (str);
 	free (normalstring);
