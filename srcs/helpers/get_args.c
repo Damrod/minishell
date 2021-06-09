@@ -35,14 +35,14 @@ const unsigned short	*ft_wstrchr(unsigned short c,
 	return (delim);
 }
 
-size_t	ft_wstrlen(const unsigned short *str, char ignore)
+size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
 {
 	size_t i;
 	size_t len;
 	unsigned short	bitmask;
 
 	bitmask = 0xFFFFU;
-	if (ignore)
+	if (is_untilspace)
 		bitmask = 0xFF00U;
 	i = 0;
 	len = 0;
@@ -55,20 +55,20 @@ size_t	ft_wstrlen(const unsigned short *str, char ignore)
 	return (len);
 }
 
-unsigned short	*ft_wstrdup(const unsigned short *str, char ignore)
+unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace)
 {
 	unsigned short	*result;
 	size_t			len;
 	size_t			i;
 	unsigned short	bitmask;
 
-	len = ft_wstrlen(str, ignore);
+	len = ft_wstrlen(str, is_untilspace);
 	if (!na_calloc(sizeof(*result), len + 1, (void **)&result))
 		return (NULL);
 	i = 0;
 	len = 0;
 	bitmask = 0xFFFFU;
-	if (ignore)
+	if (is_untilspace)
 		bitmask = 0xFF00U;
 	while (str[i] & bitmask)
 	{
@@ -132,7 +132,7 @@ void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize)
 		return (ptr);
 	else
 	{
-		newptr = malloc(newsize);
+		newptr = ft_calloc(newsize, sizeof(char));
 		if (newptr)
 		{
 			ft_memcpy(newptr, ptr, originalsize);
@@ -142,7 +142,7 @@ void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize)
 	}
 }
 
-unsigned short *get_args(const char *arg)
+unsigned short **get_args(const char *arg)
 {
 	size_t len;
 	unsigned short *bitmap;
@@ -209,35 +209,43 @@ unsigned short *get_args(const char *arg)
 		i++;
 	}
 	check_escaped('\0', 1);
-	/* size_t originalsize = 2; */
-	/* unsigned short **retreal; */
-	/* if (!na_calloc(2, sizeof(*retreal), (void **)&retreal)) */
-	/* 	return (NULL); */
-	/* retreal[originalsize - 1] = ft_wstrdup(bitmap); */
-	/* while(i < len) */
-	/* { */
-	/* 	if ((bitmap[i] & 0xFF00) != 0) */
-	/* 	{ */
-	/* 		ret */
-	/* 	} */
-	/* } */
-	/* char * normalstring = downcast_wstr(bitmap, 0); */
-	/* char **retreal = ft_split(normalstring, '0'); */
-	unsigned short *ret = ft_wstrdup(bitmap, 1);
+	size_t originalsize;
+	unsigned short **retreal;
+	retreal = NULL;
+	originalsize = 1;
+	i = 0;
+	while(i < len)
+	{
+		retreal = realloc(retreal, (originalsize + 1) * sizeof(*retreal));
+		retreal[originalsize - 1] = ft_wstrdup(&bitmap[i], 1);
+		i += ft_wstrlen(retreal[originalsize - 1], 1);
+		while (!(bitmap[i] & 0xFF00) && bitmap[i])
+			i++;
+		originalsize++;
+		retreal[originalsize - 1] = NULL;
+	}
 	free (bitmap);
-	return (ret);
+	return (retreal);
 }
 
 int main(int argc, char **argv)
 {
-	unsigned short *str;
+	unsigned short **str;
+	unsigned short **origstr;
 	char *normalstring;
+
 	(void)argc;
 	str = get_args(argv[1]);
-	normalstring = downcast_wstr(str, 1);
-	ft_printf("---%s---\n", normalstring);
-	free (str);
-	free (normalstring);
+	origstr = str;
+	while (*str)
+	{
+		normalstring = downcast_wstr(*str, 1);
+		ft_printf("---%s---\n", normalstring);
+		free (*str);
+		free (normalstring);
+		str++;
+	}
+	free (origstr);
 	return (0);
 }
 
