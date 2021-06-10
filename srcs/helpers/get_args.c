@@ -2,12 +2,48 @@
 #include <string.h>
 #include <stdio.h>
 #include <libft.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #define FLAG_ESCAPED (0b01000000 << 8)
 #define FLAG_SNGQUOT (0b00100000 << 8)
 #define FLAG_DBLQUOT (0b00010000 << 8)
 #define FLAG_NOTSPCE (0b00001000 << 8)
 #define FLAG_CIGNORE (0b00000100 << 8)
+
+# define NUL 0x00
+# define SOH 0x01
+# define STX 0x02
+# define ETX 0x03
+# define EOT 0x04
+# define ENQ 0x05
+# define ACK 0x06
+# define BEL 0x07
+# define BS 0x08
+# define HT 0x09
+# define LF 0x0A
+# define VT 0x0B
+# define FF 0x0C
+# define CR 0x0D
+# define SO 0x0E
+# define SI 0x0F
+# define DLE 0x10
+# define DC1 0x11
+# define DC2 0x12
+# define DC3 0x13
+# define DC4 0x14
+# define NAK 0x15
+# define SYN 0x16
+# define ETB 0x17
+# define CAN 0x18
+# define EM 0x19
+# define SUB 0x1A
+# define FS 0x1C
+# define GS 0x1D
+# define RS 0x1E
+# define US 0x1F
+# define DEL 0x7F
+
 
 char	check_escaped(char c, char reset)
 {
@@ -253,17 +289,29 @@ int main(int argc, char **argv)
 	char			*normalstring;
 
 	(void)argc;
-	str = get_args(argv[1]);
-	origstr = str;
-	while (*str)
+	(void)argv;
+	/* str = get_args(argv[1]); */
+	while (1)
 	{
-		normalstring = downcast_wstr(*str, 1);
-		ft_printf("---%s---\n", normalstring);
-		free (*str);
-		free (normalstring);
-		str++;
+		normalstring = readline("marishell% ");
+		if (normalstring[0] == STX)
+		{
+			free(normalstring);
+			exit(0);
+		}
+		str = get_args(normalstring);
+		free(normalstring);
+		origstr = str;
+		while (*str)
+		{
+			normalstring = downcast_wstr(*str, 1);
+			ft_printf("---%s---\n", normalstring);
+			free (*str);
+			free (normalstring);
+			str++;
+		}
+		free (origstr);
 	}
-	free (origstr);
 	return (0);
 }
 
