@@ -316,5 +316,5 @@ int main(int argc, char **argv)
 }
 
 
-// gcc -L. -lft get_args.c libft.a -I ../incs/ -I ../libft/incs/ -I ../libft/ft_printf/incs/
+// gcc -L. -lft get_args.c libft.a -I ../incs/ -I ../libft/incs/ -I ../libft/ft_printf/incs/ -lreadline
 // is this a bug ./a.out "\\\' \\\" " ?
