@@ -189,15 +189,17 @@ void freedblptr(void **ptrs)
 
 unsigned short **get_args(const char *arg)
 {
-	size_t len;
-	unsigned short *bitmap;
-	unsigned int i;
-	unsigned int j;
-	char insidedbl;
-	char insidesng;
-	char *args;
-	unsigned short *tmp;
+	size_t			len;
+	unsigned short	*bitmap;
+	unsigned int	i;
+	unsigned int	j;
+	char			insidedbl;
+	char			insidesng;
+	char			*args;
+	unsigned short	*tmp;
 
+	if (!arg || ft_strlen(arg) == 0)
+		return (NULL);
 	args = ft_strtrim(arg, " \f\n\r\t\v");
 	len = ft_strlen(args);
 	check_escaped('\0', 1);
@@ -254,9 +256,10 @@ unsigned short **get_args(const char *arg)
 		i++;
 	}
 	check_escaped('\0', 1);
-	size_t originalsize;
-	unsigned short **retreal;
-	unsigned short **tmp2;
+	size_t			originalsize;
+	unsigned short	**retreal;
+	unsigned short	**tmp2;
+
 	retreal = NULL;
 	originalsize = 1;
 	i = 0;
@@ -282,36 +285,65 @@ unsigned short **get_args(const char *arg)
 	return (retreal);
 }
 
+char *singleton_string(char *inside, char reset)
+{
+	static char	*normalstring = NULL;
+	char		*aux;
+
+	if (inside)
+		normalstring = inside;
+	if (reset)
+	{
+		aux = normalstring;
+		normalstring = NULL;
+		return (aux);
+	}
+	return (normalstring);
+}
+
+#include <signal.h>
+
+void	handle_eot(int sig)
+{
+	(void) sig;
+	free(singleton_string(NULL, 1));
+	ft_printf("\n");
+	exit(0);
+}
+
 int main(int argc, char **argv)
 {
 	unsigned short **str;
 	unsigned short **origstr;
-	char			*normalstring;
 
 	(void)argc;
 	(void)argv;
-	/* str = get_args(argv[1]); */
+	str = NULL;
+	signal(SIGINT, handle_eot);
 	while (1)
 	{
-		normalstring = readline("marishell% ");
-		if (normalstring[0] == STX)
+		singleton_string(readline("marishell% "), 0);
+		if (singleton_string(NULL, 0) && singleton_string(NULL, 0)[0] == STX)
 		{
-			free(normalstring);
-			exit(0);
+			free(singleton_string(NULL, 0));
+			break ;
 		}
-		str = get_args(normalstring);
-		free(normalstring);
+		str = get_args(singleton_string(NULL, 0));
+		free(singleton_string(NULL, 1));
+		if (!str)
+			continue ;
 		origstr = str;
 		while (*str)
 		{
-			normalstring = downcast_wstr(*str, 1);
-			ft_printf("---%s---\n", normalstring);
+			singleton_string(downcast_wstr(*str, 1), 0);
+			ft_printf("---%s---\n", singleton_string(NULL, 0));
 			free (*str);
-			free (normalstring);
+			free (singleton_string(NULL, 0));
 			str++;
 		}
 		free (origstr);
 	}
+	ft_printf("\n");
 	return (0);
 }
 

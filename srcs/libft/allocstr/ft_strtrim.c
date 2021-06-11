@@ -51,7 +51,7 @@ char	*ft_strtrim(char const *s1, char const *set)
 		i++;
 	}
 	j = ft_strlen(s1) - 1;
-	while (ischrinstr(s1[j], set) && j >= 0)
+	while (j >= 0 && ischrinstr(s1[j], set))
 	{
 		len--;
 		j--;

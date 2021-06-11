@@ -66,7 +66,7 @@ OBJ_TB	= ${SRC_TB:%.c=%.o}
 OBJS	= ${SRCS:%.c=%.o}
 OBJS_B	= ${SRC_B:%.c=%.o}
 OBJ_PFT	= ${SRC_PFT:%.c=%.o}
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra -Werror -g
 CC		= gcc
 AR		= ar
 ARFLAGS	= rc
