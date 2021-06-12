@@ -98,7 +98,7 @@ char *downcast_wstr(const unsigned short *str, char is_low)
 	i = 0;
 	while (str[i])
 	{
-		if(is_low)
+		if (is_low)
 			result[i] = (char)str[i];
 		else
 			result[i] = (char)(str[i] >> 8);
@@ -150,13 +150,14 @@ void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize)
 	}
 }
 
-void freedblptr(void **ptrs)
+void	freedblptr(void **ptrs)
 {
 	while (*ptrs)
 	{
 		free (*ptrs);
 		ptrs++;
 	}
+	free(ptrs);
 	return ;
 }
 
@@ -205,7 +206,36 @@ void	config_quotes0(unsigned short *bitmap, ssize_t *dblcnf, ssize_t *sngcnf,
 	}
 }
 
-unsigned short **get_args(const char *arg)
+unsigned short	**ft_wstrsplit(unsigned short *bitmap, size_t len)
+{
+	size_t			i;
+	size_t			size;
+	unsigned short	**ret;
+	unsigned short	**tmp;
+
+	ret = NULL;
+	size = 1;
+	i = 0;
+	while (i < len)
+	{
+		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp));
+		if (!tmp)
+		{
+			freedblptr((void **)ret);
+			return (NULL);
+		}
+		ret = tmp;
+		ret[size - 1] = ft_wstrdup(&bitmap[i], 1);
+		i += ft_wstrlen(ret[size - 1], 1);
+		while (!(bitmap[i] & 0xFF00) && bitmap[i])
+			i++;
+		size++;
+		ret[size - 1] = NULL;
+	}
+	return (ret);
+}
+
+unsigned short	**get_args(const char *arg)
 {
 	size_t			len;
 	unsigned short	*bitmap;
@@ -256,31 +286,8 @@ unsigned short **get_args(const char *arg)
 				  bitmap[i] & 0xFF);
 		i++;
 	}
-	size_t			originalsize;
 	unsigned short	**retreal;
-	unsigned short	**tmp2;
-
-	retreal = NULL;
-	originalsize = 1;
-	i = 0;
-	while (i < len)
-	{
-		tmp2 = ft_realloc(retreal, originalsize * sizeof(*retreal),
-				(originalsize + 1) * sizeof(*retreal));
-		if (!tmp2)
-		{
-			freedblptr((void **)retreal);
-			free(retreal);
-			return (NULL);
-		}
-		retreal = tmp2;
-		retreal[originalsize - 1] = ft_wstrdup(&bitmap[i], 1);
-		i += ft_wstrlen(retreal[originalsize - 1], 1);
-		while (!(bitmap[i] & 0xFF00) && bitmap[i])
-			i++;
-		originalsize++;
-		retreal[originalsize - 1] = NULL;
-	}
+	retreal = ft_wstrsplit(bitmap, len);
 	free (bitmap);
 	return (retreal);
 }
