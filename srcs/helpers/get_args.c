@@ -44,33 +44,6 @@
 # define US 0x1F
 # define DEL 0x7F
 
-
-char	check_escaped(char c, char reset)
-{
-	static char	escaped = 0;
-
-	if (reset)
-		return (escaped = 0);
-	if (c == '\\' && !escaped)
-		return (++escaped);
-	escaped = 0;
-	return (0);
-}
-
-const unsigned short	*ft_wstrchr(unsigned short c,
-									const unsigned short *delim)
-{
-	while (*delim & 0xFF00U)
-	{
-		if (*delim == c)
-			break ;
-		delim++;
-	}
-	if (*delim != c)
-		return (NULL);
-	return (delim);
-}
-
 size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
 {
 	size_t i;
@@ -247,11 +220,10 @@ unsigned short **get_args(const char *arg)
 	char			*args;
 	unsigned short	*tmp;
 
-	if (!arg || ft_strlen(arg) == 0)
+	if (!arg)
 		return (NULL);
 	args = ft_strtrim(arg, " \f\n\r\t\v");
 	len = ft_strlen(args);
-	check_escaped('\0', 1);
 	if (len == 0)
 		return (NULL);
 	if (!na_calloc(len + 1, sizeof(*bitmap), (void **)&bitmap))
@@ -287,7 +259,6 @@ unsigned short **get_args(const char *arg)
 				  bitmap[i] & 0xFF);
 		i++;
 	}
-	check_escaped('\0', 1);
 	size_t			originalsize;
 	unsigned short	**retreal;
 	unsigned short	**tmp2;
@@ -317,28 +288,24 @@ unsigned short **get_args(const char *arg)
 	return (retreal);
 }
 
-char *singleton_string(char *inside, char reset)
-{
-	static char	*normalstring = NULL;
-	char		*aux;
+#include <signal.h>
 
-	if (inside)
-		normalstring = inside;
-	if (reset)
-	{
-		aux = normalstring;
-		normalstring = NULL;
-		return (aux);
-	}
-	return (normalstring);
+typedef struct s_term {
+	char	*inputstring;
+}	t_term;
+
+void specialfree(void **tofree)
+{
+	free(*tofree);
+	*tofree = NULL;
 }
 
-#include <signal.h>
+t_term	g_term = {.inputstring = NULL };
 
 void	handle_eot(int sig)
 {
 	(void) sig;
-	free(singleton_string(NULL, 1));
+	specialfree((void**)&g_term.inputstring);
 	ft_printf("\n");
 	exit(0);
 }
@@ -355,26 +322,26 @@ int main(int argc, char **argv)
 	signal(SIGQUIT, handle_eot);
 	while (1)
 	{
-		singleton_string(readline("marishell% "), 0);
-		if (singleton_string(NULL, 0) && singleton_string(NULL, 0)[0] == STX)
+		g_term.inputstring = readline("marishell% ");
+		if (g_term.inputstring && g_term.inputstring[0] == STX)
 		{
-			free(singleton_string(NULL, 0));
+			specialfree((void**)&g_term.inputstring);
 			break ;
 		}
-		str = get_args(singleton_string(NULL, 0));
-		free(singleton_string(NULL, 1));
+		str = get_args(g_term.inputstring);
+		specialfree((void**)&g_term.inputstring);
 		if (!str)
 			continue ;
 		origstr = str;
 		while (*str)
 		{
-			singleton_string(downcast_wstr(*str, 1), 0);
-			ft_printf("---%s---\n", singleton_string(NULL, 0));
+			g_term.inputstring = downcast_wstr(*str, 1);
+			ft_printf("---%s---\n", g_term.inputstring);
 			free (*str);
-			free (singleton_string(NULL, 0));
+			specialfree ((void**)&g_term.inputstring);
 			str++;
 		}
-		free (origstr);
+		free(origstr);
 	}
 	ft_printf("\n");
 	return (0);
