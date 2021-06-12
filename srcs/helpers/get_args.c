@@ -210,7 +210,6 @@ unsigned short **get_args(const char *arg)
 	size_t			len;
 	unsigned short	*bitmap;
 	unsigned int	i;
-	unsigned int	j;
 	ssize_t			dblcnf[2];
 	/* ssize_t			insidedbl == dblcnf[0] */
 	/* ssize_t			dblquotecount == dblcnf[1] */
@@ -233,21 +232,19 @@ unsigned short **get_args(const char *arg)
 	sngcnf[1] = 0;
 	dblcnf[1] = 0;
 	i = 0;
-	j = 0;
 	while (args[i])
 	{
-		bitmap[j] |= args[i];
-		if (!ft_isspace(bitmap[j] & 0xFF))
-			bitmap[j] |= FLAG_NOTSPCE;
-		if ((bitmap[j] & 0xFF) == '\'')
+		bitmap[i] |= args[i];
+		if (!ft_isspace(bitmap[i] & 0xFF))
+			bitmap[i] |= FLAG_NOTSPCE;
+		if ((bitmap[i] & 0xFF) == '\'')
 			sngcnf[1]++;
-		if ((bitmap[j] & 0xFF) == '"')
+		if ((bitmap[i] & 0xFF) == '"')
 			dblcnf[1]++;
 		i++;
-		j++;
 	}
 	free(args);
-	config_quotes0(bitmap, dblcnf, sngcnf, j);
+	config_quotes0(bitmap, dblcnf, sngcnf, i);
 	tmp = ft_wstrdup(bitmap, 0);
 	free(bitmap);
 	bitmap = tmp;
