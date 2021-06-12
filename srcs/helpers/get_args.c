@@ -187,14 +187,67 @@ void freedblptr(void **ptrs)
 	return ;
 }
 
+char	config_quotes(ssize_t insideother, ssize_t selfcnf[2],
+			unsigned short bitmap, char is_single)
+{
+	char	cmp;
+
+	cmp = '"';
+	if (is_single)
+		cmp = '\'';
+	if (!insideother && (bitmap & ~FLAG_NOTSPCE) == (short) cmp)
+	{
+		if (selfcnf[1] && (selfcnf[1])--)
+			selfcnf[0] ^= 1;
+		else
+			selfcnf[1] = -1;
+	}
+	return (selfcnf[0]);
+}
+
+/* char	configchar(char is_dbl) */
+/* { */
+/* 	ssize_t			sngquotecount; */
+/* 	ssize_t			dblquotecount; */
+
+/* 	if (!insidesng && (bitmap[i] & ~FLAG_NOTSPCE) == (short) '"') */
+/* 	{ */
+/* 		if (dblquotecount && dblquotecount--) */
+/* 			insidedbl ^= 1; */
+/* 		else */
+/* 			dblquotecount = -1; */
+/* 	} */
+/* 	if (!insidedbl && (bitmap[i] & ~FLAG_NOTSPCE) == (short) '\'') */
+/* 	{ */
+/* 		if (sngquotecount && sngquotecount--) */
+/* 			insidesng ^= 1; */
+/* 		else */
+/* 			sngquotecount = -1; */
+/* 	} */
+/* 	if (insidedbl) */
+/* 		bitmap[i] |= FLAG_DBLQUOT; */
+/* 	if (dblquotecount == -1 || sngquotecount == -1) */
+/* 		bitmap[i] |= FLAG_ESCAPED; */
+/* 	if (insidesng) */
+/* 		bitmap[i] |= FLAG_SNGQUOT; */
+/* 	if (isquote_not_nested_not_escaped(bitmap[i], 0) */
+/* 		|| isquote_not_nested_not_escaped(bitmap[i], 1)) */
+/* 		bitmap[i] |= FLAG_CIGNORE; */
+/* 	i++; */
+/* } */
+
 unsigned short **get_args(const char *arg)
 {
 	size_t			len;
 	unsigned short	*bitmap;
 	unsigned int	i;
 	unsigned int	j;
-	char			insidedbl;
-	char			insidesng;
+	ssize_t			dblcnf[2];
+	/* ssize_t			insidedbl == dblcnf[0] */
+	/* ssize_t			dblquotecount; == dblcnf[1] */
+	ssize_t			sngcnf[2];
+	/* ssize_t			insidesng == sngcnf[0] */
+	/* ssize_t			sngquotecount; == sngcnf[1] */
 	char			*args;
 	unsigned short	*tmp;
 
@@ -207,38 +260,48 @@ unsigned short **get_args(const char *arg)
 		return (NULL);
 	if (!na_calloc(len + 1, sizeof(*bitmap), (void **)&bitmap))
 		return NULL;
+	sngcnf[1] = 0;
+	dblcnf[1] = 0;
 	i = 0;
 	j = 0;
 	while (args[i])
 	{
-		if (check_escaped(args[i], 0))
-		{
-			bitmap[j] |= FLAG_ESCAPED;
-			i++;
-			bitmap[j] |= args[i];
-			continue ;
-		}
+		/* if (check_escaped(args[i], 0)) */
+		/* { */
+		/* 	bitmap[j] |= FLAG_ESCAPED; */
+		/* 	i++; */
+		/* 	bitmap[j] |= args[i]; */
+		/* 	continue ; */
+		/* } */
 		bitmap[j] |= args[i];
 		if (!ft_isspace(bitmap[j] & 0xFF))
 			bitmap[j] |= FLAG_NOTSPCE;
+		if ((bitmap[j] & 0xFF) == '\'')
+			sngcnf[1]++;
+		if ((bitmap[j] & 0xFF) == '"')
+			dblcnf[1]++;
 		i++;
 		j++;
 	}
 	free(args);
 	len = j;
 	i = 0;
-	insidedbl = 0;
-	insidesng = 0;
+	dblcnf[0] = 0;
+	sngcnf[0] = 0;
+	sngcnf[1] -= (sngcnf[1] % 2);
+	dblcnf[1] -= (dblcnf[1] % 2);
 	while (i < len)
 	{
-		if (!insidesng && (bitmap[i] & ~FLAG_NOTSPCE) == (short)'"')
-			insidedbl ^= 1;
-		if (!insidedbl && (bitmap[i] & ~FLAG_NOTSPCE) == (short)'\'')
-			insidesng ^= 1;
-		if (insidedbl)
+		if (!config_quotes(sngcnf[0], dblcnf, bitmap[i], 0))
+			config_quotes(dblcnf[0], sngcnf, bitmap[i], 1);
+		if (dblcnf[0])
 			bitmap[i] |= FLAG_DBLQUOT;
-		if (insidesng)
+		if (dblcnf[1] == -1 && ft_memset(&dblcnf[1], 0, sizeof(dblcnf[1])))
+			bitmap[i] |= FLAG_ESCAPED;
+		if (sngcnf[0])
 			bitmap[i] |= FLAG_SNGQUOT;
+		if (sngcnf[1] == -1 && ft_memset(&sngcnf[1], 0, sizeof(sngcnf[1])))
+			bitmap[i] |= FLAG_ESCAPED;
 		if (isquote_not_nested_not_escaped(bitmap[i], 0)
 			|| isquote_not_nested_not_escaped(bitmap[i], 1))
 			bitmap[i] |= FLAG_CIGNORE;
@@ -263,10 +326,10 @@ unsigned short **get_args(const char *arg)
 	retreal = NULL;
 	originalsize = 1;
 	i = 0;
-	while(i < len)
+	while (i < len)
 	{
 		tmp2 = ft_realloc(retreal, originalsize * sizeof(*retreal),
-			(originalsize + 1) * sizeof(*retreal));
+				(originalsize + 1) * sizeof(*retreal));
 		if (!tmp2)
 		{
 			freedblptr((void **)retreal);
@@ -320,6 +383,7 @@ int main(int argc, char **argv)
 	(void)argv;
 	str = NULL;
 	signal(SIGINT, handle_eot);
+	signal(SIGQUIT, handle_eot);
 	while (1)
 	{
 		singleton_string(readline("marishell% "), 0);
