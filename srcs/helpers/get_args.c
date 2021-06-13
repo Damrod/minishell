@@ -164,7 +164,7 @@ void	freedblptr(void **ptrs)
 	return ;
 }
 
-unsigned short	**ft_wstrsplit(unsigned short *bitmap, size_t len)
+unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 {
 	size_t			i;
 	size_t			size;
@@ -174,7 +174,7 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap, size_t len)
 	ret = NULL;
 	size = 1;
 	i = 0;
-	while (i < len)
+	while (bitmap[i])
 	{
 		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp));
 		if (!tmp)
@@ -185,7 +185,7 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap, size_t len)
 		ret = tmp;
 		ret[size - 1] = ft_wstrdup(&bitmap[i], 1);
 		i += ft_wstrlen(ret[size - 1], 1);
-		while (!(bitmap[i] & 0xFF00) && bitmap[i])
+		while (bitmap[i] && !(bitmap[i] & 0xFF00))
 			i++;
 		size++;
 		ret[size - 1] = NULL;
@@ -218,10 +218,25 @@ ssize_t	toggle_inside_quote(ssize_t insideother, ssize_t selfcnf[2],
 	return (*selfinside);
 }
 
-void	config_quotes(unsigned short *bitmap)
+void	config_quotes(unsigned short *bitmap, unsigned short *prev_dbl,
+			unsigned short *prev_sng, size_t len)
 {
 	size_t	i;
 
+	if ((bitmap[len - 1] & 0xFF) != '"' && (bitmap[len - 1] & FLAG_DBLQUOT))
+	{
+		(*prev_dbl) |= FLAG_ESCAPED;
+		i = 0;
+		while (prev_dbl[i])
+			prev_dbl[i++] &= ~FLAG_DBLQUOT;
+	}
+	if ((bitmap[len - 1] & 0xFF) != '\'' && (bitmap[len - 1] & FLAG_SNGQUOT))
+	{
+		(*prev_sng) |= FLAG_ESCAPED;
+		i = 0;
+		while (prev_sng[i])
+			prev_sng[i++] &= ~FLAG_SNGQUOT;
+	}
 	i = 0;
 	while (bitmap[i])
 	{
@@ -232,7 +247,7 @@ void	config_quotes(unsigned short *bitmap)
 	}
 }
 
-ssize_t	toggle_inside_quote0(ssize_t insideother, ssize_t	*selfinside,
+ssize_t	toggle_inside_quote0(ssize_t insideother, ssize_t *selfinside,
 			unsigned short bitmap, char is_single)
 {
 	char	cmp;
@@ -245,11 +260,10 @@ ssize_t	toggle_inside_quote0(ssize_t insideother, ssize_t	*selfinside,
 	return (*selfinside);
 }
 
-void	upcast_config(unsigned short *bitmap, char *args, ssize_t sngcnf[2],
-			ssize_t dblcnf[2])
+void	upcast_config(unsigned short *bitmap, char *args, ssize_t inside_sng,
+			ssize_t inside_dbl)
 {
 	ssize_t			i;
-	ssize_t			j;
 	unsigned short	*prev_dbl;
 	unsigned short	*prev_sng;
 
@@ -259,11 +273,11 @@ void	upcast_config(unsigned short *bitmap, char *args, ssize_t sngcnf[2],
 		bitmap[i] |= args[i];
 		if (!ft_isspace(bitmap[i] & 0xFF))
 			bitmap[i] |= FLAG_NOTSPCE;
-		if (!toggle_inside_quote0(sngcnf[0], &dblcnf[0], bitmap[i], 0))
-			toggle_inside_quote0(dblcnf[0], &sngcnf[0], bitmap[i], 1);
-		if (dblcnf[0])
+		if (!toggle_inside_quote0(inside_sng, &inside_dbl, bitmap[i], 0))
+			toggle_inside_quote0(inside_dbl, &inside_sng, bitmap[i], 1);
+		if (inside_dbl)
 			bitmap[i] |= FLAG_DBLQUOT;
-		if (sngcnf[0])
+		if (inside_sng)
 			bitmap[i] |= FLAG_SNGQUOT;
 		if ((bitmap[i] & 0xFF) == '\'')
 			prev_sng = &bitmap[i];
@@ -272,21 +286,7 @@ void	upcast_config(unsigned short *bitmap, char *args, ssize_t sngcnf[2],
 		i++;
 	}
 	free (args);
-	if ((bitmap[i - 1] & 0xFF) != '"' && (bitmap[i - 1] & FLAG_DBLQUOT))
-	{
-		(*prev_dbl) |= FLAG_ESCAPED;
-		j = 0;
-		while (prev_dbl[j])
-			prev_dbl[j++] &= ~FLAG_DBLQUOT;
-	}
-	if ((bitmap[i - 1] & 0xFF) != '\'' && (bitmap[i - 1] & FLAG_SNGQUOT))
-	{
-		(*prev_sng) |= FLAG_ESCAPED;
-		j = 0;
-		while (prev_sng[j])
-			prev_sng[j++] &= ~FLAG_SNGQUOT;
-	}
-	config_quotes(bitmap);
+	config_quotes(bitmap, prev_dbl, prev_sng, i);
 }
 
 unsigned short	**get_args(const char *arg)
@@ -294,14 +294,9 @@ unsigned short	**get_args(const char *arg)
 	size_t			len;
 	unsigned short	*bitmap;
 	unsigned int	i;
-	ssize_t			dblcnf[2];
-	/* ssize_t			insidedbl == dblcnf[0] */
-	/* ssize_t			dblquotecount == dblcnf[1] */
-	ssize_t			sngcnf[2];
-	/* ssize_t			insidesng == sngcnf[0] */
-	/* ssize_t			sngquotecount == sngcnf[1] */
 	char			*args;
 	unsigned short	*tmp;
+	unsigned short	**retreal;
 
 	if (!arg)
 		return (NULL);
@@ -309,12 +304,7 @@ unsigned short	**get_args(const char *arg)
 	len = ft_strlen(args);
 	if (len == 0 || !na_calloc(len + 1, sizeof(*bitmap), (void **)&bitmap))
 		return (NULL);
-	dblcnf[0] = 0;
-	sngcnf[0] = 0;
-	sngcnf[1] = 0;
-	dblcnf[1] = 0;
-	upcast_config(bitmap, args, sngcnf, dblcnf);
-	/* free(args); */
+	upcast_config(bitmap, args, 0, 0);
 	tmp = ft_wstrdup(bitmap, 0);
 	free(bitmap);
 	bitmap = tmp;
@@ -326,8 +316,7 @@ unsigned short	**get_args(const char *arg)
 				  bitmap[i] & 0xFF);
 		i++;
 	}
-	unsigned short	**retreal;
-	retreal = ft_wstrsplit(bitmap, len);
+	retreal = ft_wstrsplit(bitmap);
 	free (bitmap);
 	return (retreal);
 }
