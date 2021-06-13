@@ -218,15 +218,14 @@ ssize_t	toggle_inside_quote(ssize_t insideother, ssize_t selfcnf[2],
 	return (*selfinside);
 }
 
-void	config_quotes(unsigned short *bitmap, ssize_t *dblcnf, ssize_t *sngcnf,
-					  size_t len)
+void	config_quotes(unsigned short *bitmap, ssize_t *dblcnf, ssize_t *sngcnf)
 {
 	size_t	i;
 
 	i = 0;
 	sngcnf[1] -= sngcnf[1] & 1;
 	dblcnf[1] -= dblcnf[1] & 1;
-	while (i < len)
+	while (bitmap[i])
 	{
 		if (!toggle_inside_quote(sngcnf[0], dblcnf, bitmap[i], 0))
 			toggle_inside_quote(dblcnf[0], sngcnf, bitmap[i], 1);
@@ -270,6 +269,25 @@ ssize_t	toggle_inside_quote0(ssize_t insideother, ssize_t selfcnf[2],
 	return (*selfinside);
 }
 
+void	upcast_config(unsigned short *bitmap, char *args, ssize_t sngcnf[2],
+			ssize_t dblcnf[2])
+{
+	ssize_t i;
+
+	i = 0;
+	while (args[i])
+	{
+		bitmap[i] |= args[i];
+		if (!ft_isspace(bitmap[i] & 0xFF))
+			bitmap[i] |= FLAG_NOTSPCE;
+		if ((bitmap[i] & 0xFF) == '\'')
+			sngcnf[1]++;
+		if ((bitmap[i] & 0xFF) == '"')
+			dblcnf[1]++;
+		i++;
+	}
+}
+
 unsigned short	**get_args(const char *arg)
 {
 	size_t			len;
@@ -294,20 +312,9 @@ unsigned short	**get_args(const char *arg)
 	sngcnf[0] = 0;
 	sngcnf[1] = 0;
 	dblcnf[1] = 0;
-	i = 0;
-	while (args[i])
-	{
-		bitmap[i] |= args[i];
-		if (!ft_isspace(bitmap[i] & 0xFF))
-			bitmap[i] |= FLAG_NOTSPCE;
-		if ((bitmap[i] & 0xFF) == '\'')
-			sngcnf[1]++;
-		if ((bitmap[i] & 0xFF) == '"')
-			dblcnf[1]++;
-		i++;
-	}
+	upcast_config(bitmap, args, sngcnf, dblcnf);
 	free(args);
-	config_quotes(bitmap, dblcnf, sngcnf, i);
+	config_quotes(bitmap, dblcnf, sngcnf);
 	tmp = ft_wstrdup(bitmap, 0);
 	free(bitmap);
 	bitmap = tmp;
