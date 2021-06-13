@@ -193,31 +193,6 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 	return (ret);
 }
 
-ssize_t	toggle_inside_quote(ssize_t insideother, ssize_t selfcnf[2],
-			unsigned short bitmap, char is_single)
-{
-	char	cmp;
-	ssize_t	*selfinside;
-	ssize_t	*selfcount;
-
-	selfinside = &selfcnf[0];
-	selfcount = &selfcnf[1];
-	cmp = '"';
-	if (is_single)
-		cmp = '\'';
-	if (!insideother && (bitmap & ~FLAG_NOTSPCE) == (short) cmp)
-	{
-		if (selfcnf[1])
-		{
-			*selfinside ^= 1;
-			(*selfcount)--;
-		}
-		else
-			*selfcount = -1;
-	}
-	return (*selfinside);
-}
-
 void	config_quotes(unsigned short *bitmap, unsigned short *prev_dbl,
 			unsigned short *prev_sng, size_t len)
 {
@@ -247,7 +222,7 @@ void	config_quotes(unsigned short *bitmap, unsigned short *prev_dbl,
 	}
 }
 
-ssize_t	toggle_inside_quote0(ssize_t insideother, ssize_t *selfinside,
+ssize_t	toggle_inside_quote(ssize_t insideother, ssize_t *selfinside,
 			unsigned short bitmap, char is_single)
 {
 	char	cmp;
@@ -273,8 +248,8 @@ void	upcast_config(unsigned short *bitmap, char *args, ssize_t inside_sng,
 		bitmap[i] |= args[i];
 		if (!ft_isspace(bitmap[i] & 0xFF))
 			bitmap[i] |= FLAG_NOTSPCE;
-		if (!toggle_inside_quote0(inside_sng, &inside_dbl, bitmap[i], 0))
-			toggle_inside_quote0(inside_dbl, &inside_sng, bitmap[i], 1);
+		if (!toggle_inside_quote(inside_sng, &inside_dbl, bitmap[i], 0))
+			toggle_inside_quote(inside_dbl, &inside_sng, bitmap[i], 1);
 		if (inside_dbl)
 			bitmap[i] |= FLAG_DBLQUOT;
 		if (inside_sng)
@@ -285,7 +260,6 @@ void	upcast_config(unsigned short *bitmap, char *args, ssize_t inside_sng,
 			prev_dbl = &bitmap[i];
 		i++;
 	}
-	free (args);
 	config_quotes(bitmap, prev_dbl, prev_sng, i);
 }
 
@@ -293,7 +267,6 @@ unsigned short	**get_args(const char *arg)
 {
 	size_t			len;
 	unsigned short	*bitmap;
-	unsigned int	i;
 	char			*args;
 	unsigned short	*tmp;
 	unsigned short	**retreal;
@@ -301,21 +274,18 @@ unsigned short	**get_args(const char *arg)
 	if (!arg)
 		return (NULL);
 	args = ft_strtrim(arg, " \f\n\r\t\v");
+	if (!args)
+		return (NULL);
 	len = ft_strlen(args);
 	if (len == 0 || !na_calloc(len + 1, sizeof(*bitmap), (void **)&bitmap))
 		return (NULL);
 	upcast_config(bitmap, args, 0, 0);
+	free (args);
 	tmp = ft_wstrdup(bitmap, 0);
+	if (!tmp)
+		return (NULL);
 	free(bitmap);
 	bitmap = tmp;
-	len = ft_wstrlen(bitmap, 0);
-	i = 0;
-	while (i < len)
-	{
-		ft_printf("%.2u binary is 0b%.8b char is: %c\n", i, bitmap[i] >> 8,
-				  bitmap[i] & 0xFF);
-		i++;
-	}
 	retreal = ft_wstrsplit(bitmap);
 	free (bitmap);
 	return (retreal);
@@ -358,11 +328,11 @@ int main(int argc, char **argv)
 		g_term.inputstring = readline("marishell% ");
 		if (g_term.inputstring && g_term.inputstring[0] == STX)
 		{
-			specialfree((void**)&g_term.inputstring);
+			specialfree((void **)&g_term.inputstring);
 			break ;
 		}
 		str = get_args(g_term.inputstring);
-		specialfree((void**)&g_term.inputstring);
+		specialfree((void **)&g_term.inputstring);
 		if (!str)
 			continue ;
 		origstr = str;
