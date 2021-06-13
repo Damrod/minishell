@@ -193,19 +193,19 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 	return (ret);
 }
 
-void	config_quotes(unsigned short *bitmap, unsigned short *prev_dbl,
-			unsigned short *prev_sng, size_t len)
+void	config_quotes(unsigned short *map, unsigned short *prev_dbl,
+			unsigned short *prev_sng, size_t sz)
 {
 	size_t	i;
 
-	if ((bitmap[len - 1] & 0xFF) != '"' && (bitmap[len - 1] & FLAG_DBLQUOT))
+	if (sz > 0 && (map[sz - 1] & 0xFF) != '"' && (map[sz - 1] & FLAG_DBLQUOT))
 	{
 		(*prev_dbl) |= FLAG_ESCAPED;
 		i = 0;
 		while (prev_dbl[i])
 			prev_dbl[i++] &= ~FLAG_DBLQUOT;
 	}
-	if ((bitmap[len - 1] & 0xFF) != '\'' && (bitmap[len - 1] & FLAG_SNGQUOT))
+	if (sz > 0 && (map[sz - 1] & 0xFF) != '\'' && (map[sz - 1] & FLAG_SNGQUOT))
 	{
 		(*prev_sng) |= FLAG_ESCAPED;
 		i = 0;
@@ -213,11 +213,11 @@ void	config_quotes(unsigned short *bitmap, unsigned short *prev_dbl,
 			prev_sng[i++] &= ~FLAG_SNGQUOT;
 	}
 	i = 0;
-	while (bitmap[i])
+	while (map[i])
 	{
-		if (isquote_not_nested_not_escaped(bitmap[i], 0)
-			|| isquote_not_nested_not_escaped(bitmap[i], 1))
-			bitmap[i] |= FLAG_CIGNORE;
+		if (isquote_not_nested_not_escaped(map[i], 0)
+			|| isquote_not_nested_not_escaped(map[i], 1))
+			map[i] |= FLAG_CIGNORE;
 		i++;
 	}
 }
