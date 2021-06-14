@@ -41,7 +41,7 @@ SRCS	= noassign/na_malloc.c memory/ft_bzero.c memory/ft_memcmp.c			   \
 		  strutils/ft_isspace_adv.c strutils/ft_strmapi.c					   \
 		  strutils/get_next_line.c atoi/ft_atoi.c output/ft_putendl_fd.c	   \
 		  output/ft_putchar_fd.c output/ft_putstr_fd.c output/ft_putnbr_fd.c   \
-		  mlx/ft_algebra.c mlx/mlx_protect.c string/ft_strlcpy.c			   \
+		   string/ft_strlcpy.c			   \
 		  string/ft_strnstr.c string/ft_strchr.c string/ft_strlen.c			   \
 		  string/ft_strlcat.c string/ft_strncmp.c string/ft_strrchr.c
 SRC_PFT	= ft_printf/srcs/ft_formattypes.c ft_printf/srcs/ft_float1.c		   \
@@ -66,7 +66,7 @@ OBJ_TB	= ${SRC_TB:%.c=%.o}
 OBJS	= ${SRCS:%.c=%.o}
 OBJS_B	= ${SRC_B:%.c=%.o}
 OBJ_PFT	= ${SRC_PFT:%.c=%.o}
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra -Werror -g
 CC		= gcc
 AR		= ar
 ARFLAGS	= rc
