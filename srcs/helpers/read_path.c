@@ -59,18 +59,18 @@ void	read_path(t_tab *t, char **env)
 	//free(t->path);
 }
 
-int main(int argc, char **argv, char **environ)
-{
-	t_tab	tab;
-	char **strings;
+/* int main(int argc, char **argv, char **environ) */
+/* { */
+/* 	t_tab	tab; */
+/* 	char **strings; */
 
-	read_path(&tab, environ);
-	strings = ft_split(getenv("PATH"), ':');
-	while (*tab.path)
-	{
-		ft_printf("\"%s\"\n", *strings);
-		ft_printf("\"%s\"\n", *tab.path);
-		tab.path++;
-		strings++;
-	}
-}
+/* 	read_path(&tab, environ); */
+/* 	strings = ft_split(getenv("PATH"), ':'); */
+/* 	while (*tab.path) */
+/* 	{ */
+/* 		ft_printf("\"%s\"\n", *strings); */
+/* 		ft_printf("\"%s\"\n", *tab.path); */
+/* 		tab.path++; */
+/* 		strings++; */
+/* 	} */
+/* } */

@@ -10,25 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <minishell0.h>
 #include <minishell.h>
 
-char	*read_line(t_tab *t)
-{
-//	char	*line;
-
-//	line = NULL;
-	get_next_line(0, &t->line);
-	// creo que este get_next_line debería tener un tamaño de buffer de 1
-	// y debería retornar si pilla algo especial, por ejemplo Ctrl+\, Ctrl + C
-	// o Ctrl+ D
-	return (t->line);
-}
-
-void	initt(t_tab *t)
-{
-	t->line = NULL;
-	t->path = NULL;
-}
+t_term	g_term = {.inputstring = NULL };
 
 void	ft_alloc_env(t_tab *t, char **env)
 {
@@ -43,11 +28,8 @@ void	ft_alloc_env(t_tab *t, char **env)
 	i = 0;
 	while (env[i])
 	{
-		j = 0;
-		while (env[i][j])
-			j++; // Esto es lo mismo que esto: j = ft_strlen(env[i])
+		j = ft_strlen(env[i]);
 		t->our_env[i] = (char *)malloc(sizeof(char) * (j + 1));
-		/* sizeof(char) es siempre == 1; y es sizeof(char), no sizeof(char *) */
 		i++;
 	}
 }
@@ -83,66 +65,73 @@ void	ft_order_list(t_tab *t, t_dlist *lst, int i)
 	}
 }
 
-void	ft_miniloop(t_tab *t, t_dlist *lst)
+void specialfree(void **tofree)
 {
-	int	i;
-
-	while (1)
-	{
-		i = 0;
-		ft_putstr_fd("marishell% ", 1);
-		//pillar signals
-		t->line = read_line(t);
-		//care quotes
-		t->orders = ft_split(t->line, ';'); // si no entiendo mal, la idea es:
-		// un comando compuesto es una secuencia válida de comandos en una
-		// línea, independiendemente de si están separados por | o ;. El | o
-		// ; al final de un comando simple es lo que nos proporciona el tipo
-		// de comando simple que estamos tratando. Nos da la clave sobre cómo
-		// redireccionar input y output, y nos dice qué tiene que hacer la shell
-		// mientras espera que el comando hijo sea ejecutado.
-		// Desde mi punto de vista t_tab->orders debería ser cada uno de los
-		// comandos simples, y cada uno de ellos debería ser un nodo de la lista
-		free(t->line);
-		ft_order_list(t, lst, i);
-	}
+	free(*tofree);
+	*tofree = NULL;
 }
 
-int	main(int argc, char **argv, char **env)
+char	*downcast_wstr(const unsigned short *str, char is_low)
 {
-	t_tab	*t;
-	t_dlist	*lst;
-//	int		i;
+	char	*result;
+	size_t	i;
+
+	if (!na_calloc(sizeof(*result), ft_wstrlen(str, UNTIL_END_OF_STRING) + 1,
+			(void **)&result))
+		return (NULL);
+	i = 0;
+	while (str[i])
+	{
+		if (is_low)
+			result[i] = (char)str[i];
+		else
+			result[i] = (char)(str[i] >> 8);
+		i++;
+	}
+	return (result);
+}
+
+void	handle_eot(int sig)
+{
+	(void) sig;
+	specialfree((void **)&g_term.inputstring);
+	ft_printf("\n");
+	exit(0);
+}
+
+int	main(int argc, char **argv)
+{
+	unsigned short	**str;
+	unsigned short	**origstr;
 
 	(void)argc;
 	(void)argv;
-	lst = NULL;
-	t = malloc (sizeof(t_tab));
-	initt(t);
-
-	ft_copy_env(t, env);
-	ft_miniloop(t, lst);
-
-/*	caca anterior
+	str = NULL;
+	signal(SIGINT, handle_eot);
+	signal(SIGQUIT, handle_eot);
 	while (1)
 	{
-		i = 0;
-		ft_putstr_fd("marishell% ", 1);
-		t->line = read_line(t);
-		t->orders = ft_split(t->line, ';');
-		while (t->orders[i])
+		g_term.inputstring = readline("marishell% ");
+		if (g_term.inputstring && g_term.inputstring[0] == STX)
 		{
-			t->tokens = ft_split_com(t->orders[i], ' ',t);
-			if(check_our_implement(t))
-			{
-			//	read_path(t, env);
-			//	check_path(t, env);
-			}
-			i++;
-			free(t->tokens);
+			specialfree((void **)&g_term.inputstring);
+			break ;
 		}
-		free(t->orders);
+		str = get_args(g_term.inputstring);
+		specialfree((void **)&g_term.inputstring);
+		if (!str)
+			continue ;
+		origstr = str;
+		while (*str)
+		{
+			g_term.inputstring = downcast_wstr(*str, 1);
+			ft_printf("---%s---\n", g_term.inputstring);
+			free (*str);
+			specialfree ((void **)&g_term.inputstring);
+			str++;
+		}
+		free(origstr);
 	}
-*/
-
+	ft_printf("\n");
+	return (0);
 }
