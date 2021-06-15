@@ -264,7 +264,7 @@ void	upcast_config(unsigned short *bitmap, char *args, ssize_t inside_sng,
 }
 
 ///potato
-int join_var(unsigned short **bitmap, int i, char *var)
+int join_var(unsigned short **bitmap, int i, char **var)
 {
 	int j;
 	int flags;
@@ -274,13 +274,13 @@ int join_var(unsigned short **bitmap, int i, char *var)
 	unsigned short *tempbitmap;
 
 	paracortes = i;
-	varsize = ft_strlen(var);
+	varsize = ft_strlen(*var);
 	//esto supongo que no es necesario asi
 	flags = 0;
 	flags |= (*bitmap)[i] >> 8;
-	if(!(var = getenv(var)))
-		var = ft_strdup("");
-	lennew = (((ft_wstrlen(*bitmap, 0)) - (varsize + 1)) + ft_strlen(var));
+	if(!((*var) = getenv((*var))))
+		(*var) = ft_strdup("");
+	lennew = (((ft_wstrlen(*bitmap, 0)) - (varsize + 1)) + ft_strlen((*var)));
 	if (!na_calloc(lennew + 1, sizeof(**bitmap), (void **)&tempbitmap))
 			return -1;
 	i = 0;
@@ -289,11 +289,11 @@ int join_var(unsigned short **bitmap, int i, char *var)
 		tempbitmap[i] = (*bitmap)[i];
 		i++;
 	}
-	paracortes += ft_strlen(var);
+	paracortes += ft_strlen((*var));
 	j = 0;
 	while(i + j < paracortes)
 	{
-		tempbitmap[i + j] = var[j];
+		tempbitmap[i + j] = (*var)[j];
 		tempbitmap[i + j] |= flags << 8;
 		j++;
 	}
@@ -326,9 +326,9 @@ int swap_var(unsigned short **bitmap, int i)
 		j++;
 	}
 	var[j] = 0;
-	if(!join_var(bitmap, i, var))
+	if(!join_var(bitmap, i, &var))
 		return(-1);
-	return(varlen);
+	return(ft_strlen(var));
 }
 
 int substitute_var(unsigned short **bitmap)
@@ -338,13 +338,8 @@ int substitute_var(unsigned short **bitmap)
 	i = 0;
 	while ((*bitmap)[i])
 	{
-ft_printf("char:%c \n", (*bitmap)[i]);
 		if((char)(*bitmap)[i] == '$' && !((*bitmap)[i] & FLAG_SNGQUOT))
-		{
 			i += swap_var(bitmap, i);
-
-ft_printf("entra \n");
-		}
 		i++;
 	}
 	return(ft_wstrlen((*bitmap), 0));
