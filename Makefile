@@ -39,7 +39,7 @@ INCLUDES += -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft/incs					   \
 VPATH = $(SOURCEDIRS)
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g # -fsanitize=address
-LDLIBS = -lm -lncurses
+LDLIBS = -lreadline
 
 RM = rm -rf
 MKDIR = mkdir -p

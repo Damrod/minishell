@@ -1,48 +1,12 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <libft.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include <minishell0.h>
 
-#define FLAG_ESCAPED (0b01000000 << 8)
-#define FLAG_SNGQUOT (0b00100000 << 8)
-#define FLAG_DBLQUOT (0b00010000 << 8)
-#define FLAG_NOTSPCE (0b00001000 << 8)
-#define FLAG_CIGNORE (0b00000100 << 8)
-
-# define NUL 0x00
-# define SOH 0x01
-# define STX 0x02
-# define ETX 0x03
-# define EOT 0x04
-# define ENQ 0x05
-# define ACK 0x06
-# define BEL 0x07
-# define BS 0x08
-# define HT 0x09
-# define LF 0x0A
-# define VT 0x0B
-# define FF 0x0C
-# define CR 0x0D
-# define SO 0x0E
-# define SI 0x0F
-# define DLE 0x10
-# define DC1 0x11
-# define DC2 0x12
-# define DC3 0x13
-# define DC4 0x14
-# define NAK 0x15
-# define SYN 0x16
-# define ETB 0x17
-# define CAN 0x18
-# define EM 0x19
-# define SUB 0x1A
-# define FS 0x1C
-# define GS 0x1D
-# define RS 0x1E
-# define US 0x1F
-# define DEL 0x7F
+char	cmp_space(const unsigned short str, char is_untilspace)
+{
+	if (is_untilspace < UNTIL_ANY_SPACE)
+		return (1);
+	else
+		return (!ft_isspace(str & 0xFF));
+}
 
 size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
 {
@@ -51,11 +15,11 @@ size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
 	unsigned short	bitmask;
 
 	bitmask = 0xFFFFU;
-	if (is_untilspace)
+	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
 		bitmask = 0xFF00U;
 	i = 0;
 	len = 0;
-	while (str[i] & bitmask)
+	while (str[i] & bitmask && cmp_space(str[i], is_untilspace))
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			len++;
@@ -77,31 +41,12 @@ unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace)
 	i = 0;
 	len = 0;
 	bitmask = 0xFFFFU;
-	if (is_untilspace)
+	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
 		bitmask = 0xFF00U;
-	while (str[i] & bitmask)
+	while (str[i] & bitmask && cmp_space(str[i], is_untilspace))
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			result[len++] = str[i];
-		i++;
-	}
-	return (result);
-}
-
-char	*downcast_wstr(const unsigned short *str, char is_low)
-{
-	char	*result;
-	size_t	i;
-
-	if (!na_calloc(sizeof(*result), ft_wstrlen(str, 0) + 1, (void **)&result))
-		return (NULL);
-	i = 0;
-	while (str[i])
-	{
-		if (is_low)
-			result[i] = (char)str[i];
-		else
-			result[i] = (char)(str[i] >> 8);
 		i++;
 	}
 	return (result);
@@ -183,8 +128,8 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 			return (NULL);
 		}
 		ret = tmp;
-		ret[size - 1] = ft_wstrdup(&bitmap[i], 1);
-		i += ft_wstrlen(ret[size - 1], 1);
+		ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_NON_QUOTED_SPACE);
+		i += ft_wstrlen(ret[size - 1], UNTIL_NON_QUOTED_SPACE);
 		while (bitmap[i] && !(bitmap[i] & 0xFF00))
 			i++;
 		size++;
@@ -263,6 +208,89 @@ void	upcast_config(unsigned short *bitmap, char *args, ssize_t inside_sng,
 	config_quotes(bitmap, prev_dbl, prev_sng, i);
 }
 
+///potato
+int join_var(unsigned short **bitmap, int i, char **var)
+{
+	int j;
+	int flags;
+	int lennew;
+	int paracortes;
+	int varsize;
+	unsigned short *tempbitmap;
+
+	paracortes = i;
+	varsize = ft_strlen(*var);
+	//esto supongo que no es necesario asi
+	flags = 0;
+	flags |= (*bitmap)[i] >> 8;
+	if(!((*var) = getenv((*var))))
+		(*var) = ft_strdup("");
+	lennew = (((ft_wstrlen(*bitmap, 0)) - (varsize + 1)) + ft_strlen((*var)));
+	if (!na_calloc(lennew + 1, sizeof(**bitmap), (void **)&tempbitmap))
+			return -1;
+	i = 0;
+	while(i < paracortes)
+	{
+		tempbitmap[i] = (*bitmap)[i];
+		i++;
+	}
+	paracortes += ft_strlen((*var));
+	j = 0;
+	while(i + j < paracortes)
+	{
+		tempbitmap[i + j] = (*var)[j];
+		tempbitmap[i + j] |= flags << 8;
+		j++;
+	}
+	paracortes = lennew;
+	while(i + j < paracortes)
+	{
+		tempbitmap[i + j] = (*bitmap)[i + varsize + 1];
+		i++;
+	}
+	//free
+	free(*bitmap);
+	(*bitmap) = tempbitmap;
+	return(1);
+}
+
+int swap_var(unsigned short **bitmap, int i)
+{
+	unsigned short *tmp;
+	char *var;
+	int varlen;
+	int j;
+
+	tmp = ft_wstrdup((*bitmap) + i + 1, UNTIL_ANY_SPACE);
+	varlen = ft_wstrlen(tmp, 0);
+	var = malloc(varlen + 1);
+	j = 0;
+	while(j < varlen)
+	{
+		var[j] = (char)tmp[j];
+		j++;
+	}
+	var[j] = 0;
+	if(!join_var(bitmap, i, &var))
+		return(-1);
+	return(ft_strlen(var));
+}
+
+int substitute_var(unsigned short **bitmap)
+{
+	int i;
+
+	i = 0;
+	while ((*bitmap)[i])
+	{
+		if((char)(*bitmap)[i] == '$' && !((*bitmap)[i] & FLAG_SNGQUOT))
+			i += swap_var(bitmap, i);
+		i++;
+	}
+	return(ft_wstrlen((*bitmap), 0));
+}
+///potato
+
 unsigned short	**get_args(const char *arg)
 {
 	size_t			len;
@@ -281,77 +309,28 @@ unsigned short	**get_args(const char *arg)
 		return (NULL);
 	upcast_config(bitmap, args, 0, 0);
 	free (args);
-	tmp = ft_wstrdup(bitmap, 0);
+	tmp = ft_wstrdup(bitmap, UNTIL_END_OF_STRING);
 	if (!tmp)
 		return (NULL);
 	free(bitmap);
 	bitmap = tmp;
+
+	///potato
+	len = substitute_var(&bitmap);
+
+ft_printf("\n\n");
+	size_t i;
+	i = 0;
+	while (i < len)
+	{
+		ft_printf("%.2u binary is 0b%.8b char is: %c\n", i, bitmap[i] >> 8,
+				  bitmap[i] & 0xFF);
+		i++;
+	}
+
+	///potato
+
 	retreal = ft_wstrsplit(bitmap);
 	free (bitmap);
 	return (retreal);
 }
-
-#include <signal.h>
-
-typedef struct s_term {
-	char	*inputstring;
-}	t_term;
-
-void specialfree(void **tofree)
-{
-	free(*tofree);
-	*tofree = NULL;
-}
-
-t_term	g_term = {.inputstring = NULL };
-
-void	handle_eot(int sig)
-{
-	(void) sig;
-	specialfree((void**)&g_term.inputstring);
-	ft_printf("\n");
-	exit(0);
-}
-
-int main(int argc, char **argv)
-{
-	unsigned short **str;
-	unsigned short **origstr;
-
-	(void)argc;
-	(void)argv;
-	str = NULL;
-	signal(SIGINT, handle_eot);
-	signal(SIGQUIT, handle_eot);
-	while (1)
-	{
-		g_term.inputstring = readline("marishell% ");
-		if (g_term.inputstring && g_term.inputstring[0] == STX)
-		{
-			specialfree((void **)&g_term.inputstring);
-			break ;
-		}
-		str = get_args(g_term.inputstring);
-		specialfree((void **)&g_term.inputstring);
-		if (!str)
-			continue ;
-		origstr = str;
-		while (*str)
-		{
-			g_term.inputstring = downcast_wstr(*str, 1);
-			ft_printf("---%s---\n", g_term.inputstring);
-			free (*str);
-			specialfree ((void **)&g_term.inputstring);
-			str++;
-		}
-		free(origstr);
-	}
-	ft_printf("\n");
-	return (0);
-}
-
-
-// gcc -L. -lft get_args.c libft.a -I ../incs/ -I ../libft/incs/ -I ../libft/ft_printf/incs/ -lreadline
-// is this a bug ./a.out "\\\' \\\" " ?
-// bug marishell% "h'" 'a VS "h" 'a
-// bug "s'd'd" 'd
