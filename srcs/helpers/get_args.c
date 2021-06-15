@@ -11,6 +11,10 @@
 #define FLAG_NOTSPCE (0b00001000 << 8)
 #define FLAG_CIGNORE (0b00000100 << 8)
 
+#define UNTIL_END_OF_STRING 0
+#define UNTIL_NON_QUOTED_SPACE 1
+#define UNTIL_ANY_SPACE 2
+
 # define NUL 0x00
 # define SOH 0x01
 # define STX 0x02
@@ -44,6 +48,14 @@
 # define US 0x1F
 # define DEL 0x7F
 
+char	cmp_space(const unsigned short str, char is_untilspace)
+{
+	if (is_untilspace < UNTIL_ANY_SPACE)
+		return (1);
+	else
+		return (!ft_isspace(str & 0xFF));
+}
+
 size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
 {
 	size_t			i;
@@ -51,11 +63,11 @@ size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
 	unsigned short	bitmask;
 
 	bitmask = 0xFFFFU;
-	if (is_untilspace)
+	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
 		bitmask = 0xFF00U;
 	i = 0;
 	len = 0;
-	while (str[i] & bitmask)
+	while (str[i] & bitmask && cmp_space(str[i], is_untilspace))
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			len++;
@@ -77,9 +89,9 @@ unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace)
 	i = 0;
 	len = 0;
 	bitmask = 0xFFFFU;
-	if (is_untilspace)
+	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
 		bitmask = 0xFF00U;
-	while (str[i] & bitmask)
+	while (str[i] & bitmask && cmp_space(str[i], is_untilspace))
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			result[len++] = str[i];
@@ -93,7 +105,8 @@ char	*downcast_wstr(const unsigned short *str, char is_low)
 	char	*result;
 	size_t	i;
 
-	if (!na_calloc(sizeof(*result), ft_wstrlen(str, 0) + 1, (void **)&result))
+	if (!na_calloc(sizeof(*result), ft_wstrlen(str, UNTIL_END_OF_STRING) + 1,
+			(void **)&result))
 		return (NULL);
 	i = 0;
 	while (str[i])
@@ -183,8 +196,8 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 			return (NULL);
 		}
 		ret = tmp;
-		ret[size - 1] = ft_wstrdup(&bitmap[i], 1);
-		i += ft_wstrlen(ret[size - 1], 1);
+		ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_NON_QUOTED_SPACE);
+		i += ft_wstrlen(ret[size - 1], UNTIL_NON_QUOTED_SPACE);
 		while (bitmap[i] && !(bitmap[i] & 0xFF00))
 			i++;
 		size++;
@@ -316,7 +329,7 @@ int swap_var(unsigned short **bitmap, int i)
 	int varlen;
 	int j;
 
-	tmp = ft_wstrdup((*bitmap) + i + 1, 1);
+	tmp = ft_wstrdup((*bitmap) + i + 1, UNTIL_ANY_SPACE);
 	varlen = ft_wstrlen(tmp, 0);
 	var = malloc(varlen + 1);
 	j = 0;
@@ -364,7 +377,7 @@ unsigned short	**get_args(const char *arg)
 		return (NULL);
 	upcast_config(bitmap, args, 0, 0);
 	free (args);
-	tmp = ft_wstrdup(bitmap, 0);
+	tmp = ft_wstrdup(bitmap, UNTIL_END_OF_STRING);
 	if (!tmp)
 		return (NULL);
 	free(bitmap);
