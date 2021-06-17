@@ -9,48 +9,32 @@
 /*   Updated: 2021/06/06 19:21:18 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
+#include <libft.h>
 #include <minishell0.h>
 #include <minishell.h>
 
-t_term	g_term = {.inputstring = NULL };
+t_term	g_term = {
+	.inputstring = NULL,
+	.cmds = NULL
+};
 
-void	ft_alloc_env(t_tab *t, char **env)
+void	print_dblptr(const char *input)
 {
-	int	i;
-	int	j;
-
-	i = 0;
-	while (env[i])
-		i++;
-	t->our_env = (char **)malloc(sizeof(char *) * (i + 1));
-	t->our_env[i] = NULL;
-	i = 0;
-	while (env[i])
-	{
-		j = ft_strlen(env[i]);
-		t->our_env[i] = (char *)malloc(sizeof(char) * (j + 1));
-		i++;
-	}
+	printf("%s\n", input);
 }
 
-void	ft_copy_env(t_tab *t, char **env)
+void	apply_dblptr(char **data, void (*f)())
 {
-	int	i;
-	int	j;
+	size_t	len;
 
-	i = 0;
-	ft_alloc_env(t, env);
-	while (env[i])
+	len = 0;
+	if (data)
 	{
-		j = 0;
-		while (env[i][j])
+		while (data[len])
 		{
-			t->our_env[i][j] = env[i][j];
-			j++;
+			f(data[len]);
+			len++;
 		}
-		t->our_env[i][j] = '\0';
-		i++;
 	}
 }
 
@@ -65,7 +49,7 @@ void	ft_order_list(t_tab *t, t_dlist *lst, int i)
 	}
 }
 
-void specialfree(void **tofree)
+void	specialfree(void **tofree)
 {
 	free(*tofree);
 	*tofree = NULL;
@@ -99,39 +83,51 @@ void	handle_eot(int sig)
 	exit(0);
 }
 
-int	main(int argc, char **argv)
-{
-	unsigned short	**str;
-	unsigned short	**origstr;
+/* int	main(int argc, char **argv, char **environ) */
+/* { */
+/* 	unsigned short	**str; */
+/* 	unsigned short	**origstr; */
 
+/* 	(void)argc; */
+/* 	(void)argv; */
+/* 	(void)environ; */
+/* 	str = NULL; */
+/* 	signal(SIGINT, handle_eot); */
+/* 	signal(SIGQUIT, handle_eot); */
+/* 	while (1) */
+/* 	{ */
+/* 		g_term.inputstring = readline("marishell% "); */
+/* 		if (g_term.inputstring && g_term.inputstring[0] == STX) */
+/* 		{ */
+/* 			specialfree((void **)&g_term.inputstring); */
+/* 			break ; */
+/* 		} */
+/* 		str = get_args(g_term.inputstring); */
+/* 		specialfree((void **)&g_term.inputstring); */
+/* 		if (!str) */
+/* 			continue ; */
+/* 		origstr = str; */
+/* 		while (*str) */
+/* 		{ */
+/* 			g_term.inputstring = downcast_wstr(*str, 1); */
+/* 			ft_printf("---%s---\n", g_term.inputstring); */
+/* 			free (*str); */
+/* 			specialfree ((void **)&g_term.inputstring); */
+/* 			str++; */
+/* 		} */
+/* 		free(origstr); */
+/* 	} */
+/* 	ft_printf("\n"); */
+/* 	return (0); */
+/* } */
+
+int	main(int argc, char **argv, char const **environ)
+{
+	char	**str;
+	str = ft_dblptr_cpy(environ, "hitokisi\n", 0);
 	(void)argc;
 	(void)argv;
-	str = NULL;
-	signal(SIGINT, handle_eot);
-	signal(SIGQUIT, handle_eot);
-	while (1)
-	{
-		g_term.inputstring = readline("marishell% ");
-		if (g_term.inputstring && g_term.inputstring[0] == STX)
-		{
-			specialfree((void **)&g_term.inputstring);
-			break ;
-		}
-		str = get_args(g_term.inputstring);
-		specialfree((void **)&g_term.inputstring);
-		if (!str)
-			continue ;
-		origstr = str;
-		while (*str)
-		{
-			g_term.inputstring = downcast_wstr(*str, 1);
-			ft_printf("---%s---\n", g_term.inputstring);
-			free (*str);
-			specialfree ((void **)&g_term.inputstring);
-			str++;
-		}
-		free(origstr);
-	}
-	ft_printf("\n");
-	return (0);
+	apply_dblptr(str, print_dblptr);
+	free(str);
+	/* freedblptr((void **)str); */
 }

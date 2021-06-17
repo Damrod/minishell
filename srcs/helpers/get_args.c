@@ -70,45 +70,6 @@ char	isquote_not_nested_not_escaped(unsigned short c, char is_dblquotes)
 	return (0);
 }
 
-void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize)
-{
-	void	*newptr;
-
-	if (newsize == 0)
-	{
-		free(ptr);
-		return (NULL);
-	}
-	else if (!ptr)
-		return (malloc(newsize));
-	else if (newsize <= originalsize)
-		return (ptr);
-	else
-	{
-		newptr = ft_calloc(newsize, sizeof(char));
-		if (newptr)
-		{
-			ft_memcpy(newptr, ptr, originalsize);
-			free(ptr);
-		}
-		return (newptr);
-	}
-}
-
-void	freedblptr(void **ptrs)
-{
-	void	**orig;
-
-	orig = ptrs;
-	while (*ptrs)
-	{
-		free (*ptrs);
-		ptrs++;
-	}
-	free(orig);
-	return ;
-}
-
 unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 {
 	size_t			i;
@@ -123,10 +84,7 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 	{
 		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp));
 		if (!tmp)
-		{
-			freedblptr((void **)ret);
-			return (NULL);
-		}
+			return (freedblptr((void **)ret));
 		ret = tmp;
 		ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_NON_QUOTED_SPACE);
 		i += ft_wstrlen(ret[size - 1], UNTIL_NON_QUOTED_SPACE);

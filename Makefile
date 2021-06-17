@@ -22,7 +22,7 @@ NAME = minishell
 LIBFTD = libft/noassign libft/memory libft/polyarray libft/btree			   \
 	   libft/list libft/mytinygc libft/ctype libft/allocstr libft/strutils	   \
 	   libft/atoi libft/output libft/ft_printf libft/ft_printf/srcs			   \
-	   libft/string libft/list/dllist
+	   libft/string libft/list/dllist libft/dblptr
 DIRS = common helpers
 DIRS += $(LIBFTD)
 SOURCEDIRS = $(foreach dir, $(DIRS), $(addprefix $(SOURCEDIR)/, $(dir)))

@@ -238,8 +238,4 @@ t_array	*alloc_matrix(size_t m, size_t n, enum e_types tpe, t_byte *st);
 void	*elem(t_array *array, size_t i, size_t j);
 void	*ft_arrbyte(t_array *a, void *key);
 
-//
-
-char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
-
 #endif

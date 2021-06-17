@@ -51,6 +51,7 @@
 
 typedef struct s_term {
 	char	*inputstring;
+	t_dlist	*cmds;
 }	t_term;
 
 unsigned short	**get_args(const char *arg);
