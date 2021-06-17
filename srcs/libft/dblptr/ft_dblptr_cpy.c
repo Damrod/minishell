@@ -9,7 +9,7 @@ static void	add_item(char **ret, const char *item, char is_deep, size_t *j)
 }
 
 static size_t	copy_dblptr2(const char **data, char **ret, char is_deep,
-						 size_t len)
+			size_t len)
 {
 	size_t	j;
 
@@ -37,12 +37,7 @@ char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep)
 	size_t		j;
 	size_t		destsize;
 
-	len = 0;
-	if (data)
-	{
-		while (data[len])
-			len++;
-	}
+	len = ft_dblptrlen((void **)data);
 	destsize = len;
 	if (item)
 		destsize++;

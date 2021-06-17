@@ -154,7 +154,6 @@ int		ft_findptrinarr(void **array, void *key, int size);
 void	*ft_calloc(size_t nmemb, size_t size);
 void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize);
 char	*ft_itoa(int n);
-void	*freedblptr(void **ptrs);
 
 //		alloc string
 
@@ -241,5 +240,7 @@ void	*ft_arrbyte(t_array *a, void *key);
 //
 
 char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
+size_t	ft_dblptrlen(void **data);
+void	*freedblptr(void **ptrs);
 
 #endif
