@@ -322,6 +322,34 @@ int join_var(unsigned short **bitmap, int i, char **var)
 	return(1);
 }
 
+int check_quotes(unsigned short *var, int flags)
+{
+	int i;
+	int j;
+	unsigned short *tmp;
+
+	i = 0;
+	j = 0;
+	while ((char)var[i])
+	{
+		if (((var[i] >> 8 ^ flags)))
+		{
+			if (!na_calloc(sizeof(*tmp), i, (void **)&tmp))
+				return (-1);
+			while (j < i)
+			{
+				tmp[j] = var[j];
+				j++;
+			}
+			free(var);
+			var = tmp;
+			return(j);
+		}
+		i++;
+	}
+	return(i);
+}
+
 int swap_var(unsigned short **bitmap, int i)
 {
 	unsigned short *tmp;
@@ -330,7 +358,8 @@ int swap_var(unsigned short **bitmap, int i)
 	int j;
 
 	tmp = ft_wstrdup((*bitmap) + i + 1, UNTIL_ANY_SPACE);
-	varlen = ft_wstrlen(tmp, 0);
+	varlen = check_quotes(tmp, *((*bitmap) + i)  >> 8);
+//	varlen = ft_wstrlen(tmp, 0);
 	var = malloc(varlen + 1);
 	j = 0;
 	while(j < varlen)
@@ -384,17 +413,8 @@ unsigned short	**get_args(const char *arg)
 	bitmap = tmp;
 
 	///potato
-	len = substitute_var(&bitmap);
 
-ft_printf("\n\n");
-	size_t i;
-	i = 0;
-	while (i < len)
-	{
-		ft_printf("%.2u binary is 0b%.8b char is: %c\n", i, bitmap[i] >> 8,
-				  bitmap[i] & 0xFF);
-		i++;
-	}
+	len = substitute_var(&bitmap);
 
 	///potato
 
