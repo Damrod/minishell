@@ -1,4 +1,5 @@
 #include <minishell0.h>
+#include "libft.h"
 
 char	cmp_space(const unsigned short str, char is_untilspace)
 {
@@ -228,6 +229,7 @@ int swap_var(unsigned short **bitmap, int i)
 		var[j] = (char)tmp[j];
 		j++;
 	}
+	free(tmp);
 	var[j] = 0;
 	if(!join_var(bitmap, i, &var))
 		return(-1);
@@ -249,6 +251,12 @@ int substitute_var(unsigned short **bitmap)
 }
 ///potato
 
+void	*get_args_fail(char *args)
+{
+	free (args);
+	return (NULL);
+}
+
 unsigned short	**get_args(const char *arg)
 {
 	size_t			len;
@@ -258,18 +266,18 @@ unsigned short	**get_args(const char *arg)
 	unsigned short	**retreal;
 
 	if (!arg)
-		return (NULL);
+		return (get_args_fail(NULL));
 	args = ft_strtrim(arg, " \f\n\r\t\v");
 	if (!args)
-		return (NULL);
+		return (get_args_fail(NULL));
 	len = ft_strlen(args);
 	if (len == 0 || !na_calloc(len + 1, sizeof(*bitmap), (void **)&bitmap))
-		return (NULL);
+		return (get_args_fail(args));
 	upcast_config(bitmap, args, 0, 0);
 	free (args);
 	tmp = ft_wstrdup(bitmap, UNTIL_END_OF_STRING);
 	if (!tmp)
-		return (NULL);
+		return (get_args_fail(args));
 	free(bitmap);
 	bitmap = tmp;
 

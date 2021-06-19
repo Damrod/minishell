@@ -15,6 +15,7 @@
 #include <minishell.h>
 
 t_term	g_term = {
+	.args = NULL,
 	.inputstring = NULL,
 	.cmds = NULL
 };
@@ -84,51 +85,71 @@ void	handle_eot(int sig)
 	exit(0);
 }
 
-/* int	main(int argc, char **argv, char **environ) */
-/* { */
-/* 	unsigned short	**str; */
-/* 	unsigned short	**origstr; */
-
-/* 	(void)argc; */
-/* 	(void)argv; */
-/* 	(void)environ; */
-/* 	str = NULL; */
-/* 	signal(SIGINT, handle_eot); */
-/* 	signal(SIGQUIT, handle_eot); */
-/* 	while (1) */
-/* 	{ */
-/* 		g_term.inputstring = readline("marishell% "); */
-/* 		if (g_term.inputstring && g_term.inputstring[0] == STX) */
-/* 		{ */
-/* 			specialfree((void **)&g_term.inputstring); */
-/* 			break ; */
-/* 		} */
-/* 		str = get_args(g_term.inputstring); */
-/* 		specialfree((void **)&g_term.inputstring); */
-/* 		if (!str) */
-/* 			continue ; */
-/* 		origstr = str; */
-/* 		while (*str) */
-/* 		{ */
-/* 			g_term.inputstring = downcast_wstr(*str, 1); */
-/* 			ft_printf("---%s---\n", g_term.inputstring); */
-/* 			free (*str); */
-/* 			specialfree ((void **)&g_term.inputstring); */
-/* 			str++; */
-/* 		} */
-/* 		free(origstr); */
-/* 	} */
-/* 	ft_printf("\n"); */
-/* 	return (0); */
-/* } */
-
-int	main(int argc, char **argv, char const **environ)
+int	main(int argc, char **argv, char **environ)
 {
-	char	**str;
-	str = ft_dblptr_cpy(environ, "hitokisi\n", 0);
+	unsigned short	**str;
+	size_t			i;
+
 	(void)argc;
 	(void)argv;
-	apply_dblptr(str, print_dblptr);
-	free(str);
-	/* freedblptr((void **)str); */
+	(void)environ;
+	str = NULL;
+	signal(SIGINT, handle_eot);
+	signal(SIGQUIT, handle_eot);
+	while (1)
+	{
+		g_term.inputstring = readline("marishell% ");
+		if (g_term.inputstring && g_term.inputstring[0] == STX)
+		{
+			specialfree((void **)&g_term.inputstring);
+			break ;
+		}
+		str = get_args(g_term.inputstring);
+		specialfree((void **)&g_term.inputstring);
+		if (!str)
+			continue ;
+		if (!na_calloc(ft_dblptrlen((void **)str) + 1, sizeof(void *),
+			(void **)&g_term.args))
+		{
+			specialfree((void **)&g_term.inputstring);
+			break ;
+		}
+		i = 0;
+		while (str[i])
+		{
+			g_term.args[i] = downcast_wstr(str[i], 1);
+			free (str[i]);
+			specialfree ((void **)&g_term.inputstring);
+			i++;
+		}
+		free(str);
+		apply_dblptr(g_term.args, print_dblptr);
+		if (1)
+		{
+			freedblptr((void **)g_term.args);
+		}
+	}
+	ft_printf("\n");
+	return (0);
 }
+
+/* int	main(int argc, char **argv, char const **environ) */
+/* { */
+/* 	char	**str; */
+/* 	str = ft_dblptr_cpy(environ, "hitokisi\n", 0); */
+/* 	(void)argc; */
+/* 	(void)argv; */
+/* 	apply_dblptr(str, print_dblptr); */
+/* 	free(str); */
+/* 	/\* freedblptr((void **)str); *\/ */
+/* } */
+//echo "mandalorian" |tail -c 2
+/* alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" |tail -c 2              
+   n
+   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" | tail -c 2             n
+   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian"|tail -c 2n
+   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian"|tail -c 5
+   rian
+   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" "|" tail -c 5           mandalorian | tail -c 5
+   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" | tail -c 5rian
+   alvaro@Tuor:~/minishell(AlvaroTrasteo)$  */

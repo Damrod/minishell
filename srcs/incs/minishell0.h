@@ -49,7 +49,18 @@
 # define US 0x1F
 # define DEL 0x7F
 
+# define TYPE_END	0
+# define TYPE_PIPE	1
+# define TYPE_BREAK	2
+
+typedef struct s_compcmd {
+	char			**args;
+	char			type;
+	int				pipes[2];
+}	t_compcmd;
+
 typedef struct s_term {
+	char	**args;
 	char	*inputstring;
 	t_dlist	*cmds;
 }	t_term;
