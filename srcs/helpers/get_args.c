@@ -169,7 +169,7 @@ ssize_t	toggle_inside_quote(ssize_t insideother, ssize_t *selfinside,
 	return (*selfinside);
 }
 
-unsigned short	*upcast_str(char *args)
+unsigned short	*upcast_str(const char *args)
 {
 	unsigned short	*ret;
 	size_t			len;

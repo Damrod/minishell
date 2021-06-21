@@ -77,22 +77,71 @@ char	*downcast_wstr(const unsigned short *str, char is_low)
 	return (result);
 }
 
+#define CHECK_ONLY_LOW 0
+#define CHECK_SNGQUOTE 1
+#define CHECK_DBLQUOTE 2
+
+static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
+			char checkdepth)
+{
+	*bitmask2 = 0;
+	*bitmask = 0xFF00U;
+	if (checkdepth == CHECK_SNGQUOTE)
+	{
+		*bitmask2 = FLAG_SNGQUOT;
+		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_DBLQUOT);
+	}
+	if (checkdepth == CHECK_DBLQUOTE)
+	{
+		*bitmask2 = FLAG_DBLQUOT;
+		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_SNGQUOT);
+	}
+}
+
+int	ft_wstrncmp(unsigned short *s1, const char *str2, char checkdepth, size_t n)
+{
+	int					a;
+	size_t				i;
+	unsigned short		*s2;
+	unsigned short		bitmask;
+	unsigned short		bitmask2;
+
+	if (n == 0)
+		return (0);
+	config_bitmasks(&bitmask, &bitmask2, checkdepth);
+	s2 = upcast_str(str2);
+	if (!s2)
+		return (-0xFFFFF);
+	i = 0;
+	while (s1[i] && ((s1[i] & ~bitmask) == (s2[i] | bitmask2)) && (i < n - 1))
+		i++;
+	a = (int)s1[i] - (int)s2[i];
+	free (s2);
+	return (a);
+}
+
+
 void	handle_eot(int sig)
 {
+	extern char		**environ;
+
 	(void) sig;
 	specialfree((void **)&g_term.inputstring);
+	/* ft_printf("%s\n", getenv("TERM")); */
 	ft_printf("\n");
+	free(environ);
 	exit(0);
 }
 
-int	main(int argc, char **argv, char **environ)
+int	main(int argc, char **argv)
 {
 	unsigned short	**str;
 	size_t			i;
+	extern char		**environ;
 
 	(void)argc;
 	(void)argv;
-	(void)environ;
+	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
 	str = NULL;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
@@ -129,58 +178,7 @@ int	main(int argc, char **argv, char **environ)
 			freedblptr((void **)g_term.args);
 		}
 	}
+	free(environ);
 	ft_printf("\n");
 	return (0);
 }
-
-
-
-/* int	main(int argc, char **argv, char **environ) */
-/* { */
-/* 	unsigned short	*str; */
-
-/* 	(void)argc; */
-/* 	(void)argv; */
-/* 	(void)environ; */
-/* 	str = NULL; */
-/* 	signal(SIGINT, handle_eot); */
-/* 	signal(SIGQUIT, handle_eot); */
-/* 	while (1) */
-/* 	{ */
-/* 		g_term.inputstring = readline("marishell% "); */
-/* 		if (g_term.inputstring && g_term.inputstring[0] == STX) */
-/* 		{ */
-/* 			specialfree((void **)&g_term.inputstring); */
-/* 			break ; */
-/* 		} */
-/* 		str = ft_wstrdup(upcast_str(g_term.inputstring), UNTIL_ANY_ENDOFTOKEN); */
-/* 		specialfree((void **)&g_term.inputstring); */
-/* 		if (!str) */
-/* 			continue ; */
-/* 		char *realstr = downcast_wstr(str, 1); */
-/* 		ft_printf("%s\n", realstr); */
-/* 	} */
-/* 	ft_printf("\n"); */
-/* 	return (0); */
-/* } */
-
-/* int	main(int argc, char **argv, char const **environ) */
-/* { */
-/* 	char	**str; */
-/* 	str = ft_dblptr_cpy(environ, "hitokisi\n", 0); */
-/* 	(void)argc; */
-/* 	(void)argv; */
-/* 	apply_dblptr(str, print_dblptr); */
-/* 	free(str); */
-/* 	/\* freedblptr((void **)str); *\/ */
-/* } */
-//echo "mandalorian" |tail -c 2
-/* alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" |tail -c 2
-   n
-   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" | tail -c 2             n
-   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian"|tail -c 2n
-   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian"|tail -c 5
-   rian
-   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" "|" tail -c 5           mandalorian | tail -c 5
-   alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" | tail -c 5rian
-   alvaro@Tuor:~/minishell(AlvaroTrasteo)$  */

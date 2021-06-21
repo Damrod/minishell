@@ -62,13 +62,14 @@ typedef struct s_compcmd {
 
 typedef struct s_term {
 	char	**args;
+	char	**environ;
 	char	*inputstring;
 	t_dlist	*cmds;
 }	t_term;
 
 unsigned short	**get_args(const char *arg);
 size_t			ft_wstrlen(const unsigned short *str, char is_untilspace);
-unsigned short	*upcast_str(char *args);
+unsigned short	*upcast_str(const char *args);
 unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace);
 
 extern t_term	g_term;
