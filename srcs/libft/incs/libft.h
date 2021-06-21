@@ -152,6 +152,7 @@ int		ft_findptrinarr(void **array, void *key, int size);
 //		misc alloc
 
 void	*ft_calloc(size_t nmemb, size_t size);
+void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize);
 char	*ft_itoa(int n);
 
 //		alloc string
@@ -235,5 +236,11 @@ void	*ft_arrayshift(void *currpos, t_array *arr, int tms);
 t_array	*alloc_matrix(size_t m, size_t n, enum e_types tpe, t_byte *st);
 void	*elem(t_array *array, size_t i, size_t j);
 void	*ft_arrbyte(t_array *a, void *key);
+
+//
+
+char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
+size_t	ft_dblptrlen(void **data);
+void	*freedblptr(void **ptrs);
 
 #endif
