@@ -1,26 +1,36 @@
 #include <minishell0.h>
 #include "libft.h"
 
-char	cmp_space(const unsigned short str, char is_untilspace)
+char	*downcast_wstr(const unsigned short *str, char is_low);
+
+char	is_anytoken(unsigned short str)
 {
-	if (is_untilspace < UNTIL_ANY_SPACE)
+	if ((str == (FLAG_NOTSPCE | (unsigned short)'>'))
+		|| (str == (FLAG_NOTSPCE | (unsigned short)'<'))
+		|| (str == (FLAG_NOTSPCE | (unsigned short)'|')))
 		return (1);
-	else
+	return (0);
+}
+
+unsigned short	cmp_space(const unsigned short str, char is_untilspace)
+{
+	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
+		return (str & 0xFF00);
+	if (is_untilspace == UNTIL_ANY_SPACE)
 		return (!ft_isspace(str & 0xFF));
+	if (is_untilspace == UNTIL_ANY_ENDOFTOKEN)
+		return ((str & 0xFF00) && !is_anytoken(str));
+	return str;
 }
 
 size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
 {
 	size_t			i;
 	size_t			len;
-	unsigned short	bitmask;
 
-	bitmask = 0xFFFFU;
-	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
-		bitmask = 0xFF00U;
 	i = 0;
 	len = 0;
-	while (str[i] & bitmask && cmp_space(str[i], is_untilspace))
+	while (cmp_space(str[i], is_untilspace))
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			len++;
@@ -34,17 +44,13 @@ unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace)
 	unsigned short	*result;
 	size_t			len;
 	size_t			i;
-	unsigned short	bitmask;
 
 	len = ft_wstrlen(str, is_untilspace);
 	if (!na_calloc(sizeof(*result), len + 1, (void **)&result))
 		return (NULL);
 	i = 0;
 	len = 0;
-	bitmask = 0xFFFFU;
-	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
-		bitmask = 0xFF00U;
-	while (str[i] & bitmask && cmp_space(str[i], is_untilspace))
+	while (cmp_space(str[i], is_untilspace))
 	{
 		if (!(str[i] & FLAG_CIGNORE))
 			result[len++] = str[i];
@@ -71,6 +77,27 @@ char	isquote_not_nested_not_escaped(unsigned short c, char is_dblquotes)
 	return (0);
 }
 
+unsigned short	*get_token(unsigned short *bitmap)
+{
+	unsigned short	*token;
+	size_t			j;
+	size_t			len;
+
+	len = 0;
+	while (bitmap[len] && is_anytoken(bitmap[len]))
+		len++;
+	if (!na_calloc(len + 1, sizeof(*token), (void **)&token))
+		return (NULL);
+	ft_memset(token, '\0', sizeof(*token) * (len + 1));
+	j = 0;
+	while (bitmap[len] && is_anytoken(bitmap[j]))
+	{
+		token[j] = bitmap[j];
+		j++;
+	}
+	return (token);
+}
+
 unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 {
 	size_t			i;
@@ -87,8 +114,11 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 		if (!tmp)
 			return (freedblptr((void **)ret));
 		ret = tmp;
-		ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_NON_QUOTED_SPACE);
-		i += ft_wstrlen(ret[size - 1], UNTIL_NON_QUOTED_SPACE);
+		if (!is_anytoken(bitmap[i]))
+			ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_ANY_ENDOFTOKEN);
+		else
+			ret[size - 1] = get_token(&bitmap[i]);
+		i += ft_wstrlen(ret[size - 1], UNTIL_END_OF_STRING);
 		while (bitmap[i] && !(bitmap[i] & 0xFF00))
 			i++;
 		size++;
@@ -137,6 +167,24 @@ ssize_t	toggle_inside_quote(ssize_t insideother, ssize_t *selfinside,
 	if (!insideother && (bitmap & ~FLAG_NOTSPCE) == (short) cmp)
 		*selfinside ^= 1;
 	return (*selfinside);
+}
+
+unsigned short	*upcast_str(char *args)
+{
+	unsigned short	*ret;
+	size_t			len;
+	size_t			i;
+
+	len = ft_strlen(args);
+	if (!na_calloc(len + 1, sizeof(*ret), (void **)&ret))
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		ret[i] |= args[i];
+		i++;
+	}
+	return (ret);
 }
 
 void	upcast_config(unsigned short *bitmap, char *args, ssize_t inside_sng,
@@ -277,7 +325,7 @@ unsigned short	**get_args(const char *arg)
 	free (args);
 	tmp = ft_wstrdup(bitmap, UNTIL_END_OF_STRING);
 	if (!tmp)
-		return (get_args_fail(args));
+		return (NULL);
 	free(bitmap);
 	bitmap = tmp;
 

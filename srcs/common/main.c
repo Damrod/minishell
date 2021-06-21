@@ -109,7 +109,7 @@ int	main(int argc, char **argv, char **environ)
 		if (!str)
 			continue ;
 		if (!na_calloc(ft_dblptrlen((void **)str) + 1, sizeof(void *),
-			(void **)&g_term.args))
+				(void **)&g_term.args))
 		{
 			specialfree((void **)&g_term.inputstring);
 			break ;
@@ -133,6 +133,37 @@ int	main(int argc, char **argv, char **environ)
 	return (0);
 }
 
+
+
+/* int	main(int argc, char **argv, char **environ) */
+/* { */
+/* 	unsigned short	*str; */
+
+/* 	(void)argc; */
+/* 	(void)argv; */
+/* 	(void)environ; */
+/* 	str = NULL; */
+/* 	signal(SIGINT, handle_eot); */
+/* 	signal(SIGQUIT, handle_eot); */
+/* 	while (1) */
+/* 	{ */
+/* 		g_term.inputstring = readline("marishell% "); */
+/* 		if (g_term.inputstring && g_term.inputstring[0] == STX) */
+/* 		{ */
+/* 			specialfree((void **)&g_term.inputstring); */
+/* 			break ; */
+/* 		} */
+/* 		str = ft_wstrdup(upcast_str(g_term.inputstring), UNTIL_ANY_ENDOFTOKEN); */
+/* 		specialfree((void **)&g_term.inputstring); */
+/* 		if (!str) */
+/* 			continue ; */
+/* 		char *realstr = downcast_wstr(str, 1); */
+/* 		ft_printf("%s\n", realstr); */
+/* 	} */
+/* 	ft_printf("\n"); */
+/* 	return (0); */
+/* } */
+
 /* int	main(int argc, char **argv, char const **environ) */
 /* { */
 /* 	char	**str; */
@@ -144,7 +175,7 @@ int	main(int argc, char **argv, char **environ)
 /* 	/\* freedblptr((void **)str); *\/ */
 /* } */
 //echo "mandalorian" |tail -c 2
-/* alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" |tail -c 2              
+/* alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" |tail -c 2
    n
    alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian" | tail -c 2             n
    alvaro@Tuor:~/minishell(AlvaroTrasteo)$ echo "mandalorian"|tail -c 2n
