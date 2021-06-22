@@ -17,6 +17,11 @@
 # define UNTIL_ANY_SPACE 2
 # define UNTIL_ANY_ENDOFTOKEN 3
 
+# define CHECK_ONLY_LOW 0
+# define CHECK_SNGQUOTE 1
+# define CHECK_DBLQUOTE 2
+# define CHECK_ANYQUOTE 3
+
 # define NUL 0x00
 # define SOH 0x01
 # define STX 0x02

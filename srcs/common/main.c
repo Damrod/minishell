@@ -77,15 +77,16 @@ char	*downcast_wstr(const unsigned short *str, char is_low)
 	return (result);
 }
 
-#define CHECK_ONLY_LOW 0
-#define CHECK_SNGQUOTE 1
-#define CHECK_DBLQUOTE 2
-
 static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
 			char checkdepth)
 {
 	*bitmask2 = 0;
-	*bitmask = 0xFF00U;
+	*bitmask = 0;
+	if (checkdepth == CHECK_ONLY_LOW)
+	{
+		*bitmask2 = 0;
+		*bitmask = 0xFF00U;
+	}
 	if (checkdepth == CHECK_SNGQUOTE)
 	{
 		*bitmask2 = FLAG_SNGQUOT;
@@ -96,6 +97,32 @@ static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
 		*bitmask2 = FLAG_DBLQUOT;
 		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_SNGQUOT);
 	}
+	if (checkdepth == CHECK_ANYQUOTE)
+	{
+		*bitmask2 = 0;
+		*bitmask = 0;
+	}
+}
+
+
+
+char cmp_chars(unsigned short a, unsigned short b, char checkdepth)
+{
+	unsigned short	bitmask;
+	unsigned short	bitmask2;
+	unsigned short	bitmask3;
+	unsigned short	bitmask4;
+	char			aggregate;
+
+	if (checkdepth == CHECK_ANYQUOTE)
+	{
+		config_bitmasks(&bitmask, &bitmask2, CHECK_DBLQUOTE);
+		config_bitmasks(&bitmask3, &bitmask4, CHECK_SNGQUOTE);
+		aggregate = ((a & ~bitmask) == (b | bitmask2));
+		return (aggregate || ((a & ~bitmask3) == (b | bitmask4)));
+	}
+	config_bitmasks(&bitmask, &bitmask2, checkdepth);
+	return ((a & ~bitmask) == (b | bitmask2));
 }
 
 int	ft_wstrncmp(unsigned short *s1, const char *str2, char checkdepth, size_t n)
@@ -103,17 +130,14 @@ int	ft_wstrncmp(unsigned short *s1, const char *str2, char checkdepth, size_t n)
 	int					a;
 	size_t				i;
 	unsigned short		*s2;
-	unsigned short		bitmask;
-	unsigned short		bitmask2;
 
 	if (n == 0)
 		return (0);
-	config_bitmasks(&bitmask, &bitmask2, checkdepth);
 	s2 = upcast_str(str2);
 	if (!s2)
 		return (-0xFFFFF);
 	i = 0;
-	while (s1[i] && ((s1[i] & ~bitmask) == (s2[i] | bitmask2)) && (i < n - 1))
+	while (s1[i] && cmp_chars(s1[i], s2[i], checkdepth) && (i < n - 1))
 		i++;
 	a = (int)s1[i] - (int)s2[i];
 	free (s2);
@@ -164,7 +188,10 @@ int	main(int argc, char **argv)
 		i = 0;
 		while (str[i])
 		{
+			char *param = "|";
 			g_term.args[i] = downcast_wstr(str[i], 1);
+			if (ft_wstrncmp(str[i], param, CHECK_ONLY_LOW, 2) == 0)
+				ft_printf("equals %s\n", param);
 			free (str[i]);
 			free_and_nullify ((void **)&g_term.inputstring);
 			i++;

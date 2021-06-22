@@ -88,9 +88,8 @@ unsigned short	*get_token(unsigned short *bitmap)
 		len++;
 	if (!na_calloc(len + 1, sizeof(*token), (void **)&token))
 		return (NULL);
-	ft_memset(token, '\0', sizeof(*token) * (len + 1));
 	j = 0;
-	while (bitmap[len] && is_anytoken(bitmap[j]))
+	while (bitmap[j] && is_anytoken(bitmap[j]))
 	{
 		token[j] = bitmap[j];
 		j++;
