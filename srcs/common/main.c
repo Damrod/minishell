@@ -120,16 +120,17 @@ int	ft_wstrncmp(unsigned short *s1, const char *str2, char checkdepth, size_t n)
 	return (a);
 }
 
+char **oldenviron;
 
 void	handle_eot(int sig)
 {
 	extern char		**environ;
 
 	(void) sig;
+	specialfree ((void **)&environ);
 	specialfree((void **)&g_term.inputstring);
 	/* ft_printf("%s\n", getenv("TERM")); */
 	ft_printf("\n");
-	free(environ);
 	exit(0);
 }
 
@@ -179,6 +180,8 @@ int	main(int argc, char **argv)
 		}
 	}
 	free(environ);
+	free(oldenviron);
+	environ = NULL;
 	ft_printf("\n");
 	return (0);
 }

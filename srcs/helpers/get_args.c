@@ -15,11 +15,11 @@ char	is_anytoken(unsigned short str)
 unsigned short	cmp_space(const unsigned short str, char is_untilspace)
 {
 	if (is_untilspace == UNTIL_NON_QUOTED_SPACE)
-		return (str & 0xFF00);
+		return (str && (str & 0xFF00));
 	if (is_untilspace == UNTIL_ANY_SPACE)
-		return (!ft_isspace(str & 0xFF));
+		return (str && !ft_isspace(str & 0xFF));
 	if (is_untilspace == UNTIL_ANY_ENDOFTOKEN)
-		return ((str & 0xFF00) && !is_anytoken(str));
+		return (str && (str & 0xFF00) && !is_anytoken(str));
 	return str;
 }
 
@@ -46,7 +46,7 @@ unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace)
 	size_t			i;
 
 	len = ft_wstrlen(str, is_untilspace);
-	if (!na_calloc(sizeof(*result), len + 1, (void **)&result))
+	if (!na_calloc(len + 1, sizeof(*result), (void **)&result))
 		return (NULL);
 	i = 0;
 	len = 0;
@@ -249,9 +249,12 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 	int				lennew;
 	int				varsize;
 	unsigned short	*tempbitmap;
+	char			*tmp;
 
+	tmp = *var;
 	varsize = ft_strlen(*var);
 	(*var) = getenv((*var));
+	free(tmp); // fixed memleak
 	if (!(*var))
 		(*var) = ft_strdup("");
 	lennew = (((ft_wstrlen(*bitmap, 0)) - (varsize + 1)) + ft_strlen((*var)));
@@ -268,7 +271,7 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 	return (1);
 }
 
-int	check_quotes(unsigned short *var, int flags)
+int	check_quotes(unsigned short **var, int flags)
 {
 	int				i;
 	int				j;
@@ -276,19 +279,23 @@ int	check_quotes(unsigned short *var, int flags)
 
 	i = 0;
 	j = 0;
-	while ((char)var[i])
+	while ((char)(*var)[i])
 	{
-		if (((var[i] >> 8 ^ flags)))
+		if (((((*var)[i] >> 8) ^ flags))) // ((*var)[i] >> 8) ^ flags) ?
+			// Las parentesis no son necesarias por precedencia
+			// de operadores, pero creo que queda más claro.
+			// esto es como decir ((*var)[i] >> 8) != flags , No?
+			// si te digo la verdad esto no lo pillo
 		{
-			if (!na_calloc(sizeof(*tmp), i, (void **)&tmp))
+			if (!na_calloc(sizeof(*tmp), i + 1, (void **)&tmp))
 				return (-1);
 			while (j < i)
 			{
-				tmp[j] = var[j];
+				tmp[j] = (*var)[j];
 				j++;
 			}
-			free(var);
-			var = tmp;
+			free(*var); // fixed memleak
+			(*var) = tmp;
 			return (j);
 		}
 		i++;
@@ -304,7 +311,7 @@ int	swap_var(unsigned short **bitmap, int i)
 	int				j;
 
 	tmp = ft_wstrdup((*bitmap) + i + 1, UNTIL_ANY_SPACE);
-	varlen = check_quotes(tmp, *((*bitmap) + i) >> 8);
+	varlen = check_quotes(&tmp, *((*bitmap) + i) >> 8);
 	var = malloc(varlen + 1);
 	j = 0;
 	while (j < varlen)
@@ -328,7 +335,8 @@ int	substitute_var(unsigned short **bitmap)
 	{
 		if ((char)(*bitmap)[i] == '$' && !((*bitmap)[i] & FLAG_SNGQUOT))
 			i += swap_var(bitmap, i);
-		i++;
+		if ((*bitmap)[i]) // fixed memory error
+			i++;
 	}
 	return (ft_wstrlen((*bitmap), 0));
 }
