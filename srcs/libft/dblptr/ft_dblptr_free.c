@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-void	*freedblptr(void **ptrs)
+void	*ft_dblptr_free(void **ptrs)
 {
 	void	**orig;
 

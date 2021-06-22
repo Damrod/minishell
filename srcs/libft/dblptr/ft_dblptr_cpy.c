@@ -22,7 +22,7 @@ static ssize_t	copy_dblptr2(const char **data, char **ret, char is_deep,
 			ret[j] = (char *)data[j];
 		if (!ret[j] && is_deep)
 		{
-			freedblptr((void **)ret);
+			ft_dblptr_free((void **)ret);
 			return (-1);
 		}
 		j++;

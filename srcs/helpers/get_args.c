@@ -112,7 +112,7 @@ unsigned short	**ft_wstrsplit(unsigned short *bitmap)
 	{
 		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp));
 		if (!tmp)
-			return (freedblptr((void **)ret));
+			return (ft_dblptr_free((void **)ret));
 		ret = tmp;
 		if (!is_anytoken(bitmap[i]))
 			ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_ANY_ENDOFTOKEN);
@@ -257,7 +257,8 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 	free(tmp); // fixed memleak
 	if (!(*var))
 		(*var) = ft_strdup("");
-	lennew = (((ft_wstrlen(*bitmap, 0)) - (varsize + 1)) + ft_strlen((*var)));
+	lennew = ft_wstrlen(*bitmap, UNTIL_END_OF_STRING) - (varsize + 1)
+		+ ft_strlen(*var);
 	if (!na_calloc(lennew + 1, sizeof(**bitmap), (void **)&tempbitmap))
 		return (-1);
 	j = join_var2(i, bitmap, var, &tempbitmap);
@@ -338,7 +339,7 @@ int	substitute_var(unsigned short **bitmap)
 		if ((*bitmap)[i]) // fixed memory error
 			i++;
 	}
-	return (ft_wstrlen((*bitmap), 0));
+	return (ft_wstrlen((*bitmap), UNTIL_END_OF_STRING));
 }
 ///potato
 

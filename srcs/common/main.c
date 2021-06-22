@@ -51,7 +51,7 @@ void	ft_order_list(t_tab *t, t_dlist *lst, int i)
 	}
 }
 
-void	specialfree(void **tofree)
+void	free_and_nullify(void **tofree)
 {
 	free(*tofree);
 	*tofree = NULL;
@@ -120,16 +120,13 @@ int	ft_wstrncmp(unsigned short *s1, const char *str2, char checkdepth, size_t n)
 	return (a);
 }
 
-char **oldenviron;
-
 void	handle_eot(int sig)
 {
 	extern char		**environ;
 
 	(void) sig;
-	specialfree ((void **)&environ);
-	specialfree((void **)&g_term.inputstring);
-	/* ft_printf("%s\n", getenv("TERM")); */
+	free_and_nullify ((void **)&environ);
+	free_and_nullify((void **)&g_term.inputstring);
 	ft_printf("\n");
 	exit(0);
 }
@@ -151,17 +148,17 @@ int	main(int argc, char **argv)
 		g_term.inputstring = readline("marishell% ");
 		if (g_term.inputstring && g_term.inputstring[0] == STX)
 		{
-			specialfree((void **)&g_term.inputstring);
+			free_and_nullify((void **)&g_term.inputstring);
 			break ;
 		}
 		str = get_args(g_term.inputstring);
-		specialfree((void **)&g_term.inputstring);
+		free_and_nullify((void **)&g_term.inputstring);
 		if (!str)
 			continue ;
 		if (!na_calloc(ft_dblptrlen((void **)str) + 1, sizeof(void *),
 				(void **)&g_term.args))
 		{
-			specialfree((void **)&g_term.inputstring);
+			free_and_nullify((void **)&g_term.inputstring);
 			break ;
 		}
 		i = 0;
@@ -169,18 +166,17 @@ int	main(int argc, char **argv)
 		{
 			g_term.args[i] = downcast_wstr(str[i], 1);
 			free (str[i]);
-			specialfree ((void **)&g_term.inputstring);
+			free_and_nullify ((void **)&g_term.inputstring);
 			i++;
 		}
 		free(str);
 		apply_dblptr(g_term.args, print_dblptr);
 		if (1)
 		{
-			freedblptr((void **)g_term.args);
+			ft_dblptr_free((void **)g_term.args);
 		}
 	}
 	free(environ);
-	free(oldenviron);
 	environ = NULL;
 	ft_printf("\n");
 	return (0);

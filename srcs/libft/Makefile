@@ -41,7 +41,7 @@ SRCS	= noassign/na_malloc.c memory/ft_bzero.c memory/ft_memcmp.c			   \
 		  strutils/ft_isspace_adv.c strutils/ft_strmapi.c					   \
 		  strutils/get_next_line.c atoi/ft_atoi.c output/ft_putendl_fd.c	   \
 		  output/ft_putchar_fd.c output/ft_putstr_fd.c output/ft_putnbr_fd.c   \
-		  string/ft_strlcpy.c allocstr/ft_realloc.c dblptr/free_dbl_ptr.c	   \
+		  string/ft_strlcpy.c allocstr/ft_realloc.c dblptr/ft_dblptr_free.c	   \
 		  string/ft_strnstr.c string/ft_strchr.c string/ft_strlen.c			   \
 		  string/ft_strlcat.c string/ft_strncmp.c string/ft_strrchr.c		   \
 		  dblptr/ft_dblptr_cpy.c dblptr/ft_dblptrlen.c
