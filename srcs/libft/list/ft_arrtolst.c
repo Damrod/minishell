@@ -16,6 +16,8 @@ t_list	*ft_arrtolst(void **array, int size, void *(*alloc)())
 {
 	t_list	*list;
 
+	if (size < 0)
+		size = ft_dblptrlen(array);
 	list = NULL;
 	while (size)
 	{

@@ -21,6 +21,17 @@
 # define CHECK_SNGQUOTE 1
 # define CHECK_DBLQUOTE 2
 # define CHECK_ANYQUOTE 3
+# define CHECK_NOTQUOTE 4
+
+enum e_type {
+	TYPE_NO = -1,
+	TYPE_OUT = 0,
+	TYPE_IN	 = 1,
+	TYPE_APP = 2,
+	TYPE_HEREDOC = 3,
+	TYPE_END = 4,
+	TYPE_PIPE = 5,
+};
 
 # define NUL 0x00
 # define SOH 0x01
@@ -55,10 +66,6 @@
 # define US 0x1F
 # define DEL 0x7F
 
-# define TYPE_END	0
-# define TYPE_PIPE	1
-# define TYPE_BREAK	2
-
 typedef struct s_compcmd {
 	char			**args;
 	char			type;
@@ -70,6 +77,8 @@ typedef struct s_term {
 	char	**environ;
 	char	*inputstring;
 	t_dlist	*cmds;
+	int		infd;
+	int		outfd;
 }	t_term;
 
 unsigned short	**get_args(const char *arg);
