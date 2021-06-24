@@ -303,144 +303,141 @@ unsigned char	get_type(unsigned short *arg)
 /* 	return (EXIT_SUCCESS); */
 /* } */
 
-/* int get_redirs(unsigned short **args, int *input, int *output) */
-/* { */
-/* 	t_list			*list; */
-/* 	unsigned char 	type; */
-/* 	char			*file; */
-/* 	char			fileopen[TYPE_HEREDOC + 1]; */
-/* 	int				*prunepattern; */
-/* 	size_t			i; */
-/* 	t_list			*lstorig; */
+int get_redirs(t_list **args, int *input, int *output)
+{
+	unsigned char	type;
+	char			*file;
+	char			fileopen[TYPE_HEREDOC + 1];
+	int				*prunepattern;
+	size_t			i;
+	t_list			*list;
 
-/* 	prunepattern = ft_calloc(ft_dblptrlen((void **)args), sizeof(*prunepattern)); */
-/* 	*input = STDIN_FILENO; */
-/* 	*output = STDOUT_FILENO; */
-/* 	ft_memset(fileopen, 0, sizeof(fileopen)); */
-/* 	i = 0; */
-/* 	list = ft_arrtolst((void **)args, -1, NULL); */
-/* 	lstorig = list; */
-/* 	free(args); */
-/* 	while (list) */
-/* 	{ */
-/* 		if (is_redir((unsigned short *)list->content)) */
-/* 		{ */
-/* 			type = get_type((unsigned short *)list->content); */
-/* 			if (list->next && list->next->content) */
-/* 				file = downcast_wstr(list->next->content, 1); */
-/* 			if (type == TYPE_IN) */
-/* 			{ */
-/* 				if (list->next && list->next->content) */
-/* 				{ */
-/* 					if (fileopen[TYPE_IN]) */
-/* 						close(*input); */
-/* 					*input = open(file, O_RDONLY); */
-/* 					free(file); */
-/* 					fileopen[TYPE_IN] = 1; */
-/* 					if (*input == -1) */
-/* 						return (error_file(file, prunepattern, lstorig, errno)); */
-/* 				} */
-/* 				else if (!list->next) */
-/* 					return (syntax_error(file, prunepattern, lstorig, list->content)); */
-/* 			} */
-/* 			if (type == TYPE_APP) */
-/* 			{ */
-/* 				if (list->next && list->next->content) */
-/* 				{ */
-/* 					if (fileopen[TYPE_APP]) */
-/* 						close(*input); */
-/* 					*output = open(file, O_CREAT|O_WRONLY|O_APPEND); */
-/* 					fileopen[TYPE_APP] = 1; */
-/* 					if (*input == -1) */
-/* 						return (error_file(file, errno)); */
-/* 				} */
-/* 				else if (!list->next) */
-/* 					return (syntax_error(file, list->content)); */
-/* 			} */
-/* 			if (type == TYPE_OUT) */
-/* 			{ */
-/* 				if (list->next && list->next->content) */
-/* 				{ */
-/* 					if (fileopen[TYPE_OUT]) */
-/* 						close(*input); */
-/* 					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC); */
-/* 					fileopen[TYPE_OUT] = 1; */
-/* 					if (*input == -1) */
-/* 						return (error_file(file, errno)); */
-/* 				} */
-/* 				else if (!list->next) */
-/* 					return (syntax_error(file, list->content)); */
-/* 			} */
-/* 			if (type == TYPE_HEREDOC) */
-/* 			{ */
-/* 				if (list->next && list->next->content) */
-/* 				{ */
-/* 					char 	*line; */
-/* 					char 	*result; */
-/* 					char 	*tmp0; */
-/* 					char 	*array[3]; */
-/* 					char	isfirst; */
-/* 					size_t	size; */
+	prunepattern = ft_calloc(ft_lstsize(*args), sizeof(*prunepattern));
+	*input = STDIN_FILENO;
+	*output = STDOUT_FILENO;
+	ft_memset(fileopen, 0, sizeof(fileopen));
+	i = 0;
+	list = *args;
+	while (list)
+	{
+		if (is_redir((unsigned short *)list->content))
+		{
+			type = get_type((unsigned short *)list->content);
+			if (list->next && list->next->content)
+				file = downcast_wstr(list->next->content, 1);
+			if (type == TYPE_IN)
+			{
+				if (list->next && list->next->content)
+				{
+					if (fileopen[TYPE_IN])
+						close(*input);
+					*input = open(file, O_RDONLY);
+					free(file);
+					fileopen[TYPE_IN] = 1;
+					if (*input == -1)
+						return (error_file(file, prunepattern, *args, errno));
+				}
+				else if (!list->next)
+					return (syntax_error(file, prunepattern, *args, list->content));
+			}
+			if (type == TYPE_APP)
+			{
+				if (list->next && list->next->content)
+				{
+					if (fileopen[TYPE_APP])
+						close(*input);
+					*output = open(file, O_CREAT|O_WRONLY|O_APPEND);
+					fileopen[TYPE_APP] = 1;
+					if (*input == -1)
+						return (error_file(file, errno));
+				}
+				else if (!list->next)
+					return (syntax_error(file, list->content));
+			}
+			if (type == TYPE_OUT)
+			{
+				if (list->next && list->next->content)
+				{
+					if (fileopen[TYPE_OUT])
+						close(*input);
+					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC);
+					fileopen[TYPE_OUT] = 1;
+					if (*input == -1)
+						return (error_file(file, errno));
+				}
+				else if (!list->next)
+					return (syntax_error(file, list->content));
+			}
+			if (type == TYPE_HEREDOC)
+			{
+				if (list->next && list->next->content)
+				{
+					char 	*line;
+					char 	*result;
+					char 	*tmp0;
+					char 	*array[3];
+					char	isfirst;
+					size_t	size;
 
-/* 					result = NULL; */
-/* 					isfirst = 1; */
-/* 					while (get_next_line(0, &line) > 0 */
-/* 						   && ft_strncmp(line, file, ft_strlen(line) + 1)) */
-/* 					{ */
-/* 						if(isfirst) */
-/* 						{ */
-/* 							array[0] = line; */
-/* 							array[1] = "\n"; */
-/* 							size = 2; */
-/* 							isfirst = 0; */
-/* 						} */
-/* 						else */
-/* 						{ */
-/* 							array[0] = result; */
-/* 							array[1] = line; */
-/* 							array[2] = "\n"; */
-/* 							size = 3; */
-/* 						} */
-/* 						tmp0 = ft_strjoin_ult(size, array, ""); */
-/* 						free(result); */
-/* 						free(line); */
-/* 						result = tmp0; */
-/* 					} */
-/* 					free (line); */
-/* 					g_term.inputstring = result; */
-/* 				} */
-/* 				else if (!list->next) */
-/* 					return (syntax_error(file, list->content)); */
-/* 			} */
-/* 			free(file); */
-/* 			prunepattern[i++] = 1; */
-/* 			prunepattern[i++] = 1; */
-/* 			if (list) */
-/* 				list = list->next->next; */
-/* 		} */
-/* 		else */
-/* 		{ */
-/* 			i++; */
-/* 			if (list) */
-/* 				list = list->next; */
-/* 		} */
-/* 	} */
-/* 	ft_lstcullpat(&lstorig, prunepattern, free, free); */
-/* 	free(prunepattern); */
-/* 	list = lstorig; */
-/* 	char *tmp; */
-/* 	while(list) */
-/* 	{ */
-/* 		tmp = downcast_wstr(list->content, 1); */
-/* 		free(list->content); */
-/* 		list->content = tmp; */
-/* 		list = list->next; */
-/* 	} */
-/* 	char **cmpcmd; */
-/* 	cmpcmd = (char **)ft_lsttoarr(lstorig, NULL); */
-/* 	ft_lstclear(&lstorig, NULL, free); */
-/* 	return cmpcmd; */
-/* } */
+					result = NULL;
+					isfirst = 1;
+					while (get_next_line(0, &line) > 0
+						   && ft_strncmp(line, file, ft_strlen(line) + 1))
+					{
+						if(isfirst)
+						{
+							array[0] = line;
+							array[1] = "\n";
+							size = 2;
+							isfirst = 0;
+						}
+						else
+						{
+							array[0] = result;
+							array[1] = line;
+							array[2] = "\n";
+							size = 3;
+						}
+						tmp0 = ft_strjoin_ult(size, array, "");
+						free(result);
+						free(line);
+						result = tmp0;
+					}
+					free (line);
+					g_term.inputstring = result;
+				}
+				else if (!list->next)
+					return (syntax_error(file, list->content));
+			}
+			free(file);
+			prunepattern[i++] = 1;
+			prunepattern[i++] = 1;
+			if (list)
+				list = list->next->next;
+		}
+		else
+		{
+			i++;
+			if (list)
+				list = list->next;
+		}
+	}
+	ft_lstcullpat(args, prunepattern, free, free);
+	free(prunepattern);
+	list = *args;
+	char *tmp;
+	while(list)
+	{
+		tmp = downcast_wstr(list->content, 1);
+		free(list->content);
+		list->content = tmp;
+		list = list->next;
+	}
+	char **cmpcmd;
+	cmpcmd = (char **)ft_lsttoarr(*args, NULL);
+	ft_lstclear(args, NULL, free);
+	return cmpcmd;
+}
 
 int	main(int argc, char **argv)
 {
