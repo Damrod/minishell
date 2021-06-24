@@ -13,6 +13,7 @@
 #include <libft.h>
 #include <minishell0.h>
 #include <minishell.h>
+#include <stdbool.h>
 
 t_term	g_term = {
 	.args = NULL,
@@ -86,18 +87,18 @@ static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
 	*bitmask = 0;
 	if (checkdepth == CHECK_ONLY_LOW)
 	{
-		*bitmask2 = 0;
 		*bitmask = 0xFF00U;
+		*bitmask2 = 0;
 	}
 	if (checkdepth == CHECK_SNGQUOTE)
 	{
-		*bitmask2 = FLAG_SNGQUOT;
 		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_DBLQUOT);
+		*bitmask2 = FLAG_SNGQUOT;
 	}
 	if (checkdepth == CHECK_DBLQUOTE)
 	{
-		*bitmask2 = FLAG_DBLQUOT;
 		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_SNGQUOT);
+		*bitmask2 = FLAG_DBLQUOT;
 	}
 	if (checkdepth == CHECK_ANYQUOTE)
 	{
@@ -112,18 +113,14 @@ char cmp_chars(unsigned short a, unsigned short b, char checkdepth)
 {
 	unsigned short	bitmask;
 	unsigned short	bitmask2;
-	unsigned short	bitmask3;
-	unsigned short	bitmask4;
-	char			aggregate;
+	bool			aggregate;
 
 	if (checkdepth == CHECK_ANYQUOTE || checkdepth == CHECK_NOTQUOTE)
 	{
-		config_bitmasks(&bitmask, &bitmask2, CHECK_DBLQUOTE);
-		config_bitmasks(&bitmask3, &bitmask4, CHECK_SNGQUOTE);
-		aggregate = ((a & ~bitmask) == (b | bitmask2));
-		aggregate = aggregate || ((a & ~bitmask3) == (b | bitmask4));
+		aggregate = ((a & FLAG_DBLQUOT) | (a & FLAG_SNGQUOT));
 		if (checkdepth == CHECK_NOTQUOTE)
-			return (!(aggregate));
+			aggregate = !aggregate;
+		aggregate &= ((a & 0xFF) == (b & 0xFF));
 		return (aggregate);
 	}
 	config_bitmasks(&bitmask, &bitmask2, checkdepth);
