@@ -206,17 +206,17 @@ char is_redir(unsigned short *arg)
 	return (0);
 }
 
-/* char is_pipe(unsigned short *arg) */
-/* { */
-/* 	if (ft_wstrncmp(arg, "|", CHECK_NOTQUOTE, 2) == 0) */
-/* 		return (1); */
-/* 	return (0); */
-/* } */
+char is_pipe(unsigned short *arg)
+{
+	if (ft_wstrncmp(arg, "|", CHECK_NOTQUOTE, 2) == 0)
+		return (1);
+	return (0);
+}
 
-/* char is_symbol(unsigned short *arg) */
-/* { */
-/* 	return (is_pipe(arg) || is_redir(arg)); */
-/* } */
+char is_symbol(unsigned short *arg)
+{
+	return (is_pipe(arg) || is_redir(arg));
+}
 
 unsigned char	get_type(unsigned short *arg)
 {
@@ -303,7 +303,27 @@ unsigned char	get_type(unsigned short *arg)
 /* 	return (EXIT_SUCCESS); */
 /* } */
 
-int get_redirs(t_list **args, int *input, int *output)
+int syntax_error(char *token, int *prunepattern, t_list **args, char *argz)
+{
+	free(prunepattern);
+	ft_lstclear(args, free, free);
+	ft_dprintf(2, "%s: syntax error near unexpected token `%s'\n", argz, token);
+	return (1);
+}
+
+int error_file(char *file, int *prunepattern, t_list **args, char *argz)
+{
+	int		error;
+
+	error = errno;
+	free(prunepattern);
+	ft_lstclear(args, free, free);
+	ft_dprintf(2, "%s: %s: %s\n", argz, file, strerror(error));
+	free(file);
+	return (1);
+}
+
+int	get_redirs(t_list **args, int *input, int *output)
 {
 	unsigned char	type;
 	char			*file;
@@ -324,7 +344,15 @@ int get_redirs(t_list **args, int *input, int *output)
 		{
 			type = get_type((unsigned short *)list->content);
 			if (list->next && list->next->content)
+			{
 				file = downcast_wstr(list->next->content, 1);
+				if (is_symbol(list->next->content))
+				{
+					syntax_error(file, prunepattern, args, EXENAME);
+					free (file);
+					return (1);
+				}
+			}
 			if (type == TYPE_IN)
 			{
 				if (list->next && list->next->content)
@@ -332,13 +360,12 @@ int get_redirs(t_list **args, int *input, int *output)
 					if (fileopen[TYPE_IN])
 						close(*input);
 					*input = open(file, O_RDONLY);
-					free(file);
 					fileopen[TYPE_IN] = 1;
 					if (*input == -1)
-						return (error_file(file, prunepattern, *args, errno));
+						return (error_file(file, prunepattern, args, EXENAME));
 				}
 				else if (!list->next)
-					return (syntax_error(file, prunepattern, *args, list->content));
+					return (syntax_error("newline", prunepattern, args, EXENAME));
 			}
 			if (type == TYPE_APP)
 			{
@@ -346,13 +373,14 @@ int get_redirs(t_list **args, int *input, int *output)
 				{
 					if (fileopen[TYPE_APP])
 						close(*input);
-					*output = open(file, O_CREAT|O_WRONLY|O_APPEND);
+					*output = open(file, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|
+								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					fileopen[TYPE_APP] = 1;
-					if (*input == -1)
-						return (error_file(file, errno));
+					if (*output == -1)
+						return (error_file(file, prunepattern, args, EXENAME));
 				}
 				else if (!list->next)
-					return (syntax_error(file, list->content));
+					return (syntax_error("newline", prunepattern, args, EXENAME));
 			}
 			if (type == TYPE_OUT)
 			{
@@ -360,22 +388,23 @@ int get_redirs(t_list **args, int *input, int *output)
 				{
 					if (fileopen[TYPE_OUT])
 						close(*input);
-					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC);
+					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|
+								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					fileopen[TYPE_OUT] = 1;
-					if (*input == -1)
-						return (error_file(file, errno));
+					if (*output == -1)
+						return (error_file(file, prunepattern, args, EXENAME));
 				}
 				else if (!list->next)
-					return (syntax_error(file, list->content));
+					return (syntax_error("newline", prunepattern, args, EXENAME));
 			}
 			if (type == TYPE_HEREDOC)
 			{
 				if (list->next && list->next->content)
 				{
-					char 	*line;
-					char 	*result;
-					char 	*tmp0;
-					char 	*array[3];
+					char	*line;
+					char	*result;
+					char	*tmp0;
+					char	*array[3];
 					char	isfirst;
 					size_t	size;
 
@@ -398,7 +427,7 @@ int get_redirs(t_list **args, int *input, int *output)
 							array[2] = "\n";
 							size = 3;
 						}
-						tmp0 = ft_strjoin_ult(size, array, "");
+						tmp0 = ft_strjoin_ult(size, (const char **)array, "");
 						free(result);
 						free(line);
 						result = tmp0;
@@ -407,7 +436,7 @@ int get_redirs(t_list **args, int *input, int *output)
 					g_term.inputstring = result;
 				}
 				else if (!list->next)
-					return (syntax_error(file, list->content));
+					return (syntax_error(file, prunepattern, args, EXENAME));
 			}
 			free(file);
 			prunepattern[i++] = 1;
@@ -424,19 +453,7 @@ int get_redirs(t_list **args, int *input, int *output)
 	}
 	ft_lstcullpat(args, prunepattern, free, free);
 	free(prunepattern);
-	list = *args;
-	char *tmp;
-	while(list)
-	{
-		tmp = downcast_wstr(list->content, 1);
-		free(list->content);
-		list->content = tmp;
-		list = list->next;
-	}
-	char **cmpcmd;
-	cmpcmd = (char **)ft_lsttoarr(*args, NULL);
-	ft_lstclear(args, NULL, free);
-	return cmpcmd;
+	return (0);
 }
 
 int	main(int argc, char **argv)
@@ -445,6 +462,7 @@ int	main(int argc, char **argv)
 	t_list			*orig;
 	size_t			i;
 	extern char		**environ;
+	char			*tmp;
 
 	(void)argc;
 	(void)argv;
@@ -464,34 +482,27 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&g_term.inputstring);
 		if (!str)
 			continue ;
-		if (!na_calloc(ft_lstsize(str) + 1, sizeof(void *),
-				(void **)&g_term.args))
-		{
-			free_and_nullify((void **)&g_term.inputstring);
-			break ;
-		}
+		int ret = get_redirs(&str, &g_term.infd, &g_term.outfd);
+		ft_printf("this was grabbed by gnl: %s\n", g_term.inputstring);
+		free_and_nullify((void **)&g_term.inputstring);
+		if (ret)
+			continue;
 		orig = str;
 		i = 0;
 		while (str)
 		{
-			const char *pipe = "|";
-			/* const char *out = ">"; */
-			/* const char *in = "<"; */
-			/* const char *outappend = ">>"; */
-			/* const char *heredoc = "<<"; */
-			g_term.args[i] = downcast_wstr(str->content, 1);
-			if (ft_wstrncmp(str->content, pipe, CHECK_NOTQUOTE, 2) == 0)
-				ft_printf("This \"%s\" is a pipe\n", pipe);
-			/* free_and_nullify ((void **)&g_term.inputstring); */
+			tmp = downcast_wstr(str->content, 1);
+			ft_printf("%s\n", tmp);
+			free(tmp);
 			str = str->next;
 			i++;
 		}
 		ft_lstclear(&orig, free, free);
-		apply_dblptr(g_term.args, print_dblptr);
-		if (1)
-		{
-			ft_dblptr_free((void **)g_term.args);
-		}
+		/* apply_dblptr(g_term.args, print_dblptr); */
+		/* if (1) */
+		/* { */
+		/* 	ft_dblptr_free((void **)g_term.args); */
+		/* } */
 	}
 	free(environ);
 	environ = NULL;

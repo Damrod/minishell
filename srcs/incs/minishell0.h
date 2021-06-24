@@ -6,6 +6,8 @@
 # include <readline/history.h>
 # include <signal.h>
 
+# define EXENAME "minishell"
+
 # define FLAG_ESCAPED (0b0100000000000000)
 # define FLAG_SNGQUOT (0b0010000000000000)
 # define FLAG_DBLQUOT (0b0001000000000000)
