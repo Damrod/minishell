@@ -306,147 +306,149 @@ unsigned char	get_type(unsigned short *arg)
 /* 	return (EXIT_SUCCESS); */
 /* } */
 
-int get_redirs(unsigned short **args, int *input, int *output)
-{
-	t_list			*list;
-	unsigned char 	type;
-	char			*file;
-	char			fileopen[TYPE_HEREDOC + 1];
-	int				*prunepattern;
-	size_t			i;
-	t_list			*lstorig;
+/* int get_redirs(unsigned short **args, int *input, int *output) */
+/* { */
+/* 	t_list			*list; */
+/* 	unsigned char 	type; */
+/* 	char			*file; */
+/* 	char			fileopen[TYPE_HEREDOC + 1]; */
+/* 	int				*prunepattern; */
+/* 	size_t			i; */
+/* 	t_list			*lstorig; */
 
-	prunepattern = ft_calloc(ft_dblptrlen((void **)args), sizeof(*prunepattern));
-	*input = STDIN_FILENO;
-	*output = STDOUT_FILENO;
-	ft_memset(fileopen, 0, sizeof(fileopen));
-	i = 0;
-	list = ft_arrtolst((void **)args, -1, NULL);
-	lstorig = list;
-	free(args);
-	while (list->next)
-	{
-		if (is_redir((unsigned short *)list->content))
-		{
-			type = get_type((unsigned short *)list->content);
-			if (list->next && list->next->content)
-				file = downcast_wstr(list->next->content, 1);
-			if (type == TYPE_IN)
-			{
-				if (list->next && list->next->content)
-				{
-					if (fileopen[TYPE_IN])
-						close(*input);
-					*input = open(file, O_RDONLY);
-					free(file);
-					fileopen[TYPE_IN] = 1;
-					if (*input == -1)
-						return (error_file(file, errno));
-				}
-				else if (!list->next)
-					return (syntax_error(file, list->content));
-			}
-			if (type == TYPE_APP)
-			{
-				if (list->next && list->next->content)
-				{
-					if (fileopen[TYPE_APP])
-						close(*input);
-					*output = open(file, O_CREAT|O_WRONLY|O_APPEND);
-					fileopen[TYPE_APP] = 1;
-					if (*input == -1)
-						return (error_file(file, errno));
-				}
-				else if (!list->next)
-					return (syntax_error(file, list->content));
-			}
-			if (type == TYPE_OUT)
-			{
-				if (list->next && list->next->content)
-				{
-					if (fileopen[TYPE_OUT])
-						close(*input);
-					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC);
-					fileopen[TYPE_OUT] = 1;
-					if (*input == -1)
-						return (error_file(file, errno));
-				}
-				else if (!list->next)
-					return (syntax_error(file, list->content));
-			}
-			if (type == TYPE_HEREDOC)
-			{
-				if (list->next && list->next->content)
-				{
-					char 	*line;
-					char 	*result;
-					char 	*tmp0;
-					char 	*array[3];
-					char	isfirst;
-					size_t	size;
+/* 	prunepattern = ft_calloc(ft_dblptrlen((void **)args), sizeof(*prunepattern)); */
+/* 	*input = STDIN_FILENO; */
+/* 	*output = STDOUT_FILENO; */
+/* 	ft_memset(fileopen, 0, sizeof(fileopen)); */
+/* 	i = 0; */
+/* 	list = ft_arrtolst((void **)args, -1, NULL); */
+/* 	lstorig = list; */
+/* 	free(args); */
+/* 	while (list) */
+/* 	{ */
+/* 		if (is_redir((unsigned short *)list->content)) */
+/* 		{ */
+/* 			type = get_type((unsigned short *)list->content); */
+/* 			if (list->next && list->next->content) */
+/* 				file = downcast_wstr(list->next->content, 1); */
+/* 			if (type == TYPE_IN) */
+/* 			{ */
+/* 				if (list->next && list->next->content) */
+/* 				{ */
+/* 					if (fileopen[TYPE_IN]) */
+/* 						close(*input); */
+/* 					*input = open(file, O_RDONLY); */
+/* 					free(file); */
+/* 					fileopen[TYPE_IN] = 1; */
+/* 					if (*input == -1) */
+/* 						return (error_file(file, prunepattern, lstorig, errno)); */
+/* 				} */
+/* 				else if (!list->next) */
+/* 					return (syntax_error(file, prunepattern, lstorig, list->content)); */
+/* 			} */
+/* 			if (type == TYPE_APP) */
+/* 			{ */
+/* 				if (list->next && list->next->content) */
+/* 				{ */
+/* 					if (fileopen[TYPE_APP]) */
+/* 						close(*input); */
+/* 					*output = open(file, O_CREAT|O_WRONLY|O_APPEND); */
+/* 					fileopen[TYPE_APP] = 1; */
+/* 					if (*input == -1) */
+/* 						return (error_file(file, errno)); */
+/* 				} */
+/* 				else if (!list->next) */
+/* 					return (syntax_error(file, list->content)); */
+/* 			} */
+/* 			if (type == TYPE_OUT) */
+/* 			{ */
+/* 				if (list->next && list->next->content) */
+/* 				{ */
+/* 					if (fileopen[TYPE_OUT]) */
+/* 						close(*input); */
+/* 					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC); */
+/* 					fileopen[TYPE_OUT] = 1; */
+/* 					if (*input == -1) */
+/* 						return (error_file(file, errno)); */
+/* 				} */
+/* 				else if (!list->next) */
+/* 					return (syntax_error(file, list->content)); */
+/* 			} */
+/* 			if (type == TYPE_HEREDOC) */
+/* 			{ */
+/* 				if (list->next && list->next->content) */
+/* 				{ */
+/* 					char 	*line; */
+/* 					char 	*result; */
+/* 					char 	*tmp0; */
+/* 					char 	*array[3]; */
+/* 					char	isfirst; */
+/* 					size_t	size; */
 
-					result = NULL;
-					isfirst = 1;
-					while (get_next_line(0, &line) > 0
-						   && ft_strncmp(line, file, ft_strlen(line)))
-					{
-						if(isfirst)
-						{
-							array[0] = line;
-							array[1] = "\n";
-							size = 2;
-							isfirst = 0;
-						}
-						else
-						{
-							array[0] = result;
-							array[1] = line;
-							array[2] = "\n";
-							size = 3;
-						}
-						tmp0 = ft_strjoin_ult(size, array, "");
-						free(result);
-						free(line);
-						result = tmp0;
-					}
-					free (line);
-					g_term.inputstring = result;
-				}
-				else if (!list->next)
-					return (syntax_error(file, list->content));
-			}
-			free(file);
-			prunepattern[i++] = 1;
-			prunepattern[i++] = 1;
-			if (list)
-				list = list->next->next;
-		}
-		else
-		{
-			i++;
-			if (list)
-				list = list->next;
-		}
-	}
-	ft_lstcullpat(&lstorig, prunepattern, free, free);
-	free(prunepattern);
-	list = lstorig;
-	char *tmp;
-	while(list)
-	{
-		tmp = downcast_wstr(list->content, 1);
-		free(list->content);
-		list->content = tmp;
-		list = list->next;
-	}
-	char **cmpcmd;
-	cmpcmd = (char **)ft_lsttoarr(lstorig, NULL);
-	return cmpcmd;
-}
+/* 					result = NULL; */
+/* 					isfirst = 1; */
+/* 					while (get_next_line(0, &line) > 0 */
+/* 						   && ft_strncmp(line, file, ft_strlen(line) + 1)) */
+/* 					{ */
+/* 						if(isfirst) */
+/* 						{ */
+/* 							array[0] = line; */
+/* 							array[1] = "\n"; */
+/* 							size = 2; */
+/* 							isfirst = 0; */
+/* 						} */
+/* 						else */
+/* 						{ */
+/* 							array[0] = result; */
+/* 							array[1] = line; */
+/* 							array[2] = "\n"; */
+/* 							size = 3; */
+/* 						} */
+/* 						tmp0 = ft_strjoin_ult(size, array, ""); */
+/* 						free(result); */
+/* 						free(line); */
+/* 						result = tmp0; */
+/* 					} */
+/* 					free (line); */
+/* 					g_term.inputstring = result; */
+/* 				} */
+/* 				else if (!list->next) */
+/* 					return (syntax_error(file, list->content)); */
+/* 			} */
+/* 			free(file); */
+/* 			prunepattern[i++] = 1; */
+/* 			prunepattern[i++] = 1; */
+/* 			if (list) */
+/* 				list = list->next->next; */
+/* 		} */
+/* 		else */
+/* 		{ */
+/* 			i++; */
+/* 			if (list) */
+/* 				list = list->next; */
+/* 		} */
+/* 	} */
+/* 	ft_lstcullpat(&lstorig, prunepattern, free, free); */
+/* 	free(prunepattern); */
+/* 	list = lstorig; */
+/* 	char *tmp; */
+/* 	while(list) */
+/* 	{ */
+/* 		tmp = downcast_wstr(list->content, 1); */
+/* 		free(list->content); */
+/* 		list->content = tmp; */
+/* 		list = list->next; */
+/* 	} */
+/* 	char **cmpcmd; */
+/* 	cmpcmd = (char **)ft_lsttoarr(lstorig, NULL); */
+/* 	ft_lstclear(&lstorig, NULL, free); */
+/* 	return cmpcmd; */
+/* } */
 
 int	main(int argc, char **argv)
 {
-	unsigned short	**str;
+	t_list			*str;
+	t_list			*orig;
 	size_t			i;
 	extern char		**environ;
 
@@ -468,28 +470,29 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&g_term.inputstring);
 		if (!str)
 			continue ;
-		if (!na_calloc(ft_dblptrlen((void **)str) + 1, sizeof(void *),
+		if (!na_calloc(ft_lstsize(str) + 1, sizeof(void *),
 				(void **)&g_term.args))
 		{
 			free_and_nullify((void **)&g_term.inputstring);
 			break ;
 		}
+		orig = str;
 		i = 0;
-		while (str[i])
+		while (str)
 		{
 			const char *pipe = "|";
-			const char *out = ">";
-			const char *in = "<";
-			const char *outappend = ">>";
-			const char *heredoc = "<<";
-			g_term.args[i] = downcast_wstr(str[i], 1);
-			if (ft_wstrncmp(str[i], pipe, CHECK_NOTQUOTE, 2) == 0)
+			/* const char *out = ">"; */
+			/* const char *in = "<"; */
+			/* const char *outappend = ">>"; */
+			/* const char *heredoc = "<<"; */
+			g_term.args[i] = downcast_wstr(str->content, 1);
+			if (ft_wstrncmp(str->content, pipe, CHECK_NOTQUOTE, 2) == 0)
 				ft_printf("This \"%s\" is a pipe\n", pipe);
-			free (str[i]);
-			free_and_nullify ((void **)&g_term.inputstring);
+			/* free_and_nullify ((void **)&g_term.inputstring); */
+			str = str->next;
 			i++;
 		}
-		free(str);
+		ft_lstclear(&orig, free, free);
 		apply_dblptr(g_term.args, print_dblptr);
 		if (1)
 		{

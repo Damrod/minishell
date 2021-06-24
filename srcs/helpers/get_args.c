@@ -20,7 +20,7 @@ unsigned short	cmp_space(const unsigned short str, char is_untilspace)
 		return (str && !ft_isspace(str & 0xFF));
 	if (is_untilspace == UNTIL_ANY_ENDOFTOKEN)
 		return (str && (str & 0xFF00) && !is_anytoken(str));
-	return str;
+	return (str);
 }
 
 size_t	ft_wstrlen(const unsigned short *str, char is_untilspace)
@@ -97,31 +97,56 @@ unsigned short	*get_token(unsigned short *bitmap)
 	return (token);
 }
 
-unsigned short	**ft_wstrsplit(unsigned short *bitmap)
+/* unsigned short	**ft_wstrsplit(unsigned short *bitmap) */
+/* { */
+/* 	size_t			i; */
+/* 	size_t			size; */
+/* 	unsigned short	**ret; */
+/* 	unsigned short	**tmp; */
+
+/* 	ret = NULL; */
+/* 	size = 1; */
+/* 	i = 0; */
+/* 	while (bitmap[i]) */
+/* 	{ */
+/* 		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp)); */
+/* 		if (!tmp) */
+/* 			return (ft_dblptr_free((void **)ret)); */
+/* 		ret = tmp; */
+/* 		if (!is_anytoken(bitmap[i])) */
+/* 			ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_ANY_ENDOFTOKEN); */
+/* 		else */
+/* 			ret[size - 1] = get_token(&bitmap[i]); */
+/* 		i += ft_wstrlen(ret[size - 1], UNTIL_END_OF_STRING); */
+/* 		while (bitmap[i] && !(bitmap[i] & 0xFF00)) */
+/* 			i++; */
+/* 		size++; */
+/* 		ret[size - 1] = NULL; */
+/* 	} */
+/* 	return (ret); */
+/* } */
+
+t_list	*ft_wstrsplit(unsigned short *bitmap)
 {
 	size_t			i;
 	size_t			size;
-	unsigned short	**ret;
-	unsigned short	**tmp;
+	t_list			*ret;
+	unsigned short	*tmp;
 
 	ret = NULL;
 	size = 1;
 	i = 0;
 	while (bitmap[i])
 	{
-		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp));
-		if (!tmp)
-			return (ft_dblptr_free((void **)ret));
-		ret = tmp;
 		if (!is_anytoken(bitmap[i]))
-			ret[size - 1] = ft_wstrdup(&bitmap[i], UNTIL_ANY_ENDOFTOKEN);
+			tmp = ft_wstrdup(&bitmap[i], UNTIL_ANY_ENDOFTOKEN);
 		else
-			ret[size - 1] = get_token(&bitmap[i]);
-		i += ft_wstrlen(ret[size - 1], UNTIL_END_OF_STRING);
+			tmp = get_token(&bitmap[i]);
+		ft_lstpush_back(&ret, tmp);
+		i += ft_wstrlen(tmp, UNTIL_END_OF_STRING);
 		while (bitmap[i] && !(bitmap[i] & 0xFF00))
 			i++;
 		size++;
-		ret[size - 1] = NULL;
 	}
 	return (ret);
 }
@@ -348,13 +373,13 @@ void	*get_args_fail(char *args)
 	return (NULL);
 }
 
-unsigned short	**get_args(const char *arg)
+t_list	*get_args(const char *arg)
 {
 	size_t			len;
 	unsigned short	*bitmap;
 	char			*args;
 	unsigned short	*tmp;
-	unsigned short	**retreal;
+	t_list			*retreal;
 
 	if (!arg)
 		return (get_args_fail(NULL));
