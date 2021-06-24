@@ -436,7 +436,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 					g_term.inputstring = result;
 				}
 				else if (!list->next)
-					return (syntax_error(file, prunepattern, args, EXENAME));
+					return (syntax_error("newline", prunepattern, args, EXENAME));
 			}
 			free(file);
 			prunepattern[i++] = 1;
