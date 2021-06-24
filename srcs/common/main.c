@@ -372,7 +372,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 				if (list->next && list->next->content)
 				{
 					if (fileopen[TYPE_APP])
-						close(*input);
+						close(*output);
 					*output = open(file, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|
 								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					fileopen[TYPE_APP] = 1;
@@ -387,7 +387,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 				if (list->next && list->next->content)
 				{
 					if (fileopen[TYPE_OUT])
-						close(*input);
+						close(*output);
 					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|
 								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					fileopen[TYPE_OUT] = 1;
