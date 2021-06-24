@@ -441,7 +441,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 			free(file);
 			prunepattern[i++] = 1;
 			prunepattern[i++] = 1;
-			if (list)
+			if (list && list->next)
 				list = list->next->next;
 		}
 		else
@@ -468,6 +468,7 @@ int	main(int argc, char **argv)
 	(void)argv;
 	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
 	str = NULL;
+	g_term.lastret = 0;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)
@@ -482,10 +483,10 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&g_term.inputstring);
 		if (!str)
 			continue ;
-		int ret = get_redirs(&str, &g_term.infd, &g_term.outfd);
+		g_term.lastret = get_redirs(&str, &g_term.infd, &g_term.outfd);
 		ft_printf("this was grabbed by gnl: %s\n", g_term.inputstring);
 		free_and_nullify((void **)&g_term.inputstring);
-		if (ret)
+		if (g_term.lastret)
 			continue;
 		orig = str;
 		i = 0;

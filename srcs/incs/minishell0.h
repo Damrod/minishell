@@ -81,6 +81,7 @@ typedef struct s_term {
 	t_dlist	*cmds;
 	int		infd;
 	int		outfd;
+	uint8_t	lastret;
 }	t_term;
 
 t_list	*get_args(const char *arg);
