@@ -5,7 +5,7 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/20 18:29:03 by hellnhell         #+#    #+#             */
+/*   Created: 2020/09/20 18:29:03 by aollero           #+#    #+#             */
 /*   Updated: 2021/06/06 19:21:18 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -92,7 +92,7 @@ void	print_dblptr(const char *input)
 	printf("%s\n", input);
 }
 
-void	apply_dblptr(char **data, void (*f)())
+void	ft_dblptr_foreach(char **data, void (*f)())
 {
 	size_t	len;
 
@@ -205,7 +205,7 @@ int	main(int argc, char **argv)
 			i++;
 		}
 		ft_lstclear(&orig, free, free);
-		/* apply_dblptr(g_term.args, print_dblptr); */
+		/* ft_dblptr_foreach(g_term.args, print_dblptr); */
 		/* if (1) */
 		/* { */
 		/* 	ft_dblptr_free((void **)g_term.args); */

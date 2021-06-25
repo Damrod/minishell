@@ -75,17 +75,17 @@ typedef struct s_compcmd {
 }	t_compcmd;
 
 typedef struct s_term {
-	char		**args;
 	char		**environ;
-	char		*inputstring;
+	t_list		*args;
 	t_dlist		*cmds;
+	char		*inputstring;
+	uint32_t	lineno;
 	int			infd;
 	int			outfd;
 	uint8_t		lastret;
-	uint32_t	lineno;
 }	t_term;
 
-t_list	*get_args(const char *arg);
+t_list			*get_args(const char *arg);
 size_t			ft_wstrlen(const unsigned short *str, char is_untilspace);
 unsigned short	*upcast_str(const char *args);
 unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace);
