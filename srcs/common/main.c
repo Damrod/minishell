@@ -360,10 +360,10 @@ void	make_non_existing_filename(char *filepath, size_t size)
 }
 int	get_redirs(t_list **args, int *input, int *output)
 {
+	size_t			i;
 	unsigned char	type;
 	char			*file;
 	int				*prunepattern;
-	size_t			i;
 	t_list			*list;
 
 	prunepattern = ft_calloc(ft_lstsize(*args), sizeof(*prunepattern));
@@ -435,23 +435,19 @@ int	get_redirs(t_list **args, int *input, int *output)
 					char		*result;
 					char		*tmp0;
 					char		*array[4];
-					char		isfirst;
-					char		filepath[4098];
 					uint32_t	heredocatline;
 
 					heredocatline = g_term.lineno;
 					result = NULL;
-					isfirst = 1;
 					ft_memset(array, '\0', sizeof(void *) * 4);
 					while (get_next_line(0, &line) > 0
 						   && ft_strncmp(line, file, ft_strlen(file) + 1))
 					{
 						g_term.lineno++;
-						if(isfirst)
+						if(!result)
 						{
 							array[0] = line;
 							array[1] = "\n";
-							isfirst = 0;
 						}
 						else
 						{
@@ -467,17 +463,19 @@ int	get_redirs(t_list **args, int *input, int *output)
 					if (ft_strncmp(line, file, ft_strlen(file) + 1))
 						warning_shell(file, heredocatline);
 					free (line);
+
+					char		filepath[4098];
+
+					make_non_existing_filename(filepath, sizeof(filepath));
 					if (*input > STDIN_FILENO)
 						close(*input);
-					make_non_existing_filename(filepath, sizeof(filepath));
 					*input = open(filepath, O_CREAT|O_WRONLY, S_IRUSR|
 								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					if (*input == -1)
 						return (error_file(file, prunepattern, args));
 					write(*input, result, ft_strlen(result));
 					close(*input);
-					*input = open(filepath, O_RDONLY, S_IRUSR|
-									  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+					*input = open(filepath, O_RDONLY);
 					unlink(filepath);
 					free(result);
 				}
