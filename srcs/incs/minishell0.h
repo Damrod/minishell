@@ -64,6 +64,7 @@ typedef struct s_term {
 	char	**args;
 	char	**environ;
 	char	*inputstring;
+	char	**path;
 	t_dlist	*cmds;
 }	t_term;
 

@@ -6,13 +6,14 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:44:16 by hellnhell         #+#    #+#             */
-/*   Updated: 2021/06/05 17:11:18 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/06/25 16:08:36 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+#include <minishell0.h>
 # include	<libft.h>
 # include	<stdio.h>
 # include	<unistd.h>
@@ -31,8 +32,10 @@ typedef struct s_tab
 }					t_tab;
 
 char	*read_line(t_tab *t);
-void	read_path(t_tab *t, char **env);
-void	check_path(t_tab *t, char **env);
+//void	read_path(t_tab *t, char **env);
+void	read_path(char **env, t_term	*g_term);
+//void	check_path(t_tab *t, char **env);
+void	check_path(t_term *g_term);
 char	**split_line(char *line);
 void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize);
 char	*ft_strtok(char *str, char *sepa);
