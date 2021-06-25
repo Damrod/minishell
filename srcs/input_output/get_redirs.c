@@ -16,8 +16,6 @@ int	get_redirs(t_list **args, int *input, int *output)
 	t_list			*list;
 
 	prunepattern = ft_calloc(ft_lstsize(*args), sizeof(*prunepattern));
-	*input = STDIN_FILENO;
-	*output = STDOUT_FILENO;
 	i = 0;
 	list = *args;
 	while (list)

@@ -16,9 +16,14 @@
 #include <get_redirs.h>
 
 t_term	g_term = {
+	.environ = NULL,
 	.args = NULL,
+	.cmds = NULL,
 	.inputstring = NULL,
-	.cmds = NULL
+	.lineno = 0,
+	.infd = STDIN_FILENO,
+	.outfd = STDOUT_FILENO,
+	.lastret = 0
 };
 
 
@@ -161,7 +166,6 @@ int	main(int argc, char **argv)
 	g_term.lastret = 0;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
-	g_term.lineno = 0;
 	while (1)
 	{
 		g_term.inputstring = readline("marishell% ");
