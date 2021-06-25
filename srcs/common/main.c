@@ -344,8 +344,7 @@ void	make_non_existing_filename(char *filepath, size_t size)
 	{
 		buffer[i] = 'a' + (i % 26);
 		buffer[i + 1] = '\0';
-		ft_snprintf(filepath, size - 1, "%s/%s",
-				 getcwd(cwd, sizeof(cwd)), buffer);
+		ft_snprintf(filepath, size - 1, "/tmp/%s", buffer);
 		if (!file_exists(filepath))
 			return ;
 		i++;
@@ -356,7 +355,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 {
 	unsigned char	type;
 	char			*file;
-	char			fileopen[TYPE_HEREDOC + 1];
+	char			fileopen[TYPE_IN + 1];
 	int				*prunepattern;
 	size_t			i;
 	t_list			*list;
@@ -400,11 +399,11 @@ int	get_redirs(t_list **args, int *input, int *output)
 			{
 				if (list->next && list->next->content)
 				{
-					if (fileopen[TYPE_APP])
+					if (fileopen[TYPE_OUT])
 						close(*output);
 					*output = open(file, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|
 								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					fileopen[TYPE_APP] = 1;
+					fileopen[TYPE_OUT] = 1;
 					if (*output == -1)
 						return (error_file(file, prunepattern, args, EXENAME));
 				}
@@ -438,14 +437,6 @@ int	get_redirs(t_list **args, int *input, int *output)
 					size_t	size;
 					char	filepath[4098];
 
-					if (fileopen[TYPE_HEREDOC])
-						close(*input);
-					make_non_existing_filename(filepath, sizeof(filepath));
-					*input = open(filepath, O_CREAT|O_RDWR, S_IRUSR|
-								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					fileopen[TYPE_HEREDOC] = 1;
-					if (*input == -1)
-						return (error_file(file, prunepattern, args, EXENAME));
 					result = NULL;
 					isfirst = 1;
 					while (get_next_line(0, &line) > 0
@@ -471,6 +462,14 @@ int	get_redirs(t_list **args, int *input, int *output)
 						result = tmp0;
 					}
 					free (line);
+					if (fileopen[TYPE_IN])
+						close(*input);
+					make_non_existing_filename(filepath, sizeof(filepath));
+					*input = open(filepath, O_CREAT|O_WRONLY, S_IRUSR|
+								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+					fileopen[TYPE_IN] = 1;
+					if (*input == -1)
+						return (error_file(file, prunepattern, args, EXENAME));
 					write(*input, result, ft_strlen(result));
 					close(*input);
 					*input = open(filepath, O_RDONLY, S_IRUSR|
