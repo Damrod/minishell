@@ -23,7 +23,7 @@ LIBFTD = libft/noassign libft/memory libft/polyarray libft/btree			   \
 	   libft/list libft/mytinygc libft/ctype libft/allocstr libft/strutils	   \
 	   libft/atoi libft/output libft/ft_printf libft/ft_printf/srcs			   \
 	   libft/string libft/list/dllist libft/dblptr
-DIRS = common helpers
+DIRS = common helpers error_mng input_output
 DIRS += $(LIBFTD)
 SOURCEDIRS = $(foreach dir, $(DIRS), $(addprefix $(SOURCEDIR)/, $(dir)))
 TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))

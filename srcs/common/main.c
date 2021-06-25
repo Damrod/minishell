@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
 #include <minishell0.h>
-#include <minishell.h>
-#include <stdbool.h>
+#include <error_mng.h>
+#include <wstrcmp.h>
+#include <get_redirs.h>
 
 t_term	g_term = {
 	.args = NULL,
@@ -21,219 +21,6 @@ t_term	g_term = {
 	.cmds = NULL
 };
 
-void	print_dblptr(const char *input)
-{
-	printf("%s\n", input);
-}
-
-void	apply_dblptr(char **data, void (*f)())
-{
-	size_t	len;
-
-	len = 0;
-	if (data)
-	{
-		while (data[len])
-		{
-			f(data[len]);
-			len++;
-		}
-	}
-}
-
-void	ft_order_list(t_tab *t, t_dlist *lst, int i)
-{
-	(void)lst;
-	while (t->orders[i])
-	{
-		//procesado de to
-		printf("%s\n", t->orders[i]);
-		i++;
-	}
-}
-
-void	free_and_nullify(void **tofree)
-{
-	free(*tofree);
-	*tofree = NULL;
-}
-
-char	*downcast_wstr(const unsigned short *str, char is_low)
-{
-	char	*result;
-	size_t	i;
-
-	if (!str)
-		return (NULL);
-	if (!na_calloc(sizeof(*result), ft_wstrlen(str, UNTIL_END_OF_STRING) + 1,
-			(void **)&result))
-		return (NULL);
-	i = 0;
-	while (str[i])
-	{
-		if (is_low)
-			result[i] = (char)str[i];
-		else
-			result[i] = (char)(str[i] >> 8);
-		i++;
-	}
-	return (result);
-}
-
-static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
-			char checkdepth)
-{
-	*bitmask2 = 0;
-	*bitmask = 0;
-	if (checkdepth == CHECK_ONLY_LOW)
-	{
-		*bitmask = 0xFF00U;
-		*bitmask2 = 0;
-	}
-	if (checkdepth == CHECK_SNGQUOTE)
-	{
-		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_DBLQUOT);
-		*bitmask2 = FLAG_SNGQUOT;
-	}
-	if (checkdepth == CHECK_DBLQUOTE)
-	{
-		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_SNGQUOT);
-		*bitmask2 = FLAG_DBLQUOT;
-	}
-	if (checkdepth == CHECK_ANYQUOTE)
-	{
-		*bitmask2 = 0;
-		*bitmask = 0;
-	}
-}
-
-char cmp_chars(unsigned short a, unsigned short b, char checkdepth)
-{
-	unsigned short	bitmask;
-	unsigned short	bitmask2;
-	bool			aggregate;
-
-	if (checkdepth == CHECK_ANYQUOTE || checkdepth == CHECK_NOTQUOTE)
-	{
-		aggregate = ((a & FLAG_DBLQUOT) | (a & FLAG_SNGQUOT));
-		if (checkdepth == CHECK_NOTQUOTE)
-			aggregate = !aggregate;
-		aggregate &= ((a & 0xFF) == (b & 0xFF));
-		return (aggregate);
-	}
-	config_bitmasks(&bitmask, &bitmask2, checkdepth);
-	return ((a & ~bitmask) == (b | bitmask2));
-}
-
-int	ft_wstrncmp(unsigned short *s1, const char *str2, char checkdepth, size_t n)
-{
-	int					a;
-	size_t				i;
-	unsigned short		*s2;
-
-	if (n == 0)
-		return (0);
-	s2 = upcast_str(str2);
-	if (!s2)
-		return (-0xFFFFF);
-	i = 0;
-	while (s1[i] && cmp_chars(s1[i], s2[i], checkdepth) && (i < n - 1))
-		i++;
-	a = (int)s1[i] - (int)s2[i];
-	free (s2);
-	return (a);
-}
-
-void	handle_eot(int sig)
-{
-	extern char		**environ;
-
-	(void) sig;
-	free_and_nullify ((void **)&environ);
-	free_and_nullify((void **)&g_term.inputstring);
-	ft_printf("\n");
-	exit(0);
-}
-
-/* t_compcmd	*cmpcmd(t_dlist **cmd) */
-/* { */
-/* 	if (*cmd) */
-/* 		return ((t_compcmd *)((*cmd)->content)); */
-/* 	return (NULL); */
-/* } */
-
-/* int add_arg(t_compcmd *cmpcmd, char *arg) */
-/* { */
-/* 	char **aux; */
-
-/* 	aux = cmpcmd->args; */
-/* 	cmpcmd->args = ft_dblptr_cpy((const char **)cmpcmd->args, arg, 0); */
-/* 	if (!cmpcmd->args) */
-/* 		return (EXIT_FAILURE); */
-/* 	free (aux); */
-/* 	cmpcmd->type = TYPE_END; */
-/* 	return (EXIT_SUCCESS); */
-/* } */
-
-/* t_compcmd	*makecmpcmd(unsigned short *arg) */
-/* { */
-/* 	t_compcmd	*cmd; */
-/* 	char		**res; */
-/* 	size_t		size; */
-
-/* 	size = 0; */
-/* 	if(arg) */
-/* 		size = 1; */
-/* 	if (!na_calloc(1, sizeof(*cmd), (void **)&cmd)) */
-/* 		return (NULL); */
-/* 	if (!na_calloc(size + 1, sizeof(*res), (void **)&res)) */
-/* 		return (NULL); */
-/* 	res[0] = downcast_wstr(arg, 1); */
-/* 	cmd->args = res; */
-/* 	cmd->type = TYPE_END; */
-/* 	return(cmd); */
-/* } */
-
-char is_redir(unsigned short *arg)
-{
-	if (ft_wstrncmp(arg, ">", CHECK_NOTQUOTE, 2) == 0
-		|| ft_wstrncmp(arg, "<", CHECK_NOTQUOTE, 2) == 0
-		|| ft_wstrncmp(arg, ">>", CHECK_NOTQUOTE, 3) == 0
-		|| ft_wstrncmp(arg, "<<", CHECK_NOTQUOTE, 3) == 0)
-		return (1);
-	return (0);
-}
-
-char is_pipe(unsigned short *arg)
-{
-	if (ft_wstrncmp(arg, "|", CHECK_NOTQUOTE, 2) == 0)
-		return (1);
-	return (0);
-}
-
-char is_symbol(unsigned short *arg)
-{
-	return (is_pipe(arg) || is_redir(arg));
-}
-
-unsigned char	get_type(unsigned short *arg)
-{
-	unsigned char	type;
-
-	if (ft_wstrncmp(arg, ">", CHECK_NOTQUOTE, 2) == 0)
-		type = TYPE_OUT;
-	else if (ft_wstrncmp(arg, ">>", CHECK_NOTQUOTE, 3) == 0)
-		type = TYPE_APP;
-	else if (ft_wstrncmp(arg, "<", CHECK_NOTQUOTE, 2) == 0)
-		type = TYPE_IN;
-	else if (ft_wstrncmp(arg, "<<", CHECK_NOTQUOTE, 3) == 0)
-		type = TYPE_HEREDOC;
-	else if (ft_wstrncmp(arg, "|", CHECK_NOTQUOTE, 2) == 0)
-		type = TYPE_PIPE;
-	else
-		type = TYPE_END;
-	return (type);
-}
 
 /* int handle_redir_push(t_dlist **cmds, unsigned short *arg) */
 /* { */
@@ -299,207 +86,65 @@ unsigned char	get_type(unsigned short *arg)
 /* 	return (EXIT_SUCCESS); */
 /* } */
 
-int error_syntax(char *token, int *prunepattern, t_list **args)
+
+void	print_dblptr(const char *input)
 {
-	free(prunepattern);
-	ft_lstclear(args, free, free);
-	ft_dprintf(2, "%s: syntax error near unexpected token"
-			   " `%s'\n", EXENAME, token);
-	return (1);
+	printf("%s\n", input);
 }
 
-int warning_shell(char *token, uint32_t line)
+void	apply_dblptr(char **data, void (*f)())
 {
-	ft_dprintf(1, "%s: warning: here-document at line %u delimited by "
-			   "end-of-file (wanted `%s')\n", EXENAME, line, token);
-	return (1);
-}
+	size_t	len;
 
-int error_file(char *file, int *prunepattern, t_list **args)
-{
-	int		error;
-
-	error = errno;
-	free(prunepattern);
-	ft_lstclear(args, free, free);
-	ft_dprintf(2, "%s: %s: %s\n", EXENAME, file, strerror(error));
-	free(file);
-	return (1);
-}
-
-#include <sys/stat.h>
-#include <stdbool.h>
-
-
-bool	file_exists (char *filename)
-{
-	struct stat	buffer;
-
-	return (stat (filename, &buffer) == 0);
-}
-
-void	make_non_existing_filename(char *filepath, size_t size)
-{
-	char	buffer[2048];
-	size_t	i;
-	char	cwd[2048];
-
-	ft_memset(filepath, '\0', size);
-	ft_memset(buffer, '\0', sizeof(*buffer));
-	ft_memset(cwd, '\0', sizeof(*cwd));
-	i = 0;
-	while (i < (sizeof(buffer) - 1))
+	len = 0;
+	if (data)
 	{
-		buffer[i] = 'a' + (i % 26);
-		buffer[i + 1] = '\0';
-		ft_snprintf(filepath, size - 1, "/tmp/%s", buffer);
-		if (!file_exists(filepath))
-			return ;
-		i++;
-	}
-	return ;
-}
-int	get_redirs(t_list **args, int *input, int *output)
-{
-	size_t			i;
-	unsigned char	type;
-	char			*file;
-	int				*prunepattern;
-	t_list			*list;
-
-	prunepattern = ft_calloc(ft_lstsize(*args), sizeof(*prunepattern));
-	*input = STDIN_FILENO;
-	*output = STDOUT_FILENO;
-	i = 0;
-	list = *args;
-	while (list)
-	{
-		if (is_redir((unsigned short *)list->content))
+		while (data[len])
 		{
-			type = get_type((unsigned short *)list->content);
-			if (list->next && list->next->content)
-			{
-				file = downcast_wstr(list->next->content, 1);
-				if (is_symbol(list->next->content))
-				{
-					error_syntax(file, prunepattern, args);
-					free (file);
-					return (1);
-				}
-			}
-			if (type == TYPE_IN)
-			{
-				if (list->next && list->next->content)
-				{
-					if (*input > STDIN_FILENO)
-						close(*input);
-					*input = open(file, O_RDONLY);
-					if (*input == -1)
-						return (error_file(file, prunepattern, args));
-				}
-				else if (!list->next)
-					return (error_syntax("newline", prunepattern, args));
-			}
-			if (type == TYPE_APP)
-			{
-				if (list->next && list->next->content)
-				{
-					if (*output > STDERR_FILENO)
-						close(*output);
-					*output = open(file, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|
-								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					if (*output == -1)
-						return (error_file(file, prunepattern, args));
-				}
-				else if (!list->next)
-					return (error_syntax("newline", prunepattern, args));
-			}
-			if (type == TYPE_OUT)
-			{
-				if (list->next && list->next->content)
-				{
-					if (*output > STDERR_FILENO)
-						close(*output);
-					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|
-								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					if (*output == -1)
-						return (error_file(file, prunepattern, args));
-				}
-				else if (!list->next)
-					return (error_syntax("newline", prunepattern, args));
-			}
-			if (type == TYPE_HEREDOC)
-			{
-				if (list->next && list->next->content)
-				{
-					char		*line;
-					char		*result;
-					char		*tmp0;
-					char		*array[4];
-					uint32_t	heredocatline;
-
-					heredocatline = g_term.lineno;
-					result = NULL;
-					ft_memset(array, '\0', sizeof(void *) * 4);
-					while (get_next_line(0, &line) > 0
-						   && ft_strncmp(line, file, ft_strlen(file) + 1))
-					{
-						g_term.lineno++;
-						if(!result)
-						{
-							array[0] = line;
-							array[1] = "\n";
-						}
-						else
-						{
-							array[0] = result;
-							array[1] = line;
-							array[2] = "\n";
-						}
-						tmp0 = ft_strjoin_ult(-1, (const char **)array, "");
-						free(result);
-						free(line);
-						result = tmp0;
-					}
-					if (ft_strncmp(line, file, ft_strlen(file) + 1))
-						warning_shell(file, heredocatline);
-					free (line);
-
-					char		filepath[4098];
-
-					make_non_existing_filename(filepath, sizeof(filepath));
-					if (*input > STDIN_FILENO)
-						close(*input);
-					*input = open(filepath, O_CREAT|O_WRONLY, S_IRUSR|
-								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					if (*input == -1)
-						return (error_file(file, prunepattern, args));
-					write(*input, result, ft_strlen(result));
-					close(*input);
-					*input = open(filepath, O_RDONLY);
-					unlink(filepath);
-					free(result);
-				}
-				else if (!list->next)
-					return (error_syntax("newline", prunepattern, args));
-			}
-			free(file);
-			prunepattern[i++] = 1;
-			prunepattern[i++] = 1;
-			if (list && list->next)
-				list = list->next->next;
-		}
-		else
-		{
-			i++;
-			if (list)
-				list = list->next;
+			f(data[len]);
+			len++;
 		}
 	}
-	ft_lstcullpat(args, prunepattern, free, free);
-	free(prunepattern);
-	return (0);
 }
+
+/* t_compcmd	*cmpcmd(t_dlist **cmd) */
+/* { */
+/* 	if (*cmd) */
+/* 		return ((t_compcmd *)((*cmd)->content)); */
+/* 	return (NULL); */
+/* } */
+
+/* int add_arg(t_compcmd *cmpcmd, char *arg) */
+/* { */
+/* 	char **aux; */
+
+/* 	aux = cmpcmd->args; */
+/* 	cmpcmd->args = ft_dblptr_cpy((const char **)cmpcmd->args, arg, 0); */
+/* 	if (!cmpcmd->args) */
+/* 		return (EXIT_FAILURE); */
+/* 	free (aux); */
+/* 	cmpcmd->type = TYPE_END; */
+/* 	return (EXIT_SUCCESS); */
+/* } */
+
+/* t_compcmd	*makecmpcmd(unsigned short *arg) */
+/* { */
+/* 	t_compcmd	*cmd; */
+/* 	char		**res; */
+/* 	size_t		size; */
+
+/* 	size = 0; */
+/* 	if(arg) */
+/* 		size = 1; */
+/* 	if (!na_calloc(1, sizeof(*cmd), (void **)&cmd)) */
+/* 		return (NULL); */
+/* 	if (!na_calloc(size + 1, sizeof(*res), (void **)&res)) */
+/* 		return (NULL); */
+/* 	res[0] = downcast_wstr(arg, 1); */
+/* 	cmd->args = res; */
+/* 	cmd->type = TYPE_END; */
+/* 	return(cmd); */
+/* } */
 
 int	main(int argc, char **argv)
 {
