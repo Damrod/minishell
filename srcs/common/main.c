@@ -333,14 +333,21 @@ char	*make_non_existing_filename(void)
 {
 	char	buffer[2048];
 	size_t	i;
+	char	filepath[4098];
+	char	cwd[2048];
 
+	memset(filepath, '\0', sizeof(*filepath));
+	memset(buffer, '\0', sizeof(*buffer));
+	memset(cwd, '\0', sizeof(*cwd));
 	i = 0;
 	while (i < (sizeof(buffer) - 1))
 	{
 		buffer[i] = 'a' + (i % 26);
 		buffer[i + 1] = '\0';
-		if (!file_exists(buffer))
-			return (ft_strdup(buffer));
+		snprintf(filepath, sizeof(filepath) - 1, "%s/%s",
+				 getcwd(cwd, sizeof(cwd)), buffer);
+		if (!file_exists(filepath))
+			return (strdup(filepath));
 		i++;
 	}
 	return (NULL);
@@ -430,12 +437,12 @@ int	get_redirs(t_list **args, int *input, int *output)
 					char	*array[3];
 					char	isfirst;
 					size_t	size;
-					char	buffer[2049];
+					char	*filepath;
 
 					if (fileopen[TYPE_HEREDOC])
 						close(*input);
-					ft_memset(buffer, '\0', sizeof(buffer));
-					*input = open("./", O_RDWR|O_EXCL|__O_TMPFILE, S_IRUSR|
+					filepath = make_non_existing_filename();
+					*input = open(filepath, O_CREAT|O_RDWR, S_IRUSR|
 								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					fileopen[TYPE_HEREDOC] = 1;
 					if (*input == -1)
@@ -466,7 +473,12 @@ int	get_redirs(t_list **args, int *input, int *output)
 					}
 					free (line);
 					write(*input, result, ft_strlen(result));
-					ft_lseek(*input, 0, SEEK_SET);
+					close(*input);
+					*input = open(filepath, O_RDONLY, S_IRUSR|
+									  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+					unlink(filepath);
+					free (filepath);
+					/* ft_lseek(*input, 0, SEEK_SET); */
 					free(result);
 				}
 				else if (!list->next)
