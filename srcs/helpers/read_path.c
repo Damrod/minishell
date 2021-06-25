@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:04:38 by emartin-          #+#    #+#             */
-/*   Updated: 2021/06/25 20:29:39 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/06/25 20:58:52 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,15 +61,16 @@ void	read_path(t_tab *t, char **env)
 }
 */
 
-char *ft_cat_path(char *path, char *arg)
+char	*ft_cat_path(char *path, char *arg)
 {
-	char *ret;
-	size_t i;
+	char	*ret;
+	size_t	i;
 
 	i = 0;
-	if(!na_calloc((ft_strlen(path) + ft_strlen(arg) + 2), sizeof(char*), (void **)&ret))
+	if (!na_calloc((ft_strlen(path) + ft_strlen(arg) + 2),
+			sizeof (char*), (void **)&ret))
 		return (NULL);
-	while(*path)
+	while (*path)
 		ret[i++] = *path++;
 	ret[i++] = '/';
 	while (*arg)
@@ -78,75 +79,72 @@ char *ft_cat_path(char *path, char *arg)
 	return (ret);
 }
 
-char *ft_cat_rel_path(char *path, char *arg)
+char	*ft_cat_rel_path(char *path, char *arg)
 {
-	char *ret;
-	size_t i;
+	char	*ret;
+	size_t	i;
 
 	i = 0;
-	if(!na_calloc((ft_strlen(path) + ft_strlen(arg)), sizeof(char*), (void **)&ret))
+	if (!na_calloc((ft_strlen(path) + ft_strlen(arg)),
+			sizeof(char*), (void **)&ret))
 		return (NULL);
-	while(*path)
+	while (*path)
 		ret[i++] = *path++;
-	arg +=2;
+	arg += 2;
 	while (*arg)
 		ret[i++] = *arg++;
 	ret[i++] = 0;
 	return (ret);
 }
 
-int check_relat(char *execpath, char *cwd, t_term *g_term, int *status)
+int	check_relat(char *execpath, char *cwd, t_term *g_term, int *status)
 {
 	if ((g_term->args[0][0] == '.' && g_term->args[0][1]
 		&& g_term->args[0][1] == '/') || ft_isalpha(g_term->args[0][0]))
 	{
-	if (g_term->args[0][0] == '.')
-		execpath = ft_cat_rel_path(cwd, g_term->args[0]);
-	else if (ft_isalpha(g_term->args[0][0]))
-		execpath = ft_cat_path(cwd, g_term->args[0]);
-	*status = execve(execpath, g_term->args, g_term->environ);
-	free(execpath);
-	return (1);
+		if (g_term->args[0][0] == '.')
+			execpath = ft_cat_rel_path(cwd, g_term->args[0]);
+		else if (ft_isalpha(g_term->args[0][0]))
+			execpath = ft_cat_path(cwd, g_term->args[0]);
+		*status = execve(execpath, g_term->args, g_term->environ);
+		free(execpath);
+		return (1);
 	}
 	return (0);
 }
 
-void check_path(t_term *g_term)
+void	check_path(t_term *g_term)
 {
-	size_t i;
-	int *status;
-	char cwd[1024];
-	char *execpath;
-
+	size_t	i;
+	int		*status;
+	char	cwd[1024];
+	char	*execpath;
 
 	getcwd(cwd, 1024);
 	i = 0;
-	(void)i;
 	status = malloc(sizeof(int));
 	*status = -1;
-	(void)execpath;
-printf("args: %s\n", g_term->args[0]);
-	while(g_term->path[i])
+	while (g_term->path[i])
 	{
-		if(!check_relat(execpath, cwd, g_term, status) && *status >= 0)
-			continue;
-		if(g_term->args[0][0] == '/')
+		if (!check_relat(execpath, cwd, g_term, status) && *status >= 0)
+			continue ;
+		if (g_term->args[0][0] == '/')
 		{
 			*status = execve(g_term->args[0], g_term->args, g_term->environ);
-			if(*status >= 0)
-				continue;
+			if (*status >= 0)
+				continue ;
 		}
 		execpath = ft_cat_path(g_term->path[i], g_term->args[0]);
 		*status = execve(execpath, g_term->args, g_term->environ);
 		free(execpath);
 		i++;
 	}
-	if(*status < 0 || !g_term->path[i])
+	if (*status < 0 || !g_term->path[i])
 		printf("command not found: %s\n", g_term->args[0]);
 	free(status);
 }
 
-void read_path(char **env, t_term *g_term)
+void	read_path(char **env, t_term *g_term)
 {
 	size_t	i;
 
@@ -154,7 +152,7 @@ void read_path(char **env, t_term *g_term)
 	while (env[i])
 	{
 		if (ft_strncmp("PATH=", env[i], 5) == 0)
-				g_term->path = ft_split(&env[i][5], ':');
+			g_term->path = ft_split(&env[i][5], ':');
 		i++;
 	}
 }
