@@ -303,7 +303,8 @@ int error_syntax(char *token, int *prunepattern, t_list **args)
 {
 	free(prunepattern);
 	ft_lstclear(args, free, free);
-	ft_dprintf(2, "%s: syntax error near unexpected token `%s'\n", EXENAME, token);
+	ft_dprintf(2, "%s: syntax error near unexpected token"
+			   " `%s'\n", EXENAME, token);
 	return (1);
 }
 
