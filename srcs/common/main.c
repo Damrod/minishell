@@ -322,6 +322,7 @@ int error_file(char *file, int *prunepattern, t_list **args, char *argz)
 #include <sys/stat.h>
 #include <stdbool.h>
 
+
 bool	file_exists (char *filename)
 {
 	struct stat	buffer;
@@ -329,30 +330,28 @@ bool	file_exists (char *filename)
 	return (stat (filename, &buffer) == 0);
 }
 
-char	*make_non_existing_filename(void)
+void	make_non_existing_filename(char *filepath, size_t size)
 {
 	char	buffer[2048];
 	size_t	i;
-	char	filepath[4098];
 	char	cwd[2048];
 
-	memset(filepath, '\0', sizeof(*filepath));
-	memset(buffer, '\0', sizeof(*buffer));
-	memset(cwd, '\0', sizeof(*cwd));
+	ft_memset(filepath, '\0', size);
+	ft_memset(buffer, '\0', sizeof(*buffer));
+	ft_memset(cwd, '\0', sizeof(*cwd));
 	i = 0;
 	while (i < (sizeof(buffer) - 1))
 	{
 		buffer[i] = 'a' + (i % 26);
 		buffer[i + 1] = '\0';
-		snprintf(filepath, sizeof(filepath) - 1, "%s/%s",
+		ft_snprintf(filepath, size - 1, "%s/%s",
 				 getcwd(cwd, sizeof(cwd)), buffer);
 		if (!file_exists(filepath))
-			return (strdup(filepath));
+			return ;
 		i++;
 	}
-	return (NULL);
+	return ;
 }
-
 int	get_redirs(t_list **args, int *input, int *output)
 {
 	unsigned char	type;
@@ -437,11 +436,11 @@ int	get_redirs(t_list **args, int *input, int *output)
 					char	*array[3];
 					char	isfirst;
 					size_t	size;
-					char	*filepath;
+					char	filepath[4098];
 
 					if (fileopen[TYPE_HEREDOC])
 						close(*input);
-					filepath = make_non_existing_filename();
+					make_non_existing_filename(filepath, sizeof(filepath));
 					*input = open(filepath, O_CREAT|O_RDWR, S_IRUSR|
 								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					fileopen[TYPE_HEREDOC] = 1;
@@ -477,8 +476,6 @@ int	get_redirs(t_list **args, int *input, int *output)
 					*input = open(filepath, O_RDONLY, S_IRUSR|
 									  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 					unlink(filepath);
-					free (filepath);
-					/* ft_lseek(*input, 0, SEEK_SET); */
 					free(result);
 				}
 				else if (!list->next)
