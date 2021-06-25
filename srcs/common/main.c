@@ -180,7 +180,7 @@ int	main(int argc, char **argv)
 		{
 			char *line;
 
-			while(get_next_line(g_term.infd, &line) > 0)
+			while (get_next_line(g_term.infd, &line) > 0)
 			{
 				ft_printf("%s\n", line);
 				free (line);
@@ -193,7 +193,10 @@ int	main(int argc, char **argv)
 		if (g_term.outfd > STDERR_FILENO)
 			close(g_term.outfd);
 		if (g_term.lastret)
-			continue;
+		{
+			ft_lstclear(&str, free, free);
+			continue ;
+		}
 		orig = str;
 		i = 0;
 		while (str)
