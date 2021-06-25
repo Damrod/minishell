@@ -251,7 +251,7 @@ unsigned char	get_type(unsigned short *arg)
 /* 	cmpcmd(cmds)->type = type; */
 /* } */
 
-/* int	syntax_error(unsigned short *arg); */
+/* int	error_syntax(unsigned short *arg); */
 
 /* int	fill_cmd_table(t_dlist **cmds, unsigned short *arg) */
 /* { */
@@ -265,7 +265,7 @@ unsigned char	get_type(unsigned short *arg)
 /* 			return (EXIT_SUCCESS); */
 /* 		} */
 /* 		else */
-/* 			return (syntax_error(arg)); */
+/* 			return (error_syntax(arg)); */
 /* 	} */
 /* 	else */
 /* 	{ */
@@ -284,7 +284,7 @@ unsigned char	get_type(unsigned short *arg)
 /* 		else if (is_redir(arg) */
 /* 				 || (ft_wstrncmp(arg, "|", CHECK_NOTQUOTE, 2) == 0 */
 /* 					&& cmpcmd(cmds)->type == TYPE_PIPE)) */
-/* 			return (syntax_error(arg)); */
+/* 			return (error_syntax(arg)); */
 /* 		else */
 /* 			ft_dlstpush_front(cmds, makecmpcmd(arg)); */
 /* 		return (EXIT_SUCCESS); */
@@ -299,30 +299,29 @@ unsigned char	get_type(unsigned short *arg)
 /* 	return (EXIT_SUCCESS); */
 /* } */
 
-int syntax_error(char *token, int *prunepattern, t_list **args, char *argz)
+int error_syntax(char *token, int *prunepattern, t_list **args)
 {
 	free(prunepattern);
 	ft_lstclear(args, free, free);
-	ft_dprintf(2, "%s: syntax error near unexpected token `%s'\n", argz, token);
+	ft_dprintf(2, "%s: syntax error near unexpected token `%s'\n", EXENAME, token);
 	return (1);
 }
 
-int warning_shell(char *token, int *prunepattern, t_list **args, uint32_t line)
+int warning_shell(char *token, uint32_t line)
 {
-	free(prunepattern);
-	ft_lstclear(args, free, free);
-	ft_dprintf(2, "%s: warning: here-document at line %u delimited by end-of-file (wanted `%s')\n", EXENAME, line, token);
+	ft_dprintf(1, "%s: warning: here-document at line %u delimited by "
+			   "end-of-file (wanted `%s')\n", EXENAME, line, token);
 	return (1);
 }
 
-int error_file(char *file, int *prunepattern, t_list **args, char *argz)
+int error_file(char *file, int *prunepattern, t_list **args)
 {
 	int		error;
 
 	error = errno;
 	free(prunepattern);
 	ft_lstclear(args, free, free);
-	ft_dprintf(2, "%s: %s: %s\n", argz, file, strerror(error));
+	ft_dprintf(2, "%s: %s: %s\n", EXENAME, file, strerror(error));
 	free(file);
 	return (1);
 }
@@ -363,7 +362,6 @@ int	get_redirs(t_list **args, int *input, int *output)
 {
 	unsigned char	type;
 	char			*file;
-	char			fileopen[TYPE_IN + 1];
 	int				*prunepattern;
 	size_t			i;
 	t_list			*list;
@@ -371,7 +369,6 @@ int	get_redirs(t_list **args, int *input, int *output)
 	prunepattern = ft_calloc(ft_lstsize(*args), sizeof(*prunepattern));
 	*input = STDIN_FILENO;
 	*output = STDOUT_FILENO;
-	ft_memset(fileopen, 0, sizeof(fileopen));
 	i = 0;
 	list = *args;
 	while (list)
@@ -384,7 +381,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 				file = downcast_wstr(list->next->content, 1);
 				if (is_symbol(list->next->content))
 				{
-					syntax_error(file, prunepattern, args, EXENAME);
+					error_syntax(file, prunepattern, args);
 					free (file);
 					return (1);
 				}
@@ -393,61 +390,59 @@ int	get_redirs(t_list **args, int *input, int *output)
 			{
 				if (list->next && list->next->content)
 				{
-					if (fileopen[TYPE_IN])
+					if (*input > STDIN_FILENO)
 						close(*input);
 					*input = open(file, O_RDONLY);
-					fileopen[TYPE_IN] = 1;
 					if (*input == -1)
-						return (error_file(file, prunepattern, args, EXENAME));
+						return (error_file(file, prunepattern, args));
 				}
 				else if (!list->next)
-					return (syntax_error("newline", prunepattern, args, EXENAME));
+					return (error_syntax("newline", prunepattern, args));
 			}
 			if (type == TYPE_APP)
 			{
 				if (list->next && list->next->content)
 				{
-					if (fileopen[TYPE_OUT])
+					if (*output > STDERR_FILENO)
 						close(*output);
 					*output = open(file, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|
 								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					fileopen[TYPE_OUT] = 1;
 					if (*output == -1)
-						return (error_file(file, prunepattern, args, EXENAME));
+						return (error_file(file, prunepattern, args));
 				}
 				else if (!list->next)
-					return (syntax_error("newline", prunepattern, args, EXENAME));
+					return (error_syntax("newline", prunepattern, args));
 			}
 			if (type == TYPE_OUT)
 			{
 				if (list->next && list->next->content)
 				{
-					if (fileopen[TYPE_OUT])
+					if (*output > STDERR_FILENO)
 						close(*output);
 					*output = open(file, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|
 								   S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					fileopen[TYPE_OUT] = 1;
 					if (*output == -1)
-						return (error_file(file, prunepattern, args, EXENAME));
+						return (error_file(file, prunepattern, args));
 				}
 				else if (!list->next)
-					return (syntax_error("newline", prunepattern, args, EXENAME));
+					return (error_syntax("newline", prunepattern, args));
 			}
 			if (type == TYPE_HEREDOC)
 			{
 				if (list->next && list->next->content)
 				{
-					char	*line;
-					char	*result;
-					char	*tmp0;
-					char	*array[3];
-					char	isfirst;
-					size_t	size;
-					char	filepath[4098];
+					char		*line;
+					char		*result;
+					char		*tmp0;
+					char		*array[4];
+					char		isfirst;
+					char		filepath[4098];
+					uint32_t	heredocatline;
 
+					heredocatline = g_term.lineno;
 					result = NULL;
 					isfirst = 1;
-					uint32_t heredocatline = g_term.lineno;
+					ft_memset(array, '\0', sizeof(void *) * 4);
 					while (get_next_line(0, &line) > 0
 						   && ft_strncmp(line, file, ft_strlen(file) + 1))
 					{
@@ -456,7 +451,6 @@ int	get_redirs(t_list **args, int *input, int *output)
 						{
 							array[0] = line;
 							array[1] = "\n";
-							size = 2;
 							isfirst = 0;
 						}
 						else
@@ -464,24 +458,22 @@ int	get_redirs(t_list **args, int *input, int *output)
 							array[0] = result;
 							array[1] = line;
 							array[2] = "\n";
-							size = 3;
 						}
-						tmp0 = ft_strjoin_ult(size, (const char **)array, "");
+						tmp0 = ft_strjoin_ult(-1, (const char **)array, "");
 						free(result);
 						free(line);
 						result = tmp0;
 					}
 					if (ft_strncmp(line, file, ft_strlen(file) + 1))
-						return warning_shell(file, prunepattern, args, heredocatline);
+						warning_shell(file, heredocatline);
 					free (line);
-					if (fileopen[TYPE_IN])
+					if (*input > STDIN_FILENO)
 						close(*input);
 					make_non_existing_filename(filepath, sizeof(filepath));
 					*input = open(filepath, O_CREAT|O_WRONLY, S_IRUSR|
 								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-					fileopen[TYPE_IN] = 1;
 					if (*input == -1)
-						return (error_file(file, prunepattern, args, EXENAME));
+						return (error_file(file, prunepattern, args));
 					write(*input, result, ft_strlen(result));
 					close(*input);
 					*input = open(filepath, O_RDONLY, S_IRUSR|
@@ -490,7 +482,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 					free(result);
 				}
 				else if (!list->next)
-					return (syntax_error("newline", prunepattern, args, EXENAME));
+					return (error_syntax("newline", prunepattern, args));
 			}
 			free(file);
 			prunepattern[i++] = 1;
