@@ -307,6 +307,14 @@ int syntax_error(char *token, int *prunepattern, t_list **args, char *argz)
 	return (1);
 }
 
+int warning_shell(char *token, int *prunepattern, t_list **args, uint32_t line)
+{
+	free(prunepattern);
+	ft_lstclear(args, free, free);
+	ft_dprintf(2, "%s: warning: here-document at line %u delimited by end-of-file (wanted `%s')\n", EXENAME, line, token);
+	return (1);
+}
+
 int error_file(char *file, int *prunepattern, t_list **args, char *argz)
 {
 	int		error;
@@ -439,9 +447,11 @@ int	get_redirs(t_list **args, int *input, int *output)
 
 					result = NULL;
 					isfirst = 1;
+					uint32_t heredocatline = g_term.lineno;
 					while (get_next_line(0, &line) > 0
 						   && ft_strncmp(line, file, ft_strlen(file) + 1))
 					{
+						g_term.lineno++;
 						if(isfirst)
 						{
 							array[0] = line;
@@ -461,6 +471,8 @@ int	get_redirs(t_list **args, int *input, int *output)
 						free(line);
 						result = tmp0;
 					}
+					if (ft_strncmp(line, file, ft_strlen(file) + 1))
+						return warning_shell(file, prunepattern, args, heredocatline);
 					free (line);
 					if (fileopen[TYPE_IN])
 						close(*input);
@@ -513,9 +525,11 @@ int	main(int argc, char **argv)
 	g_term.lastret = 0;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
+	g_term.lineno = 0;
 	while (1)
 	{
 		g_term.inputstring = readline("marishell% ");
+		g_term.lineno++;
 		if (g_term.inputstring && g_term.inputstring[0] == STX)
 		{
 			free_and_nullify((void **)&g_term.inputstring);

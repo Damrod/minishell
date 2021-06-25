@@ -75,13 +75,14 @@ typedef struct s_compcmd {
 }	t_compcmd;
 
 typedef struct s_term {
-	char	**args;
-	char	**environ;
-	char	*inputstring;
-	t_dlist	*cmds;
-	int		infd;
-	int		outfd;
-	uint8_t	lastret;
+	char		**args;
+	char		**environ;
+	char		*inputstring;
+	t_dlist		*cmds;
+	int			infd;
+	int			outfd;
+	uint8_t		lastret;
+	uint32_t	lineno;
 }	t_term;
 
 t_list	*get_args(const char *arg);
