@@ -242,5 +242,6 @@ void	*ft_arrbyte(t_array *a, void *key);
 char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
 size_t	ft_dblptrlen(void **data);
 void	*ft_dblptr_free(void **ptrs);
+off_t	ft_lseek(int fd, off_t offset, int whence);
 
 #endif

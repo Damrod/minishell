@@ -107,8 +107,6 @@ static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
 	}
 }
 
-
-
 char cmp_chars(unsigned short a, unsigned short b, char checkdepth)
 {
 	unsigned short	bitmask;
@@ -273,10 +271,8 @@ unsigned char	get_type(unsigned short *arg)
 /* 	{ */
 /* 		if (cmpcmd(cmds)->type == TYPE_PIPE) */
 /* 		{ */
-			
 /* 		} */
 /* 	} */
-			
 /* 		|| cmpcmd(cmds)->type == TYPE_PIPE */
 /* 		if (!*cmds) */
 /* 		{ */
@@ -321,6 +317,32 @@ int error_file(char *file, int *prunepattern, t_list **args, char *argz)
 	ft_dprintf(2, "%s: %s: %s\n", argz, file, strerror(error));
 	free(file);
 	return (1);
+}
+
+#include <sys/stat.h>
+#include <stdbool.h>
+
+bool	file_exists (char *filename)
+{
+	struct stat	buffer;
+
+	return (stat (filename, &buffer) == 0);
+}
+
+char	*make_non_existing_filename(void)
+{
+	char	buffer[2048];
+	size_t	i;
+
+	i = 0;
+	while (i < (sizeof(buffer) - 1))
+	{
+		buffer[i] = 'a' + (i % 26);
+		buffer[i + 1] = '\0';
+		if (!file_exists(buffer))
+			return (ft_strdup(buffer));
+		i++;
+	}
 }
 
 int	get_redirs(t_list **args, int *input, int *output)
@@ -407,11 +429,20 @@ int	get_redirs(t_list **args, int *input, int *output)
 					char	*array[3];
 					char	isfirst;
 					size_t	size;
+					char	buffer[2049];
 
+					if (fileopen[TYPE_HEREDOC])
+						close(*input);
+					ft_memset(buffer, '\0', sizeof(buffer));
+					*input = open("./", O_RDWR|O_EXCL|__O_TMPFILE, S_IRUSR|
+								  S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+					fileopen[TYPE_HEREDOC] = 1;
+					if (*input == -1)
+						return (error_file(file, prunepattern, args, EXENAME));
 					result = NULL;
 					isfirst = 1;
 					while (get_next_line(0, &line) > 0
-						   && ft_strncmp(line, file, ft_strlen(line) + 1))
+						   && ft_strncmp(line, file, ft_strlen(file) + 1))
 					{
 						if(isfirst)
 						{
@@ -433,7 +464,9 @@ int	get_redirs(t_list **args, int *input, int *output)
 						result = tmp0;
 					}
 					free (line);
-					g_term.inputstring = result;
+					write(*input, result, ft_strlen(result));
+					ft_lseek(*input, 0, SEEK_SET);
+					free(result);
 				}
 				else if (!list->next)
 					return (syntax_error("newline", prunepattern, args, EXENAME));
@@ -484,8 +517,22 @@ int	main(int argc, char **argv)
 		if (!str)
 			continue ;
 		g_term.lastret = get_redirs(&str, &g_term.infd, &g_term.outfd);
-		ft_printf("this was grabbed by gnl: %s\n", g_term.inputstring);
-		free_and_nullify((void **)&g_term.inputstring);
+		if (g_term.infd > STDERR_FILENO)
+		{
+			char *line;
+
+			while(get_next_line(g_term.infd, &line) > 0)
+			{
+				ft_printf("%s\n", line);
+				free (line);
+			}
+			ft_printf("%s\n", line);
+			free (line);
+		}
+		if (g_term.infd > STDERR_FILENO)
+			close(g_term.infd);
+		if (g_term.outfd > STDERR_FILENO)
+			close(g_term.outfd);
 		if (g_term.lastret)
 			continue;
 		orig = str;

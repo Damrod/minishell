@@ -44,7 +44,7 @@ SRCS	= noassign/na_malloc.c memory/ft_bzero.c memory/ft_memcmp.c			   \
 		  string/ft_strlcpy.c allocstr/ft_realloc.c dblptr/ft_dblptr_free.c	   \
 		  string/ft_strnstr.c string/ft_strchr.c string/ft_strlen.c			   \
 		  string/ft_strlcat.c string/ft_strncmp.c string/ft_strrchr.c		   \
-		  dblptr/ft_dblptr_cpy.c dblptr/ft_dblptrlen.c
+		  dblptr/ft_dblptr_cpy.c dblptr/ft_dblptrlen.c output/ft_lseek.c
 SRC_PFT	= ft_printf/srcs/ft_formattypes.c ft_printf/srcs/ft_float1.c		   \
 		  ft_printf/srcs/ft_nitoa_helpers.c ft_printf/srcs/ft_gettype1.c	   \
 		  ft_printf/srcs/ft_vprintf.c ft_printf/srcs/ft_gettype.c			   \
