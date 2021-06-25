@@ -343,6 +343,7 @@ char	*make_non_existing_filename(void)
 			return (ft_strdup(buffer));
 		i++;
 	}
+	return (NULL);
 }
 
 int	get_redirs(t_list **args, int *input, int *output)
