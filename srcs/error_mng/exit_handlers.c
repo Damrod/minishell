@@ -3,8 +3,11 @@
 
 void	free_and_nullify(void **tofree)
 {
-	free(*tofree);
-	*tofree = NULL;
+	if (tofree)
+	{
+		free(*tofree);
+		*tofree = NULL;
+	}
 }
 
 void	handle_eot(int sig)

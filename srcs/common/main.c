@@ -163,7 +163,6 @@ int	main(int argc, char **argv)
 	(void)argv;
 	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
 	str = NULL;
-	g_term.lastret = 0;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)
@@ -190,7 +189,7 @@ int	main(int argc, char **argv)
 				free (line);
 			}
 			ft_printf("%s\n", line);
-			free (line);
+			free_and_nullify((void **)&line);
 		}
 		if (g_term.infd > STDERR_FILENO)
 			close(g_term.infd);
@@ -223,3 +222,10 @@ int	main(int argc, char **argv)
 	ft_printf("\n");
 	return (0);
 }
+
+/*
+  echo "0 1 2 3 4 5 6 7 8 9 0 a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z" | tail -c 50 | head -c 40 <abcd | tail -c 30 <main.c | head -c 20
+  _printf("\n");
+  retu
+ *
+ */

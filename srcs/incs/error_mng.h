@@ -10,5 +10,6 @@ void	handle_eot(int sig);
 int		error_syntax(char *token, int *prunepattern);
 int		warning_shell(char *token, uint32_t line);
 int		error_file(char *file, int *prunepattern);
+int		error_custom(void **freeme0, void **freeme1, void **freeme2, char *msg);
 
 #endif

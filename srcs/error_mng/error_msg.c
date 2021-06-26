@@ -25,3 +25,12 @@ int	error_file(char *file, int *prunepattern)
 	free(file);
 	return (1);
 }
+
+int	error_custom(void **freeme0, void **freeme1, void **freeme2, char *message)
+{
+	free_and_nullify(freeme0);
+	free_and_nullify(freeme1);
+	free_and_nullify(freeme2);
+	ft_dprintf(2, "%s: %s\n", EXENAME, message);
+	return (1);
+}

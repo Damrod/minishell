@@ -1,32 +1,45 @@
 #include <heredoc.h>
 
-static bool	file_exists (char *filename)
+static void	make_hash(char *hash, size_t size, const char *str)
 {
-	struct stat	buffer;
+	static char	alpha[62] = "abcdefghijklmnopqrstuvwxyz"
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	size_t		i;
+	uint32_t	len;
 
-	return (stat (filename, &buffer) == 0);
-}
-
-static void	make_non_existing_filename(char *filepath, size_t size)
-{
-	char	buffer[2048];
-	size_t	i;
-	char	cwd[2048];
-
-	ft_memset(filepath, '\0', size);
-	ft_memset(buffer, '\0', sizeof(*buffer));
-	ft_memset(cwd, '\0', sizeof(*cwd));
+	len = ft_strlen(str);
 	i = 0;
-	while (i < (sizeof(buffer) - 1))
+	while (i < len && i < size - 1)
 	{
-		buffer[i] = 'a' + (i % 26);
-		buffer[i + 1] = '\0';
-		ft_snprintf(filepath, size - 1, "/tmp/%s", buffer);
-		if (!file_exists(filepath))
-			return ;
+		hash[i] = alpha[ft_random((uint32_t)(((uint32_t)str[i] << 8)
+					^ 0x6D00)) % 62];
 		i++;
 	}
-	return ;
+	hash[i] = '\0';
+}
+
+static int	make_non_existing_filename(char *filepath, size_t size,
+			const char *str)
+{
+	char		hash[6];
+	char		cwd[2048];
+	struct stat	f_stat;
+	size_t		i;
+
+	if (!str)
+		str = "ROaTH0gDd7";
+	ft_memset(filepath, '\0', size);
+	ft_memset(cwd, '\0', sizeof(*cwd));
+	i = 0;
+	while (i < 2048)
+	{
+		make_hash(hash, sizeof(hash), str);
+		ft_snprintf(filepath, size - 1, "/tmp/tmp.%s", hash);
+		if (stat(filepath, &f_stat) != 0)
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 static void	setup_buffer(char **array, char *result, char *line, size_t size)
@@ -50,18 +63,22 @@ int	heredoc_get_fd(char *result, int *input, char *file, int *prunepattern)
 {
 	char		filepath[4098];
 
-	make_non_existing_filename(filepath, sizeof(filepath));
+	if (make_non_existing_filename(filepath, sizeof(filepath), result))
+		return (error_custom((void **)&file, (void **)&prunepattern, NULL,
+				"here-doc couldn't create file"));
 	if (*input > STDIN_FILENO)
 		close(*input);
 	*input = open(filepath, O_CREAT | O_WRONLY, S_IRUSR
 			| S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 	if (*input == -1)
 		return (error_file(file, prunepattern));
-	write(*input, result, ft_strlen(result));
+	if (result)
+		write(*input, result, ft_strlen(result));
 	close(*input);
 	*input = open(filepath, O_RDONLY);
 	unlink(filepath);
 	free(result);
+	printf("%s\n", filepath);
 	return (0);
 }
 

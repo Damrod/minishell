@@ -21,6 +21,7 @@
 # include <errno.h>
 # include <stdint.h>
 # include <ft_printf.h>
+# include "libft2.h"
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 2048
 # endif
@@ -148,6 +149,7 @@ void	ft_wrtptr(char *c, char *str);
 char	*align_right(char *field, const char *content);
 void	ft_reverse_string(char *buf);
 int		ft_findptrinarr(void **array, void *key, int size);
+t_ui32	ft_random(uint32_t seed);
 
 //		misc alloc
 

@@ -82,7 +82,10 @@ int	get_redirs(t_list **args, int *input, int *output)
 
 					heredoc_getline(file, &result);
 					if (heredoc_get_fd(result, input, file, prunepattern))
+					{
+						free (result);
 						return (1);
+					}
 				}
 				else if (!list->next)
 					return (error_syntax("newline", prunepattern));
