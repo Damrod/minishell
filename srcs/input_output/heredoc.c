@@ -22,14 +22,12 @@ static int	make_non_existing_filename(char *filepath, size_t size,
 			const char *str)
 {
 	char		hash[6];
-	char		cwd[2048];
 	struct stat	f_stat;
 	size_t		i;
 
 	if (!str)
 		str = "ROaTH0gDd7";
 	ft_memset(filepath, '\0', size);
-	ft_memset(cwd, '\0', sizeof(*cwd));
 	i = 0;
 	while (i < 2048)
 	{
