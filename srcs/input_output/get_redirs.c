@@ -72,7 +72,7 @@ int	to_heredoc(int *input, char *file, int *prunepattern, bool is_last)
 		return (error_syntax("newline", prunepattern));
 }
 
-int	get_io_type(char **file, unsigned short *listcont,
+int	get_io_file(char **file, unsigned short *listcont,
 			bool *islast, int *prunepattern)
 {
 	*islast = 0;
@@ -80,7 +80,7 @@ int	get_io_type(char **file, unsigned short *listcont,
 	if (is_symbol(listcont))
 	{
 		error_syntax(*file, prunepattern);
-		free (file);
+		free (*file);
 		return (1);
 	}
 	return (0);
@@ -91,11 +91,11 @@ int	get_redirs(t_list **args, int *input, int *output)
 	size_t			i;
 	unsigned char	type;
 	char			*file;
-	int				*prunepattern;
+	int				*clpatt;
 	t_list			*list;
 	bool			is_last;
 
-	prunepattern = ft_calloc(ft_lstsize(*args), sizeof(*prunepattern));
+	clpatt = ft_calloc(ft_lstsize(*args), sizeof(*clpatt));
 	i = 0;
 	list = *args;
 	while (list)
@@ -105,22 +105,23 @@ int	get_redirs(t_list **args, int *input, int *output)
 			is_last = 1;
 			type = get_type((unsigned short *)list->content);
 			if (list->next && list->next->content)
-				get_io_type(&file, list->next->content, &is_last, prunepattern);
+				if (get_io_file(&file, list->next->content, &is_last, clpatt))
+					return (1);
 			if (type == TYPE_IN)
-				if (to_input(input, file, prunepattern, is_last))
+				if (to_input(input, file, clpatt, is_last))
 					return (1);
 			if (type == TYPE_APP)
-				if (to_append(output, file, prunepattern, is_last))
+				if (to_append(output, file, clpatt, is_last))
 					return (1);
 			if (type == TYPE_OUT)
-				if (to_output(output, file, prunepattern, is_last))
+				if (to_output(output, file, clpatt, is_last))
 					return (1);
 			if (type == TYPE_HEREDOC)
-				if (to_heredoc(input, file, prunepattern, is_last))
+				if (to_heredoc(input, file, clpatt, is_last))
 					return (1);
 			free(file);
-			prunepattern[i++] = 1;
-			prunepattern[i++] = 1;
+			clpatt[i++] = 1;
+			clpatt[i++] = 1;
 			if (list && list->next)
 				list = list->next->next;
 		}
@@ -131,7 +132,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 				list = list->next;
 		}
 	}
-	ft_lstcullpat(args, prunepattern, free, free);
-	free(prunepattern);
+	ft_lstcullpat(args, clpatt, free, free);
+	free(clpatt);
 	return (0);
 }

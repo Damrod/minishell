@@ -179,7 +179,7 @@ void	display(void *str, int i)
 int	main(int argc, char **argv)
 {
 	t_list			*str;
-	t_list			*orig;
+	/* t_list			*orig; */
 	extern char		**environ;
 
 	(void)argc;
@@ -201,37 +201,42 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&g_term.inputstring);
 		if (!str)
 			continue ;
-		str = split_into_simple_cmds(str);
-		/* g_term.lastret = get_redirs(&str, &g_term.infd, &g_term.outfd); */
-		/* if (g_term.infd > STDERR_FILENO) */
-		/* { */
-		/* 	char *line; */
 
-		/* 	while (get_next_line(g_term.infd, &line) > 0) */
-		/* 	{ */
-		/* 		ft_printf("%s\n", line); */
-		/* 		free (line); */
-		/* 	} */
-		/* 	ft_printf("%s\n", line); */
-		/* 	free_and_nullify((void **)&line); */
-		/* } */
-		/* if (g_term.infd > STDERR_FILENO) */
-		/* 	close(g_term.infd); */
-		/* if (g_term.outfd > STDERR_FILENO) */
-		/* 	close(g_term.outfd); */
-		/* if (g_term.lastret) */
-		/* { */
-		/* 	ft_lstclear(&str, free, free); */
-		/* 	continue ; */
-		/* } */
-		orig = str;
-		while (str)
+		/* str = split_into_simple_cmds(str); */
+
+		g_term.lastret = get_redirs(&str, &g_term.infd, &g_term.outfd);
+		if (g_term.infd > STDERR_FILENO)
 		{
-			ft_lstdisplay(str->content, display);
-			ft_lstclear((t_list **)&str->content, free, free);
-			str = str->next;
+			char *line;
+
+			while (get_next_line(g_term.infd, &line) > 0)
+			{
+				ft_printf("%s\n", line);
+				free (line);
+			}
+			ft_printf("%s\n", line);
+			free_and_nullify((void **)&line);
 		}
-		ft_lstclear(&orig, NULL, free);
+		if (g_term.infd > STDERR_FILENO)
+			close(g_term.infd);
+		if (g_term.outfd > STDERR_FILENO)
+			close(g_term.outfd);
+		if (g_term.lastret)
+		{
+			ft_lstclear(&str, free, free);
+			continue ;
+		}
+
+		/* orig = str; */
+		/* while (str) */
+		/* { */
+		/* 	ft_lstdisplay(str->content, display); */
+		/* 	ft_lstclear((t_list **)&str->content, free, free); */
+		/* 	str = str->next; */
+		/* } */
+		/* ft_lstclear(&orig, NULL, free); */
+
+		
 		/* ft_dblptr_foreach(g_term.args, print_dblptr); */
 		/* if (1) */
 		/* { */
