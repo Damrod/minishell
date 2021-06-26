@@ -16,6 +16,8 @@ void	ft_lstpush_back(t_list **lst, void *content)
 {
 	t_list	*aux;
 
+	if (!content)
+		return ;
 	aux = ft_lstnew(content);
 	if (!aux)
 		return ;

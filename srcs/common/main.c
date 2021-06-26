@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <minishell0.h>
+#include <libft.h>
 #include <error_mng.h>
 #include <wstrcmp.h>
 #include <get_redirs.h>
@@ -151,13 +152,35 @@ void	ft_dblptr_foreach(char **data, void (*f)())
 /* 	return(cmd); */
 /* } */
 
+int	get_pipes(void *src, void *key)
+{
+	unsigned short	*a;
+	char			*b;
+
+	a = src;
+	b = key;
+	return (ft_wstrncmp(a, b, CHECK_NOTQUOTE, 2));
+}
+
+t_list	*split_into_simple_cmds(t_list *compcmd)
+{
+	return (ft_lstsplit(compcmd, "|", get_pipes));
+}
+
+void	display(void *str, int i)
+{
+	char *arg;
+
+	arg = downcast_wstr(str, 1);
+	ft_printf("%d, %s\n", i, arg);
+	free (arg);
+}
+
 int	main(int argc, char **argv)
 {
 	t_list			*str;
 	t_list			*orig;
-	size_t			i;
 	extern char		**environ;
-	char			*tmp;
 
 	(void)argc;
 	(void)argv;
@@ -178,39 +201,37 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&g_term.inputstring);
 		if (!str)
 			continue ;
-		g_term.lastret = get_redirs(&str, &g_term.infd, &g_term.outfd);
-		if (g_term.infd > STDERR_FILENO)
-		{
-			char *line;
+		str = split_into_simple_cmds(str);
+		/* g_term.lastret = get_redirs(&str, &g_term.infd, &g_term.outfd); */
+		/* if (g_term.infd > STDERR_FILENO) */
+		/* { */
+		/* 	char *line; */
 
-			while (get_next_line(g_term.infd, &line) > 0)
-			{
-				ft_printf("%s\n", line);
-				free (line);
-			}
-			ft_printf("%s\n", line);
-			free_and_nullify((void **)&line);
-		}
-		if (g_term.infd > STDERR_FILENO)
-			close(g_term.infd);
-		if (g_term.outfd > STDERR_FILENO)
-			close(g_term.outfd);
-		if (g_term.lastret)
-		{
-			ft_lstclear(&str, free, free);
-			continue ;
-		}
+		/* 	while (get_next_line(g_term.infd, &line) > 0) */
+		/* 	{ */
+		/* 		ft_printf("%s\n", line); */
+		/* 		free (line); */
+		/* 	} */
+		/* 	ft_printf("%s\n", line); */
+		/* 	free_and_nullify((void **)&line); */
+		/* } */
+		/* if (g_term.infd > STDERR_FILENO) */
+		/* 	close(g_term.infd); */
+		/* if (g_term.outfd > STDERR_FILENO) */
+		/* 	close(g_term.outfd); */
+		/* if (g_term.lastret) */
+		/* { */
+		/* 	ft_lstclear(&str, free, free); */
+		/* 	continue ; */
+		/* } */
 		orig = str;
-		i = 0;
 		while (str)
 		{
-			tmp = downcast_wstr(str->content, 1);
-			ft_printf("%s\n", tmp);
-			free(tmp);
+			ft_lstdisplay(str->content, display);
+			ft_lstclear((t_list **)&str->content, free, free);
 			str = str->next;
-			i++;
 		}
-		ft_lstclear(&orig, free, free);
+		ft_lstclear(&orig, NULL, free);
 		/* ft_dblptr_foreach(g_term.args, print_dblptr); */
 		/* if (1) */
 		/* { */
@@ -222,10 +243,3 @@ int	main(int argc, char **argv)
 	ft_printf("\n");
 	return (0);
 }
-
-/*
-  echo "0 1 2 3 4 5 6 7 8 9 0 a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z" | tail -c 50 | head -c 40 <abcd | tail -c 30 <main.c | head -c 20
-  _printf("\n");
-  retu
- *
- */

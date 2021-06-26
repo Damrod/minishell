@@ -197,7 +197,7 @@ t_list	*ft_lstpop_back(t_list **lst);
 void	ft_lstmerge(t_list **a, t_list *b);
 void	ft_lstdisplay(t_list *list, void (*disp)(void *, int));
 void	ft_sorted_lst_merge(t_list **a, t_list *b, int (*cmp)());
-void	ft_lstsplit(t_list *src, t_list **a, t_list **b);
+void	ft_lstsplit_half(t_list *src, t_list **a, t_list **b);
 void	ft_list_sort(t_list **src, int (*cmp)());
 void	ft_list_reverse(t_list **begin_list);
 t_list	*ft_lstdup(t_list *head, size_t contsize, void (*dc)(), void (*dn)());
@@ -207,6 +207,8 @@ int		ft_lstdeldup(t_list **list, void (*delnde)(void *));
 int		ft_lst_intcmp(void *data0, void *data1);
 void	**ft_lsttoarr(t_list *list, int *size);
 t_list	*ft_arrtolst(void **array, int size, void *(*alloc)());
+t_list	*ft_lstsplit_at(t_list *s, t_list **b, void *key, int (*cmp)());
+t_list	*ft_lstsplit(t_list *src, void *key, int (*cmp)());
 
 // Double linked lists
 
