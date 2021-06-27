@@ -1,8 +1,7 @@
 #include <error_mng.h>
 
-int	error_syntax(char *token, int *prunepattern)
+int	error_syntax(char *token)
 {
-	free(prunepattern);
 	ft_dprintf(2, "%s: syntax error near unexpected token"
 		" `%s'\n", EXENAME, token);
 	return (1);
@@ -15,12 +14,11 @@ int	warning_shell(char *token, uint32_t line)
 	return (1);
 }
 
-int	error_file(char *file, int *prunepattern)
+int	error_file(char *file)
 {
 	int		error;
 
 	error = errno;
-	free(prunepattern);
 	ft_dprintf(2, "%s: %s: %s\n", EXENAME, file, strerror(error));
 	free(file);
 	return (1);

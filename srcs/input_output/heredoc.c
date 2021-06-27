@@ -57,19 +57,19 @@ static void	setup_buffer(char **array, char *result, char *line, size_t size)
 	}
 }
 
-int	heredoc_get_fd(char *result, int *input, char *file, int *prunepattern)
+int	heredoc_get_fd(char *result, int *input, char *file)
 {
 	char		filepath[4098];
 
 	if (make_non_existing_filename(filepath, sizeof(filepath), result))
-		return (error_custom((void **)&file, (void **)&prunepattern, NULL,
+		return (error_custom((void **)&file, NULL, NULL,
 				"here-doc couldn't create file"));
 	if (*input > STDIN_FILENO)
 		close(*input);
 	*input = open(filepath, O_CREAT | O_WRONLY, S_IRUSR
 			| S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 	if (*input == -1)
-		return (error_file(file, prunepattern));
+		return (error_file(file));
 	if (result)
 		write(*input, result, ft_strlen(result));
 	close(*input);

@@ -179,7 +179,7 @@ void	display(void *str, int i)
 int	main(int argc, char **argv)
 {
 	t_list			*str;
-	/* t_list			*orig; */
+	t_list			*orig;
 	extern char		**environ;
 
 	(void)argc;
@@ -236,7 +236,17 @@ int	main(int argc, char **argv)
 		/* } */
 		/* ft_lstclear(&orig, NULL, free); */
 
-		
+		char *tmp2;
+		orig = str;
+		while (str)
+		{
+			tmp2 = downcast_wstr(str->content, 1);
+			printf("%s\n", tmp2);
+			free(tmp2);
+			str = str->next;
+		}
+		ft_lstclear(&orig, free, free);
+
 		/* ft_dblptr_foreach(g_term.args, print_dblptr); */
 		/* if (1) */
 		/* { */
