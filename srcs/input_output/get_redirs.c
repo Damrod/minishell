@@ -9,16 +9,6 @@
 #include <get_redirs.h>
 #include <get_redirs2.h>
 
-void printarr(int *A, int size)
-{
-	int i = 0;
-	while(i < size)
-	{
-		printf("A[%i] = %i\n", i, A[i]);
-		i++;
-	}
-}
-
 static int	get_redirs2(t_list **list, int *input, int *output, int **clpattern)
 {
 	bool			is_last;
