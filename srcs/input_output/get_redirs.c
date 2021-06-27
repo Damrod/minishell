@@ -63,5 +63,6 @@ int	get_redirs(t_list **args, int *input, int *output)
 		}
 	}
 	ft_lstcullpat(args, clptt, free, free);
+	free(clptt);
 	return (0);
 }
