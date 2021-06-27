@@ -9,13 +9,22 @@
 #include <get_redirs.h>
 #include <get_redirs2.h>
 
+void printarr(int *A, int size)
+{
+	int i = 0;
+	while(i < size)
+	{
+		printf("A[%i] = %i\n", i, A[i]);
+		i++;
+	}
+}
+
 static int	get_redirs2(t_list **list, int *input, int *output, int **clpattern)
 {
 	bool			is_last;
 	unsigned char	type;
 	char			*file;
 
-	(void) clpattern;
 	is_last = 1;
 	type = get_type((unsigned short *)(*list)->content);
 	if ((*list)->next && (*list)->next->content)
@@ -34,12 +43,7 @@ static int	get_redirs2(t_list **list, int *input, int *output, int **clpattern)
 		if (to_output(output, file, is_last))
 			return (1);
 	free(file);
-	/* ft_memset(*clpattern, '1', sizeof(int) * 2); */
-	/* (**clpattern) = 1; */
-	/* (*clpattern)++; */
-	/* (**clpattern) = 1; */
-	/* (*clpattern)++; */
-	/* *clpattern += 2; */
+	*clpattern = ft_memset(*clpattern, '1', sizeof(int) * 2) + 2;
 	if (*list && (*list)->next)
 		*list = (*list)->next->next;
 	return (0);
@@ -47,18 +51,18 @@ static int	get_redirs2(t_list **list, int *input, int *output, int **clpattern)
 
 int	get_redirs(t_list **args, int *input, int *output)
 {
-	int				**clpatt;
+	int				*clpatt;
 	int				*clpattern;
 	t_list			*list;
 
 	clpattern = ft_calloc(ft_lstsize(*args), sizeof(*clpattern));
-	clpatt = &clpattern;
+	clpatt = clpattern;
 	list = *args;
 	while (list)
 	{
 		if (is_redir((unsigned short *)list->content))
 		{
-			if (get_redirs2(&list, input, output, clpatt))
+			if (get_redirs2(&list, input, output, &clpatt))
 			{
 				free(clpattern);
 				return (1);
