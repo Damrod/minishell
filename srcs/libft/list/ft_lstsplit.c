@@ -56,22 +56,15 @@ t_list	*ft_lstsplit_at(t_list *s, t_list **b, void *key, int (*cmp)())
 t_dlist	*ft_lstsplit(t_list *src, void *key, int (*cmp)())
 {
 	t_list	*head;
-	t_list	*tmp;
 	t_dlist	*lstoflists;
 
 	lstoflists = NULL;
 	ft_dlstpush_back(&lstoflists, src);
 	head = src;
-	/* ft_lstclear((t_list **)&lstoflists, free, free); */
 	while (head)
 	{
 		ft_dlstpush_back(&lstoflists,
-			ft_lstsplit_at(head, &tmp, key, cmp));
-		head = tmp;
+			ft_lstsplit_at(head, &head, key, cmp));
 	}
-	(void)key;
-	(void)cmp;
-	(void)tmp;
-	(void)head;
 	return (lstoflists);
 }
