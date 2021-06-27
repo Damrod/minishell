@@ -178,7 +178,7 @@ void	display(void *str, int i)
 int	main(int argc, char **argv)
 {
 	/* t_list			*str; */
-	t_dlist			*cmds;
+	/* t_dlist			*cmds; */
 	extern char		**environ;
 
 	(void)argc;
@@ -202,16 +202,19 @@ int	main(int argc, char **argv)
 			continue ;
 
 		// SPLIT into simple commands START
-		cmds = split_into_simple_cmds(g_term.args);
-		g_term.cmds = cmds;
-		while (cmds)
+		g_term.cmds = split_into_simple_cmds(g_term.args);
+		while (g_term.cmds)
 		{
-			ft_lstdisplay(cmds->content, display);
-			ft_lstclear((t_list **)&cmds->content, free, free);
-			cmds = cmds->next;
+			ft_lstdisplay(g_term.cmds->content, display);
+			ft_lstclear((t_list **)&g_term.cmds->content, free, free);
+			if (!g_term.cmds->next)
+			{
+				ft_dlstrewind(&g_term.cmds);
+				break ;
+			}
+			g_term.cmds = g_term.cmds->next;
 		}
-		/* ft_dlstrewind(&cmds); */
-		ft_dlstclear((t_dlist **)&g_term.cmds, NULL, free);
+		ft_lstclear((t_list **)&g_term.cmds, NULL, free);
 		// SPLIT into simple commands END
 
 		/* int infd; */
