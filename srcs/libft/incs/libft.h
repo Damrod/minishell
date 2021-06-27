@@ -201,7 +201,7 @@ void	ft_lstsplit_half(t_list *src, t_list **a, t_list **b);
 void	ft_list_sort(t_list **src, int (*cmp)());
 void	ft_list_reverse(t_list **begin_list);
 t_list	*ft_lstdup(t_list *head, size_t contsize, void (*dc)(), void (*dn)());
-int		ft_lstcullpat(t_list **list, int *mask, void (*delcnt)(void *),
+int		ft_lstcullpat(t_list **list, char *mask, void (*delcnt)(void *),
 			void (*delnde)(void *));
 int		ft_lstdeldup(t_list **list, void (*delnde)(void *));
 int		ft_lst_intcmp(void *data0, void *data1);

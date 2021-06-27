@@ -5,7 +5,7 @@
 # include <minishell0.h>
 # include <stdint.h>
 
-void	free_and_nullify(void **tofree);
+int	free_and_nullify(void **tofree);
 void	handle_eot(int sig);
 int		error_syntax(char *token);
 int		warning_shell(char *token, uint32_t line);

@@ -12,7 +12,8 @@
 
 #include <libft.h>
 
-int	ft_lstcullpat(t_list **lst, int *mk, void (*dc)(void *), void (*dn)(void *))
+int	ft_lstcullpat(t_list **lst, char *mk, void (*dc)(void *),
+			void (*dn)(void *))
 {
 	t_list	**indirect;
 	int		flag;
@@ -41,7 +42,7 @@ int	ft_lstcullpat(t_list **lst, int *mk, void (*dc)(void *), void (*dn)(void *))
 	return (sz);
 }
 
-static int	ft_lstdupmask(t_list *list, int *mask, int lstsz)
+static int	ft_lstdupmask(t_list *list, char *mask, int lstsz)
 {
 	int		i;
 	int		maskidx;
@@ -53,7 +54,7 @@ static int	ft_lstdupmask(t_list *list, int *mask, int lstsz)
 	i = 0;
 	maskidx = 0;
 	ft_memset(resul, 0, sizeof(void *) * lstsz);
-	ft_memset(mask, 255, sizeof(int) * lstsz);
+	ft_memset(mask, 255, sizeof(*mask) * lstsz);
 	while (list)
 	{
 		mask[maskidx] = 1;
@@ -72,8 +73,8 @@ static int	ft_lstdupmask(t_list *list, int *mask, int lstsz)
 
 int	ft_lstdeldup(t_list **list, void (*delnde)(void *))
 {
-	int	*mask;
-	int	sz;
+	char	*mask;
+	int		sz;
 
 	mask = malloc (ft_lstsize((*list)) + 1);
 	if (!mask)

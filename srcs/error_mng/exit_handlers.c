@@ -1,13 +1,14 @@
 #include <libft.h>
 #include <minishell0.h>
 
-void	free_and_nullify(void **tofree)
+int	free_and_nullify(void **tofree)
 {
 	if (tofree)
 	{
 		free(*tofree);
 		*tofree = NULL;
 	}
+	return (1);
 }
 
 void	handle_eot(int sig)
