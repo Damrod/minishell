@@ -194,11 +194,11 @@ int	main(int argc, char **argv)
 		g_term.lineno++;
 		if (g_term.inputstring && g_term.inputstring[0] == STX)
 		{
-			free_and_nullify((void **)&g_term.inputstring);
+			free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
 			break ;
 		}
 		str = get_args(g_term.inputstring);
-		free_and_nullify((void **)&g_term.inputstring);
+		free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
 		if (!str)
 			continue ;
 
@@ -215,7 +215,7 @@ int	main(int argc, char **argv)
 				free (line);
 			}
 			ft_printf("%s\n", line);
-			free_and_nullify((void **)&line);
+			free_and_nullify((void **)&line, NULL, NULL, 1);
 		}
 		if (g_term.infd > STDERR_FILENO)
 			close(g_term.infd);

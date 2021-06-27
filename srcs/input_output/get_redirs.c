@@ -54,7 +54,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 		if (is_redir((unsigned short *)list->content))
 		{
 			if (get_redirs2(&list, input, output, &clpatt))
-				return (free_and_nullify((void **)&clptt));
+				return (free_and_nullify((void **)&clptt, NULL, NULL, 1));
 		}
 		else
 		{

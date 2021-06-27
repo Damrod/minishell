@@ -1,14 +1,25 @@
 #include <libft.h>
 #include <minishell0.h>
 
-int	free_and_nullify(void **tofree)
+int	free_and_nullify(void **tofree0, void **tofree1, void **tofree2,
+			int retvalue)
 {
-	if (tofree)
+	if (tofree0)
 	{
-		free(*tofree);
-		*tofree = NULL;
+		free(*tofree0);
+		*tofree0 = NULL;
 	}
-	return (1);
+	if (tofree1)
+	{
+		free(*tofree1);
+		*tofree1 = NULL;
+	}
+	if (tofree2)
+	{
+		free(*tofree2);
+		*tofree2 = NULL;
+	}
+	return (retvalue);
 }
 
 void	handle_eot(int sig)
@@ -16,8 +27,8 @@ void	handle_eot(int sig)
 	extern char		**environ;
 
 	(void) sig;
-	free_and_nullify ((void **)&environ);
-	free_and_nullify((void **)&g_term.inputstring);
+	free_and_nullify ((void **)&environ, NULL, NULL, 1);
+	free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
 	ft_printf("\n");
 	exit(0);
 }
