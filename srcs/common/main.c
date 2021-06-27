@@ -22,8 +22,6 @@ t_term	g_term = {
 	.cmds = NULL,
 	.inputstring = NULL,
 	.lineno = 0,
-	.infd = STDIN_FILENO,
-	.outfd = STDOUT_FILENO,
 	.lastret = 0
 };
 
@@ -162,7 +160,7 @@ int	get_pipes(void *src, void *key)
 	return (ft_wstrncmp(a, b, CHECK_NOTQUOTE, 2));
 }
 
-t_list	*split_into_simple_cmds(t_list *compcmd)
+t_dlist	*split_into_simple_cmds(t_list *compcmd)
 {
 	return (ft_lstsplit(compcmd, "|", get_pipes));
 }
@@ -172,20 +170,21 @@ void	display(void *str, int i)
 	char *arg;
 
 	arg = downcast_wstr(str, 1);
+	/* ft_printf("%d, %s\n", i, str); */
 	ft_printf("%d, %s\n", i, arg);
 	free (arg);
 }
 
 int	main(int argc, char **argv)
 {
-	t_list			*str;
-	t_list			*orig;
+	/* t_list			*str; */
+	t_dlist			*cmds;
 	extern char		**environ;
 
 	(void)argc;
 	(void)argv;
 	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
-	str = NULL;
+	g_term.args = NULL;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)
@@ -197,55 +196,60 @@ int	main(int argc, char **argv)
 			free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
 			break ;
 		}
-		str = get_args(g_term.inputstring);
+		g_term.args = get_args(g_term.inputstring);
 		free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
-		if (!str)
+		if (!g_term.args)
 			continue ;
 
-		/* str = split_into_simple_cmds(str); */
-
-		g_term.lastret = get_redirs(&str, &g_term.infd, &g_term.outfd);
-		if (g_term.infd > STDERR_FILENO)
+		// SPLIT into simple commands START
+		cmds = split_into_simple_cmds(g_term.args);
+		g_term.cmds = cmds;
+		while (cmds)
 		{
-			char *line;
-
-			while (get_next_line(g_term.infd, &line) > 0)
-			{
-				ft_printf("%s\n", line);
-				free (line);
-			}
-			ft_printf("%s\n", line);
-			free_and_nullify((void **)&line, NULL, NULL, 1);
+			ft_lstdisplay(cmds->content, display);
+			ft_lstclear((t_list **)&cmds->content, free, free);
+			cmds = cmds->next;
 		}
-		if (g_term.infd > STDERR_FILENO)
-			close(g_term.infd);
-		if (g_term.outfd > STDERR_FILENO)
-			close(g_term.outfd);
-		if (g_term.lastret)
-		{
-			ft_lstclear(&str, free, free);
-			continue ;
-		}
+		/* ft_dlstrewind(&cmds); */
+		ft_dlstclear((t_dlist **)&g_term.cmds, NULL, free);
+		// SPLIT into simple commands END
 
-		/* orig = str; */
+		/* int infd; */
+		/* int outfd; */
+
+		/* g_term.lastret = get_redirs(&g_term.args, &infd, &outfd); */
+		/* if (infd > STDERR_FILENO) */
+		/* { */
+		/* 	char *line; */
+
+		/* 	while (get_next_line(infd, &line) > 0) */
+		/* 	{ */
+		/* 		ft_printf("%s\n", line); */
+		/* 		free (line); */
+		/* 	} */
+		/* 	ft_printf("%s\n", line); */
+		/* 	free_and_nullify((void **)&line, NULL, NULL, 1); */
+		/* } */
+		/* if (infd > STDERR_FILENO) */
+		/* 	close(infd); */
+		/* if (outfd > STDERR_FILENO) */
+		/* 	close(outfd); */
+		/* if (g_term.lastret) */
+		/* { */
+		/* 	ft_lstclear(&g_term.args, free, free); */
+		/* 	continue ; */
+		/* } */
+
+		/* char *tmp2; */
+		/* str = g_term.args; */
 		/* while (str) */
 		/* { */
-		/* 	ft_lstdisplay(str->content, display); */
-		/* 	ft_lstclear((t_list **)&str->content, free, free); */
+		/* 	tmp2 = downcast_wstr(str->content, 1); */
+		/* 	printf("%s\n", tmp2); */
+		/* 	free(tmp2); */
 		/* 	str = str->next; */
 		/* } */
-		/* ft_lstclear(&orig, NULL, free); */
-
-		char *tmp2;
-		orig = str;
-		while (str)
-		{
-			tmp2 = downcast_wstr(str->content, 1);
-			printf("%s\n", tmp2);
-			free(tmp2);
-			str = str->next;
-		}
-		ft_lstclear(&orig, free, free);
+		/* ft_lstclear(&g_term.args, free, free); */
 
 		/* ft_dblptr_foreach(g_term.args, print_dblptr); */
 		/* if (1) */
@@ -258,3 +262,23 @@ int	main(int argc, char **argv)
 	ft_printf("\n");
 	return (0);
 }
+
+/* int	main(int argc, char **argv) */
+/* { */
+/* 	t_dlist *list; */
+
+/* 	list = NULL; */
+/* 	for (int i = 1; i < argc; ++i) */
+/* 		ft_dlstpush_back(&list, ft_strdup(argv[i])); */
+	/* g_term.cmds = split_into_simple_cmds(g_term.args); */
+	/* while (list) */
+	/* { */
+	/* ft_lstdisplay((t_list *)list, display); */
+		/* ft_lstclear((t_list **)&list->content, free, free); */
+		/* list = list->next; */
+	/* } */
+/* 	ft_dlstrewind(&list); */
+/* 	ft_lstclear((t_list **)&list, free, free); */
+/* 	ft_printf("\n"); */
+/* 	return (0); */
+/* } */

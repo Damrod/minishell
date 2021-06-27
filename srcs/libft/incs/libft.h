@@ -208,7 +208,9 @@ int		ft_lst_intcmp(void *data0, void *data1);
 void	**ft_lsttoarr(t_list *list, int *size);
 t_list	*ft_arrtolst(void **array, int size, void *(*alloc)());
 t_list	*ft_lstsplit_at(t_list *s, t_list **b, void *key, int (*cmp)());
-t_list	*ft_lstsplit(t_list *src, void *key, int (*cmp)());
+t_dlist	*ft_lstsplit(t_list *src, void *key, int (*cmp)());
+void	ft_dlstclear(t_dlist **lst, void (*delcnt)(void*),
+			void (*delnde)(void*));
 
 // Double linked lists
 

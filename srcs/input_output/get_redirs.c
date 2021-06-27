@@ -66,3 +66,8 @@ int	get_redirs(t_list **args, int *input, int *output)
 	free(clptt);
 	return (0);
 }
+
+/* int	get_redirs0(t_list **args, int *input, int *output) */
+/* { */
+/* 	return 1; */
+/* } */

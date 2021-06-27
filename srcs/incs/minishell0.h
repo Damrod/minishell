@@ -72,6 +72,8 @@ typedef struct s_compcmd {
 	char			**args;
 	char			type;
 	int				pipes[2];
+	int				outfd;
+	int				infd;
 }	t_compcmd;
 
 typedef struct s_term {
@@ -80,8 +82,6 @@ typedef struct s_term {
 	t_dlist		*cmds;
 	char		*inputstring;
 	uint32_t	lineno;
-	int			infd;
-	int			outfd;
 	uint8_t		lastret;
 }	t_term;
 
