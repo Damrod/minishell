@@ -203,17 +203,19 @@ int	main(int argc, char **argv)
 
 		// SPLIT into simple commands START
 		g_term.cmds = split_into_simple_cmds(g_term.args);
-		while (g_term.cmds)
+		while (g_term.cmds && g_term.cmds->content)
 		{
 			ft_lstdisplay(g_term.cmds->content, display);
 			ft_lstclear((t_list **)&g_term.cmds->content, free, free);
-			if (!g_term.cmds->next)
-			{
-				ft_dlstrewind(&g_term.cmds);
-				break ;
-			}
+			/* if (!g_term.cmds->next) */
+			/* { */
+			/* 	ft_dlstrewind(&g_term.cmds); */
+			/* 	break ; */
+			/* } */
 			g_term.cmds = g_term.cmds->next;
 		}
+		/* printf("\nantepenul: %s\n", downcast_wstr(((t_list *)(g_term.cmds->content))->content, 1)); */
+		ft_dlstrewind(&g_term.cmds);
 		ft_lstclear((t_list **)&g_term.cmds, NULL, free);
 		// SPLIT into simple commands END
 
