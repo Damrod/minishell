@@ -16,10 +16,13 @@
 #include <wstrcmp.h>
 #include <get_redirs.h>
 
+t_dlist	*build_cmd_table(t_dlist **simplecmds);
+
 t_term	g_term = {
 	.environ = NULL,
 	.args = NULL,
-	.cmds = NULL,
+	.cmdtable = NULL,
+	.simplecmds = NULL,
 	.inputstring = NULL,
 	.lineno = 0,
 	.lastret = 0
@@ -165,15 +168,15 @@ t_dlist	*split_into_simple_cmds(t_list *compcmd)
 	return (ft_lstsplit(compcmd, "|", get_pipes));
 }
 
-void	display(void *str, int i)
-{
-	char *arg;
+/* void	display(void *str, int i) */
+/* { */
+/* 	char *arg; */
 
-	arg = downcast_wstr(str, 1);
-	/* ft_printf("%d, %s\n", i, str); */
-	ft_printf("%d, %s\n", i, arg);
-	free (arg);
-}
+/* 	arg = downcast_wstr(str, 1); */
+/* 	/\* ft_printf("%d, %s\n", i, str); *\/ */
+/* 	ft_printf("%d, %s\n", i, arg); */
+/* 	free (arg); */
+/* } */
 
 int	main(int argc, char **argv)
 {
@@ -202,22 +205,24 @@ int	main(int argc, char **argv)
 			continue ;
 
 		// SPLIT into simple commands START
-		g_term.cmds = split_into_simple_cmds(g_term.args);
-		while (g_term.cmds && g_term.cmds->content)
-		{
-			ft_lstdisplay(g_term.cmds->content, display);
-			ft_lstclear((t_list **)&g_term.cmds->content, free, free);
-			/* if (!g_term.cmds->next) */
+		g_term.simplecmds = split_into_simple_cmds(g_term.args);
+		// while (g_term.simplecmds && g_term.simplecmds->content)
+		// {
+			// ft_lstdisplay(g_term.simplecmds->content, display);
+			// ft_lstclear((t_list **)&g_term.simplecmds->content, free, free);
+			/* if (!g_term.simplecmds->next) */
 			/* { */
-			/* 	ft_dlstrewind(&g_term.cmds); */
+			/* 	ft_dlstrewind(&g_term.simplecmds); */
 			/* 	break ; */
 			/* } */
-			g_term.cmds = g_term.cmds->next;
-		}
-		/* printf("\nantepenul: %s\n", downcast_wstr(((t_list *)(g_term.cmds->content))->content, 1)); */
-		ft_dlstrewind(&g_term.cmds);
-		ft_lstclear((t_list **)&g_term.cmds, NULL, free);
+			// g_term.simplecmds = g_term.simplecmds->next;
+		// }
+		/* printf("\nantepenul: %s\n", downcast_wstr(((t_list *)(g_term.simplecmds->content))->content, 1)); */
+		// ft_dlstrewind(&g_term.simplecmds);
+		// ft_lstclear((t_list **)&g_term.simplecmds, NULL, free);
 		// SPLIT into simple commands END
+
+		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
 
 		/* int infd; */
 		/* int outfd; */
@@ -275,7 +280,7 @@ int	main(int argc, char **argv)
 /* 	list = NULL; */
 /* 	for (int i = 1; i < argc; ++i) */
 /* 		ft_dlstpush_back(&list, ft_strdup(argv[i])); */
-	/* g_term.cmds = split_into_simple_cmds(g_term.args); */
+	/* g_term.simplecmds = split_into_simple_cmds(g_term.args); */
 	/* while (list) */
 	/* { */
 	/* ft_lstdisplay((t_list *)list, display); */

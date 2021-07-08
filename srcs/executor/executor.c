@@ -46,36 +46,36 @@ t_simplecmd	*simple(t_dlist *comp_cmds)
 	return ((t_simplecmd*)comp_cmds->content);
 }
 
-int	exec_cmd(t_dlist *comp_cmds, char **environ)
-{
-	int pid;
-	bool openpipe;
-	int status;
-	int ret;
+/* int	exec_cmd(t_dlist *comp_cmds, char **environ) */
+/* { */
+/* 	int pid; */
+/* 	bool openpipe; */
+/* 	int status; */
+/* 	int ret; */
 
-	ret = EXIT_FAILED;
-	openpipe = 0;
-	if(simple(comp_cmds)->type == TYPE_PIPE || (simple(comp_cmds->prev) && simple(comp_cmds->prev)->type == TYPE_PIPE))
-	{
-		openpipe = 1;
-		pipe(simple(comp_cmds)->pipes);
-	}
-	pid = fork();
-	if (pid == 0)
-	{
-		if(simple(comp_cmds)->type == TYPE_PIPE)
-			dup2(simple(comp_cmds)->pipes[1], STDOUT_FILENO);
-		if(simple(comp_cmds->prev) && simple(comp_cmds->prev)->type == TYPE_PIPE)
-			dup2(simple(comp_cmds)->pipes[0], STDIN_FILENO);
-		execve(resolve_cmd_path(simple(comp_cmds)->args[0]), simple(comp_cmds)->args, environ);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		if (openpipe && simple(comp_cmds)->type == TYPE_PIPE)
-			close(simple(comp_cmds)->pipes[1]);
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
-	}
-	return ret;
-}
+/* 	ret = EXIT_FAILED; */
+/* 	openpipe = 0; */
+/* 	if(simple(comp_cmds)->type == TYPE_PIPE || (simple(comp_cmds->prev) && simple(comp_cmds->prev)->type == TYPE_PIPE)) */
+/* 	{ */
+/* 		openpipe = 1; */
+/* 		pipe(simple(comp_cmds)->pipes); */
+/* 	} */
+/* 	pid = fork(); */
+/* 	if (pid == 0) */
+/* 	{ */
+/* 		if(simple(comp_cmds)->type == TYPE_PIPE) */
+/* 			dup2(simple(comp_cmds)->pipes[1], STDOUT_FILENO); */
+/* 		if(simple(comp_cmds->prev) && simple(comp_cmds->prev)->type == TYPE_PIPE) */
+/* 			dup2(simple(comp_cmds)->pipes[0], STDIN_FILENO); */
+/* 		execve(resolve_cmd_path(simple(comp_cmds)->args[0]), simple(comp_cmds)->args, environ); */
+/* 	} */
+/* 	else */
+/* 	{ */
+/* 		waitpid(pid, &status, 0); */
+/* 		if (openpipe && simple(comp_cmds)->type == TYPE_PIPE) */
+/* 			close(simple(comp_cmds)->pipes[1]); */
+/* 		if (WIFEXITED(status)) */
+/* 			ret = WEXITSTATUS(status); */
+/* 	} */
+/* 	return ret; */
+/* } */
