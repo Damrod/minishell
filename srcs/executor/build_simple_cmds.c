@@ -3,6 +3,10 @@
 #include <libft.h>
 #include <get_redirs.h>
 
+void	ft_dblptr_display(char **dblptr, void (*p)());
+void	print_dblptr(const char *input);
+void	display(void *str, int i);
+
 /* void	display(void *str, int i) */
 /* { */
 /* 	char *arg; */
@@ -72,9 +76,12 @@ t_simplcmd	*simple_ctor(t_dlist *head)
 	simple->type = TYPE_END;
 	simple->infd = STDIN_FILENO;
 	simple->outfd = STDOUT_FILENO;
-	if (get_redirs((t_list **)&head->content, &simple->infd,
-			&simple->outfd))
+	if (get_redirs((t_list **)&head->content, &simple->infd, &simple->outfd))
+	{
+		ft_lstclear((t_list **)&head->content, free, free);
+		free (simple);
 		return (NULL);
+	}
 	if (!ft_wstrncmp((unsigned short *)ft_lstlast(head->content)->content,
 			"|", CHECK_NOTQUOTE, 2))
 	{
@@ -100,7 +107,9 @@ void	simple_dtor(t_simplcmd *simple)
 	free (simple);
 }
 
-void	*comp_dtor(t_dlist **compcmd)
+int	error_syntax(char *token);
+
+void	*comp_dtor(t_dlist **compcmd, t_dlist **simplecmds, bool isprintsynerr)
 {
 	t_dlist		*head;
 
@@ -109,6 +118,19 @@ void	*comp_dtor(t_dlist **compcmd)
 	{
 		simple_dtor(head->content);
 		head = head->next;
+	}
+	if (simplecmds) {
+		ft_printf("%p hello0\n", *simplecmds);
+		while (simplecmds && (*simplecmds)->content)
+		{
+			ft_lstclear((t_list **)&(*simplecmds)->content, free, free);
+			*simplecmds = (*simplecmds)->next;
+		}
+	}
+	if (isprintsynerr)
+	{
+		ft_printf("%p hello1\n", *simplecmds);
+		error_syntax("|");
 	}
 	return (NULL);
 }
@@ -124,12 +146,19 @@ t_dlist	*build_cmd_table(t_dlist **simplecmds)
 	while (head && head->content)
 	{
 		simplecmd = simple_ctor(head);
-		if (!simplecmd)
-			return (comp_dtor(&cmdtable));
+		if (!simplecmd || (!ft_dblptrlen((void **)simplecmd->args)
+				&& simplecmd->type == TYPE_PIPE))
+			return (comp_dtor(&cmdtable, simplecmds, simplecmd
+					&& !ft_dblptrlen((void **)simplecmd->args)
+					&& (simplecmd->type == TYPE_PIPE)));
 		ft_dlstpush_back(&cmdtable, simplecmd);
 		head = head->next;
 	}
-	ft_dlstrewind(simplecmds);
-	ft_lstclear((t_list **)simplecmds, NULL, free);
+	lstoflst_clear((t_dlist **) simplecmds);
+	if (((t_simplcmd *)ft_dlstlast(cmdtable)->content)->type == TYPE_PIPE)
+	{
+		error_syntax("|");
+		return (NULL);
+	}
 	return (cmdtable);
 }

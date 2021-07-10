@@ -17,7 +17,7 @@
 #include <get_redirs.h>
 
 t_dlist	*build_cmd_table(t_dlist **simplecmds);
-void	*comp_dtor(t_dlist **compcmd);
+void	*comp_dtor(t_dlist **compcmd, t_dlist **simplecmds, bool isprintsynerr);
 
 t_term	g_term = {
 	.environ = NULL,
@@ -248,7 +248,7 @@ int	main(int argc, char **argv)
 			ft_printf("type: %d, out: %d, in: %d\n", getcmds(cmdtable)->type, getcmds(cmdtable)->outfd, getcmds(cmdtable)->infd);
 			cmdtable = cmdtable->next;
 		}
-		comp_dtor(&g_term.cmdtable);
+		comp_dtor(&g_term.cmdtable, NULL, 0);
 
 		/* int infd; */
 		/* int outfd; */
