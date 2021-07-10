@@ -17,6 +17,7 @@
 #include <get_redirs.h>
 
 t_dlist	*build_cmd_table(t_dlist **simplecmds);
+void	*comp_dtor(t_dlist **compcmd);
 
 t_term	g_term = {
 	.environ = NULL,
@@ -168,15 +169,32 @@ t_dlist	*split_into_simple_cmds(t_list *compcmd)
 	return (ft_lstsplit(compcmd, "|", get_pipes));
 }
 
-/* void	display(void *str, int i) */
-/* { */
-/* 	char *arg; */
+void	display(void *str, int i)
+{
+	char *arg;
 
-/* 	arg = downcast_wstr(str, 1); */
-/* 	/\* ft_printf("%d, %s\n", i, str); *\/ */
-/* 	ft_printf("%d, %s\n", i, arg); */
-/* 	free (arg); */
-/* } */
+	arg = downcast_wstr(str, 1);
+	/* ft_printf("%d, %s\n", i, str); */
+	ft_printf("%d, %s\n", i, arg);
+	free (arg);
+}
+
+void	ft_dblptr_display(char **dblptr, void (*p)())
+{
+	size_t	i;
+
+	i = 0;
+	while (dblptr[i])
+	{
+		p(dblptr[i], i);
+		i++;
+	}
+}
+
+t_simplcmd *getcmds(t_dlist *cmd)
+{
+	return ((t_simplcmd *)cmd->content);
+}
 
 int	main(int argc, char **argv)
 {
@@ -223,6 +241,14 @@ int	main(int argc, char **argv)
 		// SPLIT into simple commands END
 
 		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
+		t_dlist *cmdtable = g_term.cmdtable;
+		while (cmdtable)
+		{
+			ft_dblptr_display(getcmds(cmdtable)->args, print_dblptr);
+			ft_printf("type: %d, out: %d, in: %d\n", getcmds(cmdtable)->type, getcmds(cmdtable)->outfd, getcmds(cmdtable)->infd);
+			cmdtable = cmdtable->next;
+		}
+		comp_dtor(&g_term.cmdtable);
 
 		/* int infd; */
 		/* int outfd; */

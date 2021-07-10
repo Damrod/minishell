@@ -3,15 +3,15 @@
 #include <libft.h>
 #include <get_redirs.h>
 
-void	display(void *str, int i)
-{
-	char *arg;
+/* void	display(void *str, int i) */
+/* { */
+/* 	char *arg; */
 
-	arg = downcast_wstr(str, 1);
-	/* ft_printf("%d, %s\n", i, str); */
-	ft_printf("%d, %s\n", i, arg);
-	free (arg);
-}
+/* 	arg = downcast_wstr(str, 1); */
+/* 	/\* ft_printf("%d, %s\n", i, str); *\/ */
+/* 	ft_printf("%d, %s\n", i, arg); */
+/* 	free (arg); */
+/* } */
 
 void	lstoflst_clear(t_dlist **list)
 {
@@ -37,7 +37,7 @@ char	**downcast_dblwstr(t_dlist **args)
 			(void **)&ret))
 		return (NULL);
 	i = 0;
-	while (head->next)
+	while (head)
 	{
 		ret[i] = downcast_wstr(head->content, 1);
 		head = head->next;
@@ -66,11 +66,12 @@ char	**downcast_dblwstr(t_dlist **args)
 t_simplcmd	*simple_ctor(t_dlist *head)
 {
 	t_simplcmd	*simple;
-	t_list		*freeme;
 
 	if (!na_calloc(1, sizeof(*simple), (void **)&simple))
 		return (NULL);
 	simple->type = TYPE_END;
+	simple->infd = STDIN_FILENO;
+	simple->outfd = STDOUT_FILENO;
 	if (get_redirs((t_list **)&head->content, &simple->infd,
 			&simple->outfd))
 		return (NULL);
@@ -78,9 +79,7 @@ t_simplcmd	*simple_ctor(t_dlist *head)
 			"|", CHECK_NOTQUOTE, 2))
 	{
 		simple->type = TYPE_PIPE;
-		freeme = ft_lstpop_back((t_list **)&head->content);
-		ft_lstdelone((t_list *)freeme, free, free);
-		/* ft_lstdisplay(head->content, display); */
+		ft_lstdelone(ft_lstpop_back((t_list **)&head->content), free, free);
 	}
 	simple->args = downcast_dblwstr((t_dlist **)&head->content);
 	ft_memset(simple->pipes, '\0', 2);
@@ -89,8 +88,8 @@ t_simplcmd	*simple_ctor(t_dlist *head)
 
 void	simple_dtor(t_simplcmd *simple)
 {
-	for (size_t i = 0; i < ft_dblptrlen((void **)simple->args); i++)
-		ft_printf("%d : %s\n", i, simple->args[i]);
+	/* for (size_t i = 0; i < ft_dblptrlen((void **)simple->args); i++) */
+	/* 	ft_printf("%d : %s\n", i, simple->args[i]); */
 	if (!simple)
 		return ;
 	ft_dblptr_free((void **)simple->args);
@@ -127,11 +126,10 @@ t_dlist	*build_cmd_table(t_dlist **simplecmds)
 		simplecmd = simple_ctor(head);
 		if (!simplecmd)
 			return (comp_dtor(&cmdtable));
-		ft_dlstpush_front(&cmdtable, simplecmd);
+		ft_dlstpush_back(&cmdtable, simplecmd);
 		head = head->next;
 	}
 	ft_dlstrewind(simplecmds);
 	ft_lstclear((t_list **)simplecmds, NULL, free);
-	/* comp_dtor(&cmdtable); */
 	return (cmdtable);
 }
