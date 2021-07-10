@@ -77,12 +77,10 @@ t_simplcmd	*simple_ctor(t_dlist *head)
 	if (!ft_wstrncmp((unsigned short *)ft_lstlast(head->content)->content,
 			"|", CHECK_NOTQUOTE, 2))
 	{
-		ft_lstdisplay(head->content, display);
 		simple->type = TYPE_PIPE;
-		/* tmp = (t_dlist *)ft_lstlast(head->content); */
-		/* printf("%s %p\n", downcast_wstr(tmp->content, 1), tmp->next); */
 		freeme = ft_lstpop_back((t_list **)&head->content);
 		ft_lstdelone((t_list *)freeme, free, free);
+		/* ft_lstdisplay(head->content, display); */
 	}
 	simple->args = downcast_dblwstr((t_dlist **)&head->content);
 	ft_memset(simple->pipes, '\0', 2);
@@ -91,6 +89,8 @@ t_simplcmd	*simple_ctor(t_dlist *head)
 
 void	simple_dtor(t_simplcmd *simple)
 {
+	for (size_t i = 0; i < ft_dblptrlen((void **)simple->args); i++)
+		ft_printf("%d : %s\n", i, simple->args[i]);
 	if (!simple)
 		return ;
 	ft_dblptr_free((void **)simple->args);
@@ -132,5 +132,6 @@ t_dlist	*build_cmd_table(t_dlist **simplecmds)
 	}
 	ft_dlstrewind(simplecmds);
 	ft_lstclear((t_list **)simplecmds, NULL, free);
+	/* comp_dtor(&cmdtable); */
 	return (cmdtable);
 }
