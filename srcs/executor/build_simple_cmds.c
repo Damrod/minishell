@@ -2,20 +2,11 @@
 #include <wstrcmp.h>
 #include <libft.h>
 #include <get_redirs.h>
+#include <error_mng.h>
 
 void	ft_dblptr_display(char **dblptr, void (*p)());
 void	print_dblptr(const char *input);
 void	display(void *str, int i);
-
-/* void	display(void *str, int i) */
-/* { */
-/* 	char *arg; */
-
-/* 	arg = downcast_wstr(str, 1); */
-/* 	/\* ft_printf("%d, %s\n", i, str); *\/ */
-/* 	ft_printf("%d, %s\n", i, arg); */
-/* 	free (arg); */
-/* } */
 
 void	lstoflst_clear(t_dlist **list)
 {
@@ -52,21 +43,6 @@ char	**downcast_dblwstr(t_dlist **args)
 	return (ret);
 }
 
-// while (g_term.simplecmds && g_term.simplecmds->content)
-// {
-// ft_lstdisplay(g_term.simplecmds->content, display);
-// ft_lstclear((t_list **)&g_term.simplecmds->content, free, free);
-/* if (!g_term.simplecmds->next) */
-/* { */
-/* 	ft_dlstrewind(&g_term.simplecmds); */
-/* 	break ; */
-/* } */
-// g_term.simplecmds = g_term.simplecmds->next;
-// }
-/* printf("\nantepenul: %s\n", downcast_wstr(((t_list *)(g_term.simplecmds->content))->content, 1)); */
-// ft_dlstrewind(&g_term.simplecmds);
-// ft_lstclear((t_list **)&g_term.simplecmds, NULL, free);
-
 t_simplcmd	*simple_ctor(t_dlist *head)
 {
 	t_simplcmd	*simple;
@@ -95,8 +71,6 @@ t_simplcmd	*simple_ctor(t_dlist *head)
 
 void	simple_dtor(t_simplcmd *simple)
 {
-	/* for (size_t i = 0; i < ft_dblptrlen((void **)simple->args); i++) */
-	/* 	ft_printf("%d : %s\n", i, simple->args[i]); */
 	if (!simple)
 		return ;
 	ft_dblptr_free((void **)simple->args);
@@ -107,31 +81,23 @@ void	simple_dtor(t_simplcmd *simple)
 	free (simple);
 }
 
-int	error_syntax(char *token);
-
-void	*comp_dtor(t_dlist **compcmd, t_dlist **simplecmds, bool isprintsynerr)
+void	*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds, bool isprintsynerr)
 {
 	t_dlist		*head;
+	t_dlist		*tmp;
 
 	head = *compcmd;
-	while (head && head->content)
+	while (head)
 	{
 		simple_dtor(head->content);
+		tmp = head;
 		head = head->next;
+		free (tmp);
 	}
-	if (simplecmds) {
-		ft_printf("%p hello0\n", *simplecmds);
-		while (simplecmds && (*simplecmds)->content)
-		{
-			ft_lstclear((t_list **)&(*simplecmds)->content, free, free);
-			*simplecmds = (*simplecmds)->next;
-		}
-	}
+	if (simplecmds)
+		lstoflst_clear(&simplecmds);
 	if (isprintsynerr)
-	{
-		ft_printf("%p hello1\n", *simplecmds);
 		error_syntax("|");
-	}
 	return (NULL);
 }
 
@@ -148,17 +114,14 @@ t_dlist	*build_cmd_table(t_dlist **simplecmds)
 		simplecmd = simple_ctor(head);
 		if (!simplecmd || (!ft_dblptrlen((void **)simplecmd->args)
 				&& simplecmd->type == TYPE_PIPE))
-			return (comp_dtor(&cmdtable, simplecmds, simplecmd
+			return (comp_dtor(&cmdtable, *simplecmds, simplecmd
 					&& !ft_dblptrlen((void **)simplecmd->args)
 					&& (simplecmd->type == TYPE_PIPE)));
 		ft_dlstpush_back(&cmdtable, simplecmd);
 		head = head->next;
 	}
-	lstoflst_clear((t_dlist **) simplecmds);
+	lstoflst_clear((t_dlist **)simplecmds);
 	if (((t_simplcmd *)ft_dlstlast(cmdtable)->content)->type == TYPE_PIPE)
-	{
-		error_syntax("|");
-		return (NULL);
-	}
+		return (comp_dtor(&cmdtable, NULL, true));
 	return (cmdtable);
 }
