@@ -201,9 +201,8 @@ int exec_cmd(t_dlist *cmd, char **env);
 
 int	main(int argc, char **argv)
 {
-	/* t_list			*str; */
-	/* t_dlist			*cmds; */
 	extern char		**environ;
+	t_dlist			*cmds;
 
 	(void)argc;
 	(void)argv;
@@ -221,35 +220,8 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
 		if (!g_term.args)
 			continue ;
-
-		// SPLIT into simple commands START
 		g_term.simplecmds = split_into_simple_cmds(g_term.args);
-		// while (g_term.simplecmds && g_term.simplecmds->content)
-		// {
-			// ft_lstdisplay(g_term.simplecmds->content, display);
-			// ft_lstclear((t_list **)&g_term.simplecmds->content, free, free);
-			/* if (!g_term.simplecmds->next) */
-			/* { */
-			/* 	ft_dlstrewind(&g_term.simplecmds); */
-			/* 	break ; */
-			/* } */
-			// g_term.simplecmds = g_term.simplecmds->next;
-		// }
-		/* printf("\nantepenul: %s\n", downcast_wstr(((t_list *)(g_term.simplecmds->content))->content, 1)); */
-		// ft_dlstrewind(&g_term.simplecmds);
-		// ft_lstclear((t_list **)&g_term.simplecmds, NULL, free);
-		// SPLIT into simple commands END
-
 		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
-		/* t_dlist *cmdtable = g_term.cmdtable; */
-		/* while (cmdtable) */
-		/* { */
-		/* 	ft_dblptr_display(getcmds(cmdtable)->args, print_dblptr); */
-		/* 	ft_printf("type: %d, out: %d, in: %d\n", getcmds(cmdtable)->type, getcmds(cmdtable)->outfd, getcmds(cmdtable)->infd); */
-		/* 	cmdtable = cmdtable->next; */
-		/* } */
-		t_dlist *cmds;
-
 		cmds = g_term.cmdtable;
 		while (cmds)
 		{
@@ -257,72 +229,9 @@ int	main(int argc, char **argv)
 			cmds = cmds->next;
 		}
 		comp_dtor(&g_term.cmdtable, NULL, 0);
-
-		/* int infd; */
-		/* int outfd; */
-
-		/* g_term.lastret = get_redirs(&g_term.args, &infd, &outfd); */
-		/* if (infd > STDERR_FILENO) */
-		/* { */
-		/* 	char *line; */
-
-		/* 	while (get_next_line(infd, &line) > 0) */
-		/* 	{ */
-		/* 		ft_printf("%s\n", line); */
-		/* 		free (line); */
-		/* 	} */
-		/* 	ft_printf("%s\n", line); */
-		/* 	free_and_nullify((void **)&line, NULL, NULL, 1); */
-		/* } */
-		/* if (infd > STDERR_FILENO) */
-		/* 	close(infd); */
-		/* if (outfd > STDERR_FILENO) */
-		/* 	close(outfd); */
-		/* if (g_term.lastret) */
-		/* { */
-		/* 	ft_lstclear(&g_term.args, free, free); */
-		/* 	continue ; */
-		/* } */
-
-		/* char *tmp2; */
-		/* str = g_term.args; */
-		/* while (str) */
-		/* { */
-		/* 	tmp2 = downcast_wstr(str->content, 1); */
-		/* 	printf("%s\n", tmp2); */
-		/* 	free(tmp2); */
-		/* 	str = str->next; */
-		/* } */
-		/* ft_lstclear(&g_term.args, free, free); */
-
-		/* ft_dblptr_foreach(g_term.args, print_dblptr); */
-		/* if (1) */
-		/* { */
-		/* 	ft_dblptr_free((void **)g_term.args); */
-		/* } */
 	}
 	free(environ);
 	environ = NULL;
 	ft_printf("\n");
 	return (0);
 }
-
-/* int	main(int argc, char **argv) */
-/* { */
-/* 	t_dlist *list; */
-
-/* 	list = NULL; */
-/* 	for (int i = 1; i < argc; ++i) */
-/* 		ft_dlstpush_back(&list, ft_strdup(argv[i])); */
-	/* g_term.simplecmds = split_into_simple_cmds(g_term.args); */
-	/* while (list) */
-	/* { */
-	/* ft_lstdisplay((t_list *)list, display); */
-		/* ft_lstclear((t_list **)&list->content, free, free); */
-		/* list = list->next; */
-	/* } */
-/* 	ft_dlstrewind(&list); */
-/* 	ft_lstclear((t_list **)&list, free, free); */
-/* 	ft_printf("\n"); */
-/* 	return (0); */
-/* } */
