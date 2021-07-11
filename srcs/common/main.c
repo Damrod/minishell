@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:29:03 by hellnhell         #+#    #+#             */
-/*   Updated: 2021/07/07 20:30:51 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/11 20:33:53 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,9 @@ void	handle_eot(int sig)
 	free_and_nullify ((void **)&environ);
 	free_and_nullify((void **)&g_term.inputstring);
 	ft_printf("\n");
-	exit(0);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 //esto a libft o common(?)
@@ -191,6 +193,10 @@ int	main(int argc, char **argv)
 	while (1)
 	{
 		g_term.inputstring = readline("marishell% ");
+		if(!g_term.inputstring)
+		{
+			exit(1);
+		}
 		if (ft_strlen(g_term.inputstring) > 0)
 			add_history(g_term.inputstring);
 		if (g_term.inputstring && g_term.inputstring[0] == STX)
@@ -218,11 +224,6 @@ int	main(int argc, char **argv)
 		}
 		free(str);
 		apply_dblptr(g_term.args, print_dblptr);
-printf("\n\n\n\ntest:\n\n");
-//		ft_env(environ);
-printf("\n\n\n\n");
-//		ft_export(&environ, &g_term);
-printf("\n\n\n\n");
 		miniexec(&g_term, &environ);
 		if (1)
 		{
