@@ -213,12 +213,9 @@ int	main(int argc, char **argv)
 	while (1)
 	{
 		g_term.inputstring = readline("marishell% ");
-		g_term.lineno++;
-		if (g_term.inputstring && g_term.inputstring[0] == STX)
-		{
-			free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
+		if (!g_term.inputstring)
 			break ;
-		}
+		g_term.lineno++;
 		g_term.args = get_args(g_term.inputstring);
 		free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
 		if (!g_term.args)
