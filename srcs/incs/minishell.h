@@ -6,14 +6,14 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:44:16 by hellnhell         #+#    #+#             */
-/*   Updated: 2021/06/25 16:08:36 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/07 20:09:38 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-#include <minishell0.h>
+# include	<minishell0.h>
 # include	<libft.h>
 # include	<stdio.h>
 # include	<unistd.h>
@@ -21,7 +21,7 @@
 # include	<stdlib.h>
 # include	<errno.h>
 
-typedef struct s_tab
+typedef struct	s_tab
 {
 	char		*line;
 	char		**tokens;
@@ -43,6 +43,11 @@ char	*ft_strjoin_sl(const char *s1, const char *s2);
 int		ft_echo(char **args);
 int		ft_pwd(void);
 int		ft_cd(char **args);
+int		ft_env(char **g_term);
+int		ft_export(char ***env, t_term *g_term);
+int		ft_unset(char ***env, t_term *g_term);
+int		ft_exit(t_term *g_term);
+
 char	**ft_split_com(char const *s, char c, t_tab *t);
 int		check_our_implement(t_tab *t);
 

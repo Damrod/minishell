@@ -72,6 +72,11 @@ unsigned short	**get_args(const char *arg);
 size_t			ft_wstrlen(const unsigned short *str, char is_untilspace);
 unsigned short	*upcast_str(const char *args);
 unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace);
+void	print_dblptr(const char *input);
+void	apply_dblptr(char **data, void (*f)());
+char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
+
+
 
 extern t_term	g_term;
 
