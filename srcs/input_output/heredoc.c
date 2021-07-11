@@ -76,7 +76,6 @@ int	heredoc_get_fd(char *result, int *input, char *file)
 	*input = open(filepath, O_RDONLY);
 	unlink(filepath);
 	free(result);
-	printf("%s\n", filepath);
 	return (0);
 }
 

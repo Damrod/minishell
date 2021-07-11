@@ -196,6 +196,8 @@ t_simplcmd *getcmds(t_dlist *cmd)
 	return ((t_simplcmd *)cmd->content);
 }
 
+int exec_cmd(t_dlist *cmd, char **env);
+
 int	main(int argc, char **argv)
 {
 	/* t_list			*str; */
@@ -241,12 +243,20 @@ int	main(int argc, char **argv)
 		// SPLIT into simple commands END
 
 		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
-		t_dlist *cmdtable = g_term.cmdtable;
-		while (cmdtable)
+		/* t_dlist *cmdtable = g_term.cmdtable; */
+		/* while (cmdtable) */
+		/* { */
+		/* 	ft_dblptr_display(getcmds(cmdtable)->args, print_dblptr); */
+		/* 	ft_printf("type: %d, out: %d, in: %d\n", getcmds(cmdtable)->type, getcmds(cmdtable)->outfd, getcmds(cmdtable)->infd); */
+		/* 	cmdtable = cmdtable->next; */
+		/* } */
+		t_dlist *cmds;
+
+		cmds = g_term.cmdtable;
+		while (cmds)
 		{
-			ft_dblptr_display(getcmds(cmdtable)->args, print_dblptr);
-			ft_printf("type: %d, out: %d, in: %d\n", getcmds(cmdtable)->type, getcmds(cmdtable)->outfd, getcmds(cmdtable)->infd);
-			cmdtable = cmdtable->next;
+			g_term.lastret = exec_cmd(cmds, environ);
+			cmds = cmds->next;
 		}
 		comp_dtor(&g_term.cmdtable, NULL, 0);
 
