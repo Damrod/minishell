@@ -26,7 +26,8 @@ t_term	g_term = {
 	.simplecmds = NULL,
 	.inputstring = NULL,
 	.lineno = 0,
-	.lastret = 0
+	.lastret = 0,
+	.lastpid = 0
 };
 
 
