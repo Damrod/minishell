@@ -26,9 +26,17 @@ void	handle_eot(int sig)
 {
 	extern char		**environ;
 
+	(void) environ;
 	(void) sig;
-	free_and_nullify ((void **)&environ, NULL, NULL, 1);
-	free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
-	ft_printf("\n");
-	exit(0);
+	if (sig == SIGINT)
+	{
+		ft_printf("\n");
+		g_term.inputstring = readline("marishell% ");
+	}
+	if (sig == SIGQUIT && g_term.lastpid > 0)
+	{
+		ft_printf("Quit (core dumped) %d\n", g_term.lastpid);
+		kill(g_term.lastpid, SIGQUIT);
+		g_term.lastpid = 0;
+	}
 }

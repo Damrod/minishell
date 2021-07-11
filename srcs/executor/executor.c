@@ -28,6 +28,7 @@ int exec_cmd(t_dlist *cmd, char **env)
 			exit(1);
 	}
 	pid = fork();
+	g_term.lastpid = pid;
 	if (pid < 0)
 		exit(1);
 	else if (pid == 0)
