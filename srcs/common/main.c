@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:29:03 by hellnhell         #+#    #+#             */
-/*   Updated: 2021/06/06 19:21:18 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/07 20:30:51 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,50 @@ void	handle_eot(int sig)
 	exit(0);
 }
 
+//esto a libft o common(?)
+static int	ft_strcmp(char *s1, char *s2)
+{
+	while (*s2 == *s1 && *s1)
+	{
+		s2++;
+		s1++;
+	}
+	return (*(unsigned char *)s1 - *(unsigned char *)s2);
+}
+
+int	check_builtins(t_term *g_term, char ***env)
+{
+	if (ft_strcmp(g_term->args[0], "export") == 0)
+	{
+		ft_export(env, g_term);
+		return (1);
+	}
+	else if (ft_strcmp(g_term->args[0], "env") == 0)
+	{
+		ft_env(*env);
+		return (1);
+	}
+	else if (ft_strcmp(g_term->args[0], "unset") == 0)
+	{
+		ft_unset(env, g_term);
+		return (1);
+	}
+	else if (ft_strcmp(g_term->args[0], "exit") == 0)
+	{
+		ft_exit(g_term);
+		return (1);
+	}
+	return (0);
+}
+
+void miniexec(t_term *g_term, char ***env)
+{
+	if(!(check_builtins(g_term, env)))
+	{
+		check_path(g_term);
+	}
+}
+
 int	main(int argc, char **argv)
 {
 	unsigned short	**str;
@@ -164,12 +208,15 @@ int	main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
+	read_path(environ, &g_term);
 	str = NULL;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)
 	{
 		g_term.inputstring = readline("marishell% ");
+		if (ft_strlen(g_term.inputstring) > 0)
+			add_history(g_term.inputstring);
 		if (g_term.inputstring && g_term.inputstring[0] == STX)
 		{
 			free_and_nullify((void **)&g_term.inputstring);
@@ -198,6 +245,12 @@ int	main(int argc, char **argv)
 		}
 		free(str);
 		apply_dblptr(g_term.args, print_dblptr);
+printf("\n\n\n\ntest:\n\n");
+//		ft_env(environ);
+printf("\n\n\n\n");
+//		ft_export(&environ, &g_term);
+printf("\n\n\n\n");
+		miniexec(&g_term, &environ);
 		if (1)
 		{
 			ft_dblptr_free((void **)g_term.args);
