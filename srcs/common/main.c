@@ -149,6 +149,16 @@ void	handle_eot(int sig)
 	extern char		**environ;
 
 	(void) sig;
+	if (sig == SIGINT)
+	{
+		g_term.inputstring = readline("marishell% ");
+		return ;
+	}
+	if (sig == SIGQUIT && g_term.lastpid > 0)
+	{
+		kill(g_term.lastpid, SIGQUIT);
+		return ;
+	}
 	free_and_nullify ((void **)&environ);
 	free_and_nullify((void **)&g_term.inputstring);
 	ft_printf("\n");
@@ -215,6 +225,8 @@ int	main(int argc, char **argv)
 	while (1)
 	{
 		g_term.inputstring = readline("marishell% ");
+		if (!g_term.inputstring)
+			break ;
 		if (ft_strlen(g_term.inputstring) > 0)
 			add_history(g_term.inputstring);
 		if (g_term.inputstring && g_term.inputstring[0] == STX)

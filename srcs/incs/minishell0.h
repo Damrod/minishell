@@ -71,6 +71,7 @@ typedef struct s_term {
 	char	*inputstring;
 	char	**path;
 	t_dlist	*cmds;
+	int			lastpid;
 }	t_term;
 
 unsigned short	**get_args(const char *arg);
