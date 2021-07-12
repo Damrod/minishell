@@ -9,12 +9,7 @@
 //esto a libft o common(?)
 static int	ft_strcmp(char *s1, char *s2)
 {
-	while (*s2 == *s1 && *s1)
-	{
-		s2++;
-		s1++;
-	}
-	return (*(unsigned char *)s1 - *(unsigned char *)s2);
+	return (ft_strncmp(s1, s2, ft_strlen(s1)));
 }
 
 int	check_builtins(char **args, char ***env)
@@ -50,7 +45,7 @@ int miniexec(char **args, char ***env)
 	{
 		check_path(args, g_term.path);
 	}
-	return (1);
+	return (0);
 }
 
 t_simplcmd *simple(t_dlist *cmd)
