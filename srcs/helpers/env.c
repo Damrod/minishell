@@ -1,102 +1,8 @@
-#include "minishell.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <env.h>
 
-//join2
-static size_t	dblptrlen(const char **strs)
-{
-	const char	**last;
-
-	last = strs;
-	while (*last)
-		last++;
-	return ((size_t)(last - strs));
-}
-
-static size_t	ft_strlen_ult(ssize_t *size, const char **str)
-{
-	size_t	i;
-	size_t	resul;
-
-	if (*size < 0)
-		*size = (signed)dblptrlen(str);
-	if (*size == 0 || *str == NULL)
-		return (0);
-	resul = 0;
-	i = 0;
-	while (i < (unsigned) *size)
-	{
-//check aqui
-		if(*(str + i))
-			resul += ft_strlen(*(str + i));
-		i++;
-	}
-	return (resul);
-}
-
-static void	*malloc_mng(ssize_t *size, const char **strs, const char *sep)
-{
-	char	*resul;
-	int		fnl_pad;
-	size_t	totsz;
-
-	if (!strs || !*strs)
-		return (NULL);
-	if (*size != 0)
-		fnl_pad = ft_strlen(sep);
-	else
-		fnl_pad = 0;
-	totsz = ft_strlen_ult(size, strs) + (*size - 1) * fnl_pad;
-	resul = malloc(sizeof(char) * totsz + 1);
-	if (!resul)
-		return (NULL);
-	ft_memset(resul, '\0', totsz + 1);
-	return (resul);
-}
-
-char	*ft_strjoin_ult2(ssize_t sz, const char **strs, const char *sep)
-{
-	char	*res;
-	ssize_t	i;
-	size_t	aux;
-
-	if (!strs || !*strs)
-		return (NULL);
-	res = malloc_mng(&sz, strs, sep);
-	if (!res)
-		return (NULL);
-	if (sz == 0)
-	{
-		*res = '\0';
-		return (res);
-	}
-	aux = 0;
-	i = 0;
-	while (i < sz - 1)
-	{
-
-		aux = ft_strlcat(res, strs[i], ft_strlen(res) + ft_strlen(strs[i]) + 1);
-		aux = ft_strlcat(res, sep, aux + ft_strlen(sep) + 1);
-		i++;
-	}
-//check aqui
-	if(strs[i])
-		ft_strlcat(res, strs[i], aux + ft_strlen(strs[i]) + 1);
-	return (res);
-}
-
-//export
-
-//esto a libft o common(?)
 static int	ft_strcmp(char *s1, char *s2)
 {
-	while (*s2 == *s1 && *s1)
-	{
-		s2++;
-		s1++;
-	}
-	return (*(unsigned char *)s1 - *(unsigned char *)s2);
+	return (ft_strncmp (s1, s2, ft_strlen(s2)));
 }
 
 void	ft_print_env_ordered(char **env)
@@ -115,9 +21,7 @@ void	ft_print_env_ordered(char **env)
 	while (size--)
 	{
 		tmp2 = ft_split_ultimate(tmp[size], "=");
-printf("PETAAQUI\n");
-		tmp[size] = ft_strjoin_ult2(2, (const char **) tmp2, "=\"");
-printf("NO\n");
+		tmp[size] = ft_strjoin_ult(2, (const char **) tmp2, "=\"");
 	}
 	size = ft_dblptrlen((void **)env);
 	while (size--)
@@ -216,7 +120,7 @@ void	add_var_env(char *arg, char ***env)
 
 	printf("nocrash\n");
 	if (ft_set_varval(&varval, arg))
-		return;
+		return ;
 	if (check_valid_env_var(varval, arg, env))
 		return ;
 	i = 0;
@@ -231,24 +135,24 @@ void	add_var_env(char *arg, char ***env)
 	ft_dblptr_free((void **)varval);
 }
 
-int	ft_export(char ***env, t_term *g_term)
+int	ft_export(char ***env, char **args)
 {
 	int	i;
 	int	j;
 
-	if (!g_term->args[1])
+	if (!args[1])
 		ft_print_env_ordered(*env);
 	else
 	{
 		j = 0;
-		while (g_term->args[j])
+		while (args[j])
 		{
 			i = 0;
-			while (g_term->args[j][i])
+			while (args[j][i])
 			{
-				if (g_term->args[j][i] == '=')
+				if (args[j][i] == '=')
 				{
-					add_var_env(g_term->args[j], env);
+					add_var_env(args[j], env);
 				}
 				i++;
 			}
@@ -258,9 +162,11 @@ int	ft_export(char ***env, t_term *g_term)
 	return (0);
 }
 
+void	ft_dblptr_foreach(char **data, void (*f)());
+
 int	ft_env(char **env)
 {
-	apply_dblptr(env, print_dblptr);
+	ft_dblptr_foreach(env, print_dblptr);
 	return (0);
 }
 
@@ -306,14 +212,14 @@ int	check_env_var(char *var, char ***env)
 	return (1);
 }
 
-int	ft_unset(char ***env, t_term *g_term)
+int	ft_unset(char ***env, char **args)
 {
 	int	i;
 
 	i = 0;
-	while (g_term->args[i])
+	while (args[i])
 	{
-		if (check_env_var(g_term->args[i], env))
+		if (check_env_var(args[i], env))
 			i++;
 	}
 	return (0);
@@ -321,25 +227,25 @@ int	ft_unset(char ***env, t_term *g_term)
 
 //exit
 
-void	check_exit_arg(int num, t_term *g_term)
+void	check_exit_arg(int num, char **args)
 {
 	int	i;
 
 	i = 0;
-	if (ft_strncmp(g_term->args[1], "-", 1) == 0)
+	if (ft_strncmp(args[1], "-", 1) == 0)
 		i++;
-	while (g_term->args[1][i])
+	while (args[1][i])
 	{
-		if (ft_isdigit(g_term->args[1][i]) != 1)
+		if (ft_isdigit(args[1][i]) != 1)
 		{
 			printf("bash: exit: %s: numeric argument required\n",
-				g_term->args[1]);
+				args[1]);
 			exit(255);
 		}
 		i++;
 	}
 	i = 0;
-	while (g_term->args[++i])
+	while (args[++i])
 		;
 	if (i > 2)
 		printf("bash: exit: too many arguments\n");
@@ -347,15 +253,15 @@ void	check_exit_arg(int num, t_term *g_term)
 		exit (num);
 }
 
-int	ft_exit(t_term *g_term)
+int	ft_exit(char **args)
 {
 	int	i;
 
 	printf("exit\n");
-	if (g_term->args[1])
+	if (args[1])
 	{
-		i = ft_atoi(g_term->args[1]);
-		check_exit_arg(i, g_term);
+		i = ft_atoi(args[1]);
+		check_exit_arg(i, args);
 	}
 	else
 //exit con el estado actual, para hacer

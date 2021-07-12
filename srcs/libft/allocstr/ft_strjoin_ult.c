@@ -35,7 +35,8 @@ size_t	ft_strlen_ult(ssize_t *size, const char **str)
 	i = 0;
 	while (i < (unsigned) *size)
 	{
-		resul += ft_strlen(*(str + i));
+		if (str[i])
+			resul += ft_strlen(*(str + i));
 		i++;
 	}
 	return (resul);
@@ -85,6 +86,7 @@ char	*ft_strjoin_ult(ssize_t sz, const char **strs, const char *sep)
 		aux = ft_strlcat(res, sep, aux + ft_strlen(sep) + 1);
 		i++;
 	}
-	ft_strlcat(res, strs[i], aux + ft_strlen(strs[i]) + 1);
+	if (strs[i])
+		ft_strlcat(res, strs[i], aux + ft_strlen(strs[i]) + 1);
 	return (res);
 }

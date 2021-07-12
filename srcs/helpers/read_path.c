@@ -97,50 +97,53 @@ char	*ft_cat_rel_path(char *path, char *arg)
 	return (ret);
 }
 
-int	check_relat(char *execpath, char *cwd, t_term *g_term, int *status)
+int	check_relat(char *execpath, char *cwd, char **args, int *status)
 {
-	if ((g_term->args[0][0] == '.' && g_term->args[0][1]
-		&& g_term->args[0][1] == '/') || ft_isalpha(g_term->args[0][0]))
+	extern char	**environ;
+
+	if ((args[0][0] == '.' && args[0][1]
+		&& args[0][1] == '/') || ft_isalpha(args[0][0]))
 	{
-		if (g_term->args[0][0] == '.')
-			execpath = ft_cat_rel_path(cwd, g_term->args[0]);
-		else if (ft_isalpha(g_term->args[0][0]))
-			execpath = ft_cat_path(cwd, g_term->args[0]);
-		*status = execve(execpath, g_term->args, g_term->environ);
+		if (args[0][0] == '.')
+			execpath = ft_cat_rel_path(cwd, args[0]);
+		else if (ft_isalpha(args[0][0]))
+			execpath = ft_cat_path(cwd, args[0]);
+		*status = execve(execpath, args, environ);
 		free(execpath);
 		return (1);
 	}
 	return (0);
 }
 
-void	check_path(t_term *g_term)
+void	check_path(char **args, char **path)
 {
-	size_t	i;
-	int		*status;
-	char	cwd[1024];
-	char	*execpath;
+	size_t		i;
+	int			*status;
+	char		cwd[1024];
+	char		*execpath;
+	extern char	**environ;
 
 	getcwd(cwd, 1024);
 	i = 0;
 	status = malloc(sizeof(int));
 	*status = -1;
-	while (g_term->path[i])
+	while (path[i])
 	{
-		if (!check_relat(execpath, cwd, g_term, status) && *status >= 0)
+		if (!check_relat(execpath, cwd, args, status) && *status >= 0)
 			continue ;
-		if (g_term->args[0][0] == '/')
+		if (args[0][0] == '/')
 		{
-			*status = execve(g_term->args[0], g_term->args, g_term->environ);
+			*status = execve(args[0], args, environ);
 			if (*status >= 0)
 				continue ;
 		}
-		execpath = ft_cat_path(g_term->path[i], g_term->args[0]);
-		*status = execve(execpath, g_term->args, g_term->environ);
+		execpath = ft_cat_path(path[i], args[0]);
+		*status = execve(execpath, args, environ);
 		free(execpath);
 		i++;
 	}
-	if (*status < 0 || !g_term->path[i])
-		printf("command not found: %s\n", g_term->args[0]);
+	if (*status < 0 || !path[i])
+		printf("command not found: %s\n", args[0]);
 	free(status);
 }
 

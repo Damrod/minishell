@@ -15,6 +15,7 @@
 #include <error_mng.h>
 #include <wstrcmp.h>
 #include <get_redirs.h>
+#include <env.h>
 
 t_dlist	*build_cmd_table(t_dlist **simplecmds);
 void	*comp_dtor(t_dlist **compcmd, t_dlist **simplecmds, bool isprintsynerr);
@@ -92,27 +93,6 @@ t_simplcmd *getcmds(t_dlist *cmd)
 	return ((t_simplcmd *)cmd->content);
 }
 
-void	handle_eot(int sig)
-{
-	extern char		**environ;
-
-	(void) sig;
-	if (sig == SIGINT)
-	{
-		g_term.inputstring = readline("marishell% ");
-		return ;
-	}
-	if (sig == SIGQUIT && g_term.lastpid > 0)
-	{
-		kill(g_term.lastpid, SIGQUIT);
-		return ;
-	}
-	free_and_nullify ((void **)&environ);
-	free_and_nullify((void **)&g_term.inputstring);
-	ft_printf("\n");
-	exit(0);
-}
-
 int exec_cmd(t_dlist *cmd, char **env);
 
 //esto a libft o common(?)
@@ -126,36 +106,36 @@ static int	ft_strcmp(char *s1, char *s2)
 	return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
 
-int	check_builtins(t_term *g_term, char ***env)
+int	check_builtins(char **args, char ***env)
 {
-	if (ft_strcmp(g_term->args[0], "export") == 0)
+	if (ft_strcmp(args[0], "export") == 0)
 	{
-		ft_export(env, g_term);
+		ft_export(env, args);
 		return (1);
 	}
-	else if (ft_strcmp(g_term->args[0], "env") == 0)
+	else if (ft_strcmp(args[0], "env") == 0)
 	{
 		ft_env(*env);
 		return (1);
 	}
-	else if (ft_strcmp(g_term->args[0], "unset") == 0)
+	else if (ft_strcmp(args[0], "unset") == 0)
 	{
-		ft_unset(env, g_term);
+		ft_unset(env, args);
 		return (1);
 	}
-	else if (ft_strcmp(g_term->args[0], "exit") == 0)
+	else if (ft_strcmp(args[0], "exit") == 0)
 	{
-		ft_exit(g_term);
+		ft_exit(args);
 		return (1);
 	}
 	return (0);
 }
 
-void miniexec(t_term *g_term, char ***env)
+void miniexec(char **args, char ***env)
 {
-	if(!(check_builtins(g_term, env)))
+	if(!(check_builtins(args, env)))
 	{
-		check_path(g_term);
+		return ;
 	}
 }
 
@@ -187,12 +167,12 @@ printf("\n\n\n\ntest:\n\n");
 printf("\n\n\n\n");
 //		ft_export(&environ, &g_term);
 printf("\n\n\n\n");
-		miniexec(&g_term, &environ);
 		g_term.simplecmds = split_into_simple_cmds(g_term.args);
 		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
 		cmds = g_term.cmdtable;
 		while (cmds)
 		{
+			miniexec(((t_simplcmd *)cmds->content)->args, &environ);
 			g_term.lastret = exec_cmd(cmds, environ);
 			cmds = cmds->next;
 		}
