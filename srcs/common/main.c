@@ -5,19 +5,29 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/20 18:29:03 by hellnhell         #+#    #+#             */
-/*   Updated: 2021/07/07 20:30:51 by nazurmen         ###   ########.fr       */
+/*   Created: 2020/09/20 18:29:03 by aollero           #+#    #+#             */
+/*   Updated: 2021/06/06 19:21:18 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
 #include <minishell0.h>
-#include <minishell.h>
+#include <libft.h>
+#include <error_mng.h>
+#include <wstrcmp.h>
+#include <get_redirs.h>
+
+t_dlist	*build_cmd_table(t_dlist **simplecmds);
+void	*comp_dtor(t_dlist **compcmd, t_dlist **simplecmds, bool isprintsynerr);
 
 t_term	g_term = {
+	.environ = NULL,
 	.args = NULL,
+	.cmdtable = NULL,
+	.simplecmds = NULL,
 	.inputstring = NULL,
-	.cmds = NULL
+	.lineno = 0,
+	.lastret = 0,
+	.lastpid = 0
 };
 
 void	print_dblptr(const char *input)
@@ -25,7 +35,7 @@ void	print_dblptr(const char *input)
 	printf("%s\n", input);
 }
 
-void	apply_dblptr(char **data, void (*f)())
+void	ft_dblptr_foreach(char **data, void (*f)())
 {
 	size_t	len;
 
@@ -40,108 +50,46 @@ void	apply_dblptr(char **data, void (*f)())
 	}
 }
 
-void	ft_order_list(t_tab *t, t_dlist *lst, int i)
+int	get_pipes(void *src, void *key)
 {
-	(void)lst;
-	while (t->orders[i])
-	{
-		//procesado de to
-		printf("%s\n", t->orders[i]);
-		i++;
-	}
+	unsigned short	*a;
+	char			*b;
+
+	a = src;
+	b = key;
+	return (ft_wstrncmp(a, b, CHECK_NOTQUOTE, 2));
 }
 
-void	free_and_nullify(void **tofree)
+t_dlist	*split_into_simple_cmds(t_list *compcmd)
 {
-	free(*tofree);
-	*tofree = NULL;
+	return (ft_lstsplit(compcmd, "|", get_pipes));
 }
 
-char	*downcast_wstr(const unsigned short *str, char is_low)
+void	display(void *str, int i)
 {
-	char	*result;
+	char *arg;
+
+	arg = downcast_wstr(str, 1);
+	/* ft_printf("%d, %s\n", i, str); */
+	ft_printf("%d, %s\n", i, arg);
+	free (arg);
+}
+
+void	ft_dblptr_display(char **dblptr, void (*p)())
+{
 	size_t	i;
 
-	if (!na_calloc(sizeof(*result), ft_wstrlen(str, UNTIL_END_OF_STRING) + 1,
-			(void **)&result))
-		return (NULL);
 	i = 0;
-	while (str[i])
+	while (dblptr[i])
 	{
-		if (is_low)
-			result[i] = (char)str[i];
-		else
-			result[i] = (char)(str[i] >> 8);
+		p(dblptr[i], i);
 		i++;
 	}
-	return (result);
 }
 
-static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
-			char checkdepth)
+t_simplcmd *getcmds(t_dlist *cmd)
 {
-	*bitmask2 = 0;
-	*bitmask = 0;
-	if (checkdepth == CHECK_ONLY_LOW)
-	{
-		*bitmask2 = 0;
-		*bitmask = 0xFF00U;
-	}
-	if (checkdepth == CHECK_SNGQUOTE)
-	{
-		*bitmask2 = FLAG_SNGQUOT;
-		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_DBLQUOT);
-	}
-	if (checkdepth == CHECK_DBLQUOTE)
-	{
-		*bitmask2 = FLAG_DBLQUOT;
-		*bitmask = (FLAG_CIGNORE | FLAG_ESCAPED | FLAG_NOTSPCE | FLAG_SNGQUOT);
-	}
-	if (checkdepth == CHECK_ANYQUOTE)
-	{
-		*bitmask2 = 0;
-		*bitmask = 0;
-	}
-}
-
-
-
-char cmp_chars(unsigned short a, unsigned short b, char checkdepth)
-{
-	unsigned short	bitmask;
-	unsigned short	bitmask2;
-	unsigned short	bitmask3;
-	unsigned short	bitmask4;
-	char			aggregate;
-
-	if (checkdepth == CHECK_ANYQUOTE)
-	{
-		config_bitmasks(&bitmask, &bitmask2, CHECK_DBLQUOTE);
-		config_bitmasks(&bitmask3, &bitmask4, CHECK_SNGQUOTE);
-		aggregate = ((a & ~bitmask) == (b | bitmask2));
-		return (aggregate || ((a & ~bitmask3) == (b | bitmask4)));
-	}
-	config_bitmasks(&bitmask, &bitmask2, checkdepth);
-	return ((a & ~bitmask) == (b | bitmask2));
-}
-
-int	ft_wstrncmp(unsigned short *s1, const char *str2, char checkdepth, size_t n)
-{
-	int					a;
-	size_t				i;
-	unsigned short		*s2;
-
-	if (n == 0)
-		return (0);
-	s2 = upcast_str(str2);
-	if (!s2)
-		return (-0xFFFFF);
-	i = 0;
-	while (s1[i] && cmp_chars(s1[i], s2[i], checkdepth) && (i < n - 1))
-		i++;
-	a = (int)s1[i] - (int)s2[i];
-	free (s2);
-	return (a);
+	return ((t_simplcmd *)cmd->content);
 }
 
 void	handle_eot(int sig)
@@ -164,6 +112,8 @@ void	handle_eot(int sig)
 	ft_printf("\n");
 	exit(0);
 }
+
+int exec_cmd(t_dlist *cmd, char **env);
 
 //esto a libft o common(?)
 static int	ft_strcmp(char *s1, char *s2)
@@ -211,15 +161,13 @@ void miniexec(t_term *g_term, char ***env)
 
 int	main(int argc, char **argv)
 {
-	unsigned short	**str;
-	size_t			i;
 	extern char		**environ;
+	t_dlist			*cmds;
 
 	(void)argc;
 	(void)argv;
 	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
 	read_path(environ, &g_term);
-	str = NULL;
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)
@@ -229,44 +177,26 @@ int	main(int argc, char **argv)
 			break ;
 		if (ft_strlen(g_term.inputstring) > 0)
 			add_history(g_term.inputstring);
-		if (g_term.inputstring && g_term.inputstring[0] == STX)
-		{
-			free_and_nullify((void **)&g_term.inputstring);
-			break ;
-		}
-		str = get_args(g_term.inputstring);
-		free_and_nullify((void **)&g_term.inputstring);
-		if (!str)
+		g_term.lineno++;
+		g_term.args = get_args(g_term.inputstring);
+		free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
+		if (!g_term.args)
 			continue ;
-		if (!na_calloc(ft_dblptrlen((void **)str) + 1, sizeof(void *),
-				(void **)&g_term.args))
-		{
-			free_and_nullify((void **)&g_term.inputstring);
-			break ;
-		}
-		i = 0;
-		while (str[i])
-		{
-			char *param = "|";
-			g_term.args[i] = downcast_wstr(str[i], 1);
-			if (ft_wstrncmp(str[i], param, CHECK_ONLY_LOW, 2) == 0)
-				ft_printf("equals %s\n", param);
-			free (str[i]);
-			free_and_nullify ((void **)&g_term.inputstring);
-			i++;
-		}
-		free(str);
-		apply_dblptr(g_term.args, print_dblptr);
 printf("\n\n\n\ntest:\n\n");
 //		ft_env(environ);
 printf("\n\n\n\n");
 //		ft_export(&environ, &g_term);
 printf("\n\n\n\n");
 		miniexec(&g_term, &environ);
-		if (1)
+		g_term.simplecmds = split_into_simple_cmds(g_term.args);
+		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
+		cmds = g_term.cmdtable;
+		while (cmds)
 		{
-			ft_dblptr_free((void **)g_term.args);
+			g_term.lastret = exec_cmd(cmds, environ);
+			cmds = cmds->next;
 		}
+		comp_dtor(&g_term.cmdtable, NULL, 0);
 	}
 	free(environ);
 	environ = NULL;

@@ -21,6 +21,7 @@
 # include <errno.h>
 # include <stdint.h>
 # include <ft_printf.h>
+# include "libft2.h"
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 2048
 # endif
@@ -148,6 +149,7 @@ void	ft_wrtptr(char *c, char *str);
 char	*align_right(char *field, const char *content);
 void	ft_reverse_string(char *buf);
 int		ft_findptrinarr(void **array, void *key, int size);
+t_ui32	ft_random(uint32_t seed);
 
 //		misc alloc
 
@@ -195,16 +197,18 @@ t_list	*ft_lstpop_back(t_list **lst);
 void	ft_lstmerge(t_list **a, t_list *b);
 void	ft_lstdisplay(t_list *list, void (*disp)(void *, int));
 void	ft_sorted_lst_merge(t_list **a, t_list *b, int (*cmp)());
-void	ft_lstsplit(t_list *src, t_list **a, t_list **b);
+void	ft_lstsplit_half(t_list *src, t_list **a, t_list **b);
 void	ft_list_sort(t_list **src, int (*cmp)());
 void	ft_list_reverse(t_list **begin_list);
 t_list	*ft_lstdup(t_list *head, size_t contsize, void (*dc)(), void (*dn)());
-int		ft_lstcullpat(t_list **list, int *mask, void (*delcnt)(void *),
+int		ft_lstcullpat(t_list **list, char *mask, void (*delcnt)(void *),
 			void (*delnde)(void *));
 int		ft_lstdeldup(t_list **list, void (*delnde)(void *));
 int		ft_lst_intcmp(void *data0, void *data1);
 void	**ft_lsttoarr(t_list *list, int *size);
 t_list	*ft_arrtolst(void **array, int size, void *(*alloc)());
+t_list	*ft_lstsplit_at(t_list *s, t_list **b, void *key, int (*cmp)());
+t_dlist	*ft_lstsplit(t_list *src, void *key, int (*cmp)());
 
 // Double linked lists
 
@@ -242,5 +246,6 @@ void	*ft_arrbyte(t_array *a, void *key);
 char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
 size_t	ft_dblptrlen(void **data);
 void	*ft_dblptr_free(void **ptrs);
+off_t	ft_lseek(int fd, off_t offset, int whence);
 
 #endif

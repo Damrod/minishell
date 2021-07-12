@@ -6,6 +6,8 @@
 # include <readline/history.h>
 # include <signal.h>
 
+# define EXENAME "minishell"
+
 # define FLAG_ESCAPED (0b0100000000000000)
 # define FLAG_SNGQUOT (0b0010000000000000)
 # define FLAG_DBLQUOT (0b0001000000000000)
@@ -21,6 +23,17 @@
 # define CHECK_SNGQUOTE 1
 # define CHECK_DBLQUOTE 2
 # define CHECK_ANYQUOTE 3
+# define CHECK_NOTQUOTE 4
+
+enum e_type {
+	TYPE_NO = -1,
+	TYPE_OUT = 0,
+	TYPE_IN	 = 1,
+	TYPE_APP = 2,
+	TYPE_HEREDOC = 3,
+	TYPE_END = 4,
+	TYPE_PIPE = 5,
+};
 
 # define NUL 0x00
 # define SOH 0x01
@@ -55,34 +68,35 @@
 # define US 0x1F
 # define DEL 0x7F
 
-# define TYPE_END	0
-# define TYPE_PIPE	1
-# define TYPE_BREAK	2
-
 typedef struct s_compcmd {
 	char			**args;
 	char			type;
 	int				pipes[2];
-}	t_compcmd;
+	int				outfd;
+	int				infd;
+}	t_simplcmd;
 
 typedef struct s_term {
-	char	**args;
-	char	**environ;
-	char	*inputstring;
-	char	**path;
-	t_dlist	*cmds;
+	char		**path;
+	t_dlist		*cmds;
+	char		**environ;
+	t_list		*args;
+	t_dlist		*simplecmds;
+	t_dlist		*cmdtable;
+	char		*inputstring;
+	uint32_t	lineno;
+	uint8_t		lastret;
 	int			lastpid;
 }	t_term;
 
-unsigned short	**get_args(const char *arg);
+t_list			*get_args(const char *arg);
 size_t			ft_wstrlen(const unsigned short *str, char is_untilspace);
 unsigned short	*upcast_str(const char *args);
 unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace);
-void	print_dblptr(const char *input);
-void	apply_dblptr(char **data, void (*f)());
-char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
-
-
+void			print_dblptr(const char *input);
+void			apply_dblptr(char **data, void (*f)());
+char			**ft_dblptr_cpy(const char **data,
+					const char *item, char is_deep);
 
 extern t_term	g_term;
 

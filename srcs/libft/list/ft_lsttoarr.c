@@ -17,10 +17,11 @@ void	**ft_lsttoarr(t_list *list, int *size)
 	int		i;
 	void	**retr;
 
-	if (*size < 0)
+	if (!size || *size < 0)
 	{
 		i = ft_lstsize(list);
-		*size = i;
+		if (size)
+			*size = i;
 	}
 	else
 		i = *size;
