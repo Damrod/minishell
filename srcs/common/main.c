@@ -131,12 +131,9 @@ int	check_builtins(char **args, char ***env)
 	return (0);
 }
 
-void miniexec(char **args, char ***env)
+int miniexec(char **args, char ***env)
 {
-	if(!(check_builtins(args, env)))
-	{
-		return ;
-	}
+	return (check_builtins(args, env));
 }
 
 int	main(int argc, char **argv)
@@ -172,8 +169,8 @@ printf("\n\n\n\n");
 		cmds = g_term.cmdtable;
 		while (cmds)
 		{
-			miniexec(((t_simplcmd *)cmds->content)->args, &environ);
-			g_term.lastret = exec_cmd(cmds, environ);
+			if (!miniexec(((t_simplcmd *)cmds->content)->args, &environ))
+				g_term.lastret = exec_cmd(cmds, environ);
 			cmds = cmds->next;
 		}
 		comp_dtor(&g_term.cmdtable, NULL, 0);

@@ -30,13 +30,26 @@ void	handle_eot(int sig)
 	(void) sig;
 	if (sig == SIGINT)
 	{
+		if (g_term.lastpid > 0)
+		{
+			kill(g_term.lastpid, SIGINT);
+			g_term.lastpid = 0;
+			return ;
+		}
 		ft_printf("\n");
-		g_term.inputstring = readline("marishell% ");
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		g_term.lastret = 1;
+		return ;
 	}
-	if (sig == SIGQUIT && g_term.lastpid > 0)
+	if (sig == SIGQUIT)
 	{
-		ft_printf("Quit (core dumped) %d\n", g_term.lastpid);
-		kill(g_term.lastpid, SIGQUIT);
-		g_term.lastpid = 0;
+		if (g_term.lastpid > 0)
+		{
+			ft_printf("Quit (core dumped) %d\n", g_term.lastpid);
+			kill(g_term.lastpid, SIGQUIT);
+			g_term.lastpid = 0;
+		}
 	}
 }
