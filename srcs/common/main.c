@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:29:03 by aollero           #+#    #+#             */
-/*   Updated: 2021/06/06 19:21:18 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/12 15:55:13 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,46 +95,7 @@ t_simplcmd *getcmds(t_dlist *cmd)
 
 int exec_cmd(t_dlist *cmd, char **env);
 
-//esto a libft o common(?)
-static int	ft_strcmp(char *s1, char *s2)
-{
-	while (*s2 == *s1 && *s1)
-	{
-		s2++;
-		s1++;
-	}
-	return (*(unsigned char *)s1 - *(unsigned char *)s2);
-}
 
-int	check_builtins(char **args, char ***env)
-{
-	if (ft_strcmp(args[0], "export") == 0)
-	{
-		ft_export(env, args);
-		return (1);
-	}
-	else if (ft_strcmp(args[0], "env") == 0)
-	{
-		ft_env(*env);
-		return (1);
-	}
-	else if (ft_strcmp(args[0], "unset") == 0)
-	{
-		ft_unset(env, args);
-		return (1);
-	}
-	else if (ft_strcmp(args[0], "exit") == 0)
-	{
-		ft_exit(args);
-		return (1);
-	}
-	return (0);
-}
-
-int miniexec(char **args, char ***env)
-{
-	return (check_builtins(args, env));
-}
 
 int	main(int argc, char **argv)
 {
@@ -169,8 +130,7 @@ printf("\n\n\n\n");
 		cmds = g_term.cmdtable;
 		while (cmds)
 		{
-			if (!miniexec(((t_simplcmd *)cmds->content)->args, &environ))
-				g_term.lastret = exec_cmd(cmds, environ);
+			g_term.lastret = exec_cmd(cmds, environ);
 			cmds = cmds->next;
 		}
 		comp_dtor(&g_term.cmdtable, NULL, 0);

@@ -1,9 +1,57 @@
 #include <libft.h>
 #include <minishell0.h>
+#include <minishell.h>
 #include <sys/wait.h>
 
 #define SIDE_OUT	0
 #define SIDE_IN		1
+
+//esto a libft o common(?)
+static int	ft_strcmp(char *s1, char *s2)
+{
+	while (*s2 == *s1 && *s1)
+	{
+		s2++;
+		s1++;
+	}
+	return (*(unsigned char *)s1 - *(unsigned char *)s2);
+}
+
+int	check_builtins(char **args, char ***env)
+{
+	if (ft_strcmp(args[0], "export") == 0)
+	{
+		ft_export(env, args);
+		return (1);
+	}
+	else if (ft_strcmp(args[0], "env") == 0)
+	{
+		ft_env(*env);
+		return (1);
+	}
+	else if (ft_strcmp(args[0], "unset") == 0)
+	{
+		ft_unset(env, args);
+		return (1);
+	}
+	else if (ft_strcmp(args[0], "exit") == 0)
+	{
+		ft_exit(args);
+		return (1);
+	}
+	return (0);
+}
+
+int miniexec(char **args, char ***env)
+{
+	extern t_term g_term;
+
+	if(!(check_builtins(args, env)))
+	{
+		check_path(args, g_term.path);
+	}
+	return (1);
+}
 
 t_simplcmd *simple(t_dlist *cmd)
 {
@@ -45,7 +93,9 @@ int exec_cmd(t_dlist *cmd, char **env)
 			exit(1);
 		if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE)
 			close(simple(cmd->prev)->pipes[SIDE_IN]);
-		if ((ret = execve(simple(cmd)->args[0], simple(cmd)->args, env)) < 0)
+//if (!miniexec(((t_simplcmd *)cmds->content)->args, &environ))
+//		if ((ret = execve(simple(cmd)->args[0], simple(cmd)->args, env)) < 0)
+		if ((ret = miniexec(((t_simplcmd *)cmd->content)->args, &env)))
 			ft_dprintf(2, "error: cannot execute %s\n", simple(cmd)->args[0]);
 		exit(ret);
 	}
