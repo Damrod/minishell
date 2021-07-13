@@ -113,16 +113,16 @@ int	ft_set_varval(char ***varval, char *arg)
 	return (0);
 }
 
-void	add_var_env(char *arg, char ***env)
+int	add_var_env(char *arg, char ***env)
 {
 	char	**varval;
 	int		i;
 
 	printf("nocrash\n");
 	if (ft_set_varval(&varval, arg))
-		return ;
+		return (1) ;
 	if (check_valid_env_var(varval, arg, env))
-		return ;
+		return (1);
 	i = 0;
 	while ((*env)[i] != NULL)
 	{
@@ -133,12 +133,14 @@ void	add_var_env(char *arg, char ***env)
 	if (!(*env)[i])
 		*env = add_env(env, varval);
 	ft_dblptr_free((void **)varval);
+	return (0);
 }
 
 int	ft_export(char ***env, char **args)
 {
 	int	i;
 	int	j;
+	int	ret;
 
 	if (!args[1])
 		ft_print_env_ordered(*env);
@@ -152,14 +154,14 @@ int	ft_export(char ***env, char **args)
 			{
 				if (args[j][i] == '=')
 				{
-					add_var_env(args[j], env);
+					ret = add_var_env(args[j], env);
 				}
 				i++;
 			}
 			j++;
 		}
 	}
-	return (0);
+	return (ret);
 }
 
 void	ft_dblptr_foreach(char **data, void (*f)());

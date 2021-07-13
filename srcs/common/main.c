@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:29:03 by aollero           #+#    #+#             */
-/*   Updated: 2021/07/12 15:55:13 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/13 18:37:56 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,11 +120,6 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
 		if (!g_term.args)
 			continue ;
-printf("\n\n\n\ntest:\n\n");
-//		ft_env(environ);
-printf("\n\n\n\n");
-//		ft_export(&environ, &g_term);
-printf("\n\n\n\n");
 		g_term.simplecmds = split_into_simple_cmds(g_term.args);
 		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
 		cmds = g_term.cmdtable;

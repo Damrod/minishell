@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:04:38 by emartin-          #+#    #+#             */
-/*   Updated: 2021/06/25 20:58:52 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/13 17:49:21 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,9 +115,9 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 	return (0);
 }
 
-void	check_path(char **args, char **path)
+int	check_path(char **args, char **path)
 {
-	size_t		i;
+	int		i;
 	int			*status;
 	char		cwd[1024];
 	char		*execpath;
@@ -144,7 +144,9 @@ void	check_path(char **args, char **path)
 	}
 	if (*status < 0 || !path[i])
 		printf("command not found: %s\n", args[0]);
+	i = *status;
 	free(status);
+	return (i);
 }
 
 void	read_path(char **env, t_term *g_term)

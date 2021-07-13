@@ -13,7 +13,7 @@ int		check_valid_env_var(char **varval, char *arg, char ***env);
 int		ft_check_replace(char **varval, char ***env, int i);
 char	**add_env(char ***env, char **varval);
 int		ft_set_varval(char ***varval, char *arg);
-void	add_var_env(char *arg, char ***env);
+int		add_var_env(char *arg, char ***env);
 int		ft_export(char ***env, char **args);
 int		ft_env(char **env);
 void	rm_env_var(char ***env, int i);

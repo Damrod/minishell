@@ -277,7 +277,10 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 
 	tmp = *var;
 	varsize = ft_strlen(*var);
-	(*var) = getenv((*var));
+	if (ft_strlen(*var) == 1 && (*var)[0] == '?')
+		*var = ft_itoa(g_term.lastret);
+	else
+		(*var) = getenv((*var));
 	free(tmp); // fixed memleak
 	if (!(*var))
 		(*var) = ft_strdup("");
