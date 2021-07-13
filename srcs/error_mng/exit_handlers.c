@@ -48,8 +48,8 @@ void	handle_eot(int sig)
 		if (g_term.lastpid > 0)
 		{
 			ft_printf("Quit (core dumped) %d\n", g_term.lastpid);
-			kill(g_term.lastpid, SIGQUIT);
 			g_term.lastpid = 0;
+			return ;
 		}
 	}
 }

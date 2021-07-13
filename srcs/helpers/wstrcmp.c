@@ -51,7 +51,7 @@ static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
 	}
 }
 
-static char cmp_chars(unsigned short a, unsigned short b, char checkdepth)
+static char	cmp_chars(unsigned short a, unsigned short b, char checkdepth)
 {
 	unsigned short	bitmask;
 	unsigned short	bitmask2;
