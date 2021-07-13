@@ -32,7 +32,7 @@ void	handle_eot(int sig)
 	{
 		if (g_term.lastpid > 0)
 		{
-			kill(g_term.lastpid, SIGINT);
+			ft_printf("\n");
 			g_term.lastpid = 0;
 			return ;
 		}
@@ -45,11 +45,10 @@ void	handle_eot(int sig)
 	}
 	if (sig == SIGQUIT)
 	{
-		rl_replace_line("", 0);
-		rl_redisplay();
 		if (g_term.lastpid > 0)
 		{
 			ft_printf("Quit (core dumped)\n");
+			g_term.lastret = 1;
 			g_term.lastpid = 0;
 			return ;
 		}

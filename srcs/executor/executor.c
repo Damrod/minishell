@@ -82,6 +82,8 @@ int exec_cmd(t_dlist *cmd, char **env)
 		exit(1);
 	else if (pid == 0)
 	{
+		if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
+			exit (0);
 		if (dup2(simple(cmd)->infd, STDIN_FILENO) < 0)
 			exit(1);
 		if (dup2(simple(cmd)->outfd, STDOUT_FILENO) < 0)
