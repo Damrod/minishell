@@ -104,12 +104,14 @@ int	main(int argc, char **argv)
 
 	(void)argc;
 	(void)argv;
+	rl_catch_signals = 0;
 	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
 	read_path(environ, &g_term);
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)
 	{
+		g_term.lastpid = 0;
 		g_term.inputstring = readline("marishell% ");
 		if (!g_term.inputstring)
 			break ;

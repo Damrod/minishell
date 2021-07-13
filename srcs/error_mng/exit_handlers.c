@@ -36,7 +36,7 @@ void	handle_eot(int sig)
 			g_term.lastpid = 0;
 			return ;
 		}
-		ft_printf("\n");
+		ft_printf("^C\n");
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
@@ -45,9 +45,11 @@ void	handle_eot(int sig)
 	}
 	if (sig == SIGQUIT)
 	{
+		rl_replace_line("", 0);
+		rl_redisplay();
 		if (g_term.lastpid > 0)
 		{
-			ft_printf("Quit (core dumped) %d\n", g_term.lastpid);
+			ft_printf("Quit (core dumped)\n");
 			g_term.lastpid = 0;
 			return ;
 		}
