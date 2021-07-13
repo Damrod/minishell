@@ -94,8 +94,8 @@ t_simplcmd *getcmds(t_dlist *cmd)
 }
 
 int exec_cmd(t_dlist *cmd, char **env);
-
-
+int	is_builtin(char *arg);
+int	check_builtins(char **args, char ***env);
 
 int	main(int argc, char **argv)
 {

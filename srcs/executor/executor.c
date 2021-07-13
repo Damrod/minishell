@@ -36,9 +36,18 @@ int	check_builtins(char **args, char ***env)
 	return (-1);
 }
 
-int miniexec(char **args, char ***env)
+int	is_internal(char *arg)
 {
-	extern t_term g_term;
+	if (ft_strcmp(arg, "export") == 0 || ft_strcmp(arg, "unset") == 0
+		|| ft_strcmp(arg, "exit") == 0 || ft_strcmp(arg, "cd") == 0)
+		return (1);
+	return (0);
+}
+
+#include <stdbool.h>
+
+int	miniexec(char **args, char ***env)
+{
 	int ret;
 
 	if((ret = (check_builtins(args, env))) == -1)
@@ -61,62 +70,55 @@ int exec_cmd(t_dlist *cmd, char **env)
 	int		ret;
 	int		status;
 	int		pipe_open;
-	extern t_term g_term;
+	extern char **environ;
 
 	ret = EXIT_FAILURE;
 	pipe_open = 0;
-
-//check builtins
-	if(!cmd->next)
+	if (simple(cmd)->type == TYPE_PIPE || (simple(cmd->prev)
+			&& simple(cmd->prev)->type == TYPE_PIPE))
 	{
-		ret = check_builtins(((t_simplcmd *)cmd->content)->args, &env);
+		pipe_open = 1;
+		if (pipe(simple(cmd)->pipes))
+			exit(1);
+	}
+	pid = fork();
+	g_term.lastpid = pid;
+	if (pid < 0)
+		exit(1);
+	else if (pid == 0)
+	{
+		if (dup2(simple(cmd)->infd, STDIN_FILENO) < 0)
+			exit(1);
+		if (dup2(simple(cmd)->outfd, STDOUT_FILENO) < 0)
+			exit(1);
+		if (simple(cmd)->type == TYPE_PIPE
+			&& dup2(simple(cmd)->pipes[SIDE_IN], STDOUT_FILENO) < 0)
+			exit(1);
+		if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE
+			&& dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO) < 0)
+			exit(1);
+//if (!miniexec(((t_simplcmd *)cmds->content)->args, &environ))
+//		if ((ret = execve(simple(cmd)->args[0], simple(cmd)->args, env)) < 0)
+		if (!(is_internal(simple(cmd)->args[0]) && !cmd->prev))
+			if ((ret = miniexec(((t_simplcmd *)cmd->content)->args, &env)))
+				ft_dprintf(2, "error: cannot execute %s\n", simple(cmd)->args[0]);
+		exit(ret);
 	}
 	else
 	{
-		if (simple(cmd)->type == TYPE_PIPE || (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE))
+		if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
+			check_builtins(simple(cmd)->args, &environ);
+		waitpid(pid, &status, 0);
+		if (pipe_open)
 		{
-			pipe_open = 1;
-			if (pipe(simple(cmd)->pipes))
-				exit(1);
+			close(simple(cmd)->pipes[SIDE_IN]);
+			if (!simple(cmd->next))
+				close(simple(cmd)->pipes[SIDE_OUT]);
 		}
-		pid = fork();
-		g_term.lastpid = pid;
-		if (pid < 0)
-			exit(1);
-		else if (pid == 0)
-		{
-			if (dup2(simple(cmd)->infd, STDIN_FILENO) < 0)
-				exit(1);
-			if (dup2(simple(cmd)->outfd, STDOUT_FILENO) < 0)
-				exit(1);
-			if (simple(cmd)->type == TYPE_PIPE
-				&& dup2(simple(cmd)->pipes[SIDE_IN], STDOUT_FILENO) < 0)
-				exit(1);
-			if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE
-				&& dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO) < 0)
-				exit(1);
-			if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE)
-				close(simple(cmd->prev)->pipes[SIDE_IN]);
-	//if (!miniexec(((t_simplcmd *)cmds->content)->args, &environ))
-	//		if ((ret = execve(simple(cmd)->args[0], simple(cmd)->args, env)) < 0)
-			if ((ret = miniexec(((t_simplcmd *)cmd->content)->args, &env)))
-				ft_dprintf(2, "error: cannot execute %s\n", simple(cmd)->args[0]);
-			exit(ret);
-		}
-		else
-		{
-			waitpid(pid, &status, 0);
-			if (pipe_open)
-			{
-				close(simple(cmd)->pipes[SIDE_IN]);
-				if (!simple(cmd->next))
-					close(simple(cmd)->pipes[SIDE_OUT]);
-			}
-			if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE)
-				close(simple(cmd->prev)->pipes[SIDE_OUT]);
-			if (WIFEXITED(status))
-				ret = WEXITSTATUS(status);
-		}
+		if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE)
+			close(simple(cmd->prev)->pipes[SIDE_OUT]);
+		if (WIFEXITED(status))
+			ret = WEXITSTATUS(status);
 	}
 	g_term.lastret = ret;
 	return (ret);
