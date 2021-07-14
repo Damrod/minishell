@@ -84,15 +84,15 @@ int exec_cmd(t_dlist *cmd, char **env)
 	{
 		if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
 			exit (0);
-		if (dup2(simple(cmd)->infd, STDIN_FILENO) < 0)
-			exit(1);
-		if (dup2(simple(cmd)->outfd, STDOUT_FILENO) < 0)
-			exit(1);
 		if (simple(cmd)->type == TYPE_PIPE
 			&& dup2(simple(cmd)->pipes[SIDE_IN], STDOUT_FILENO) < 0)
 			exit(1);
 		if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE
 			&& dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO) < 0)
+			exit(1);
+		if (dup2(simple(cmd)->infd, STDIN_FILENO) < 0)
+			exit(1);
+		if (dup2(simple(cmd)->outfd, STDOUT_FILENO) < 0)
 			exit(1);
 //if (!miniexec(((t_simplcmd *)cmds->content)->args, &environ))
 //		if ((ret = execve(simple(cmd)->args[0], simple(cmd)->args, env)) < 0)
