@@ -5,10 +5,16 @@ char	*downcast_wstr(const unsigned short *str, char is_low);
 
 char	is_anytoken(unsigned short str)
 {
-	if ((str == (FLAG_NOTSPCE | (unsigned short)'>'))
-		|| (str == (FLAG_NOTSPCE | (unsigned short)'<'))
-		|| (str == (FLAG_NOTSPCE | (unsigned short)'|')))
+	static unsigned short	prev = 0;
+
+	if (prev == 0
+		&& ((str == (FLAG_NOTSPCE | (unsigned short) '>'))
+			|| (str == (FLAG_NOTSPCE | (unsigned short) '<'))
+			|| (str == (FLAG_NOTSPCE | (unsigned short) '|'))))
+		prev = (FLAG_NOTSPCE | str);
+	if (prev != 0 && (prev == str))
 		return (1);
+	prev = 0;
 	return (0);
 }
 
