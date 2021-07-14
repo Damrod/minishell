@@ -64,6 +64,14 @@ int	get_redirs(t_list **args, int *input, int *output)
 	}
 	ft_lstcullpat(args, clptt, free, free);
 	free(clptt);
+	if (!*args)
+	{
+		if (*input > STDIN_FILENO)
+			close(*input);
+		if (*output > STDOUT_FILENO)
+			close(*output);
+		return (1);
+	}
 	return (0);
 }
 

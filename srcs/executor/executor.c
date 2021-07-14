@@ -97,14 +97,12 @@ int exec_cmd(t_dlist *cmd, char **env)
 //if (!miniexec(((t_simplcmd *)cmds->content)->args, &environ))
 //		if ((ret = execve(simple(cmd)->args[0], simple(cmd)->args, env)) < 0)
 		if (!(is_internal(simple(cmd)->args[0]) && !cmd->prev))
-			if ((ret = miniexec(((t_simplcmd *)cmd->content)->args, &env)))
+			if ((ret = miniexec(simple(cmd)->args, &env)))
 				ft_dprintf(2, "error: cannot execute %s\n", simple(cmd)->args[0]);
 		exit(ret);
 	}
 	else
 	{
-		if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
-			check_builtins(simple(cmd)->args, &environ);
 		waitpid(pid, &status, 0);
 		if (pipe_open)
 		{
@@ -114,6 +112,9 @@ int exec_cmd(t_dlist *cmd, char **env)
 		}
 		if (simple(cmd->prev) && simple(cmd->prev)->type == TYPE_PIPE)
 			close(simple(cmd->prev)->pipes[SIDE_OUT]);
+		if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
+			return (g_term.lastret = check_builtins(simple(cmd)->args,
+					&environ));
 		if (WIFEXITED(status))
 			ret = WEXITSTATUS(status);
 	}
