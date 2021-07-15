@@ -98,7 +98,8 @@ int exec_cmd(t_dlist *cmd, char **env)
 //		if ((ret = execve(simple(cmd)->args[0], simple(cmd)->args, env)) < 0)
 		if (!(is_internal(simple(cmd)->args[0]) && !cmd->prev))
 			if ((ret = miniexec(simple(cmd)->args, &env)))
-				ft_dprintf(2, "error: cannot execute %s\n", simple(cmd)->args[0]);
+				ft_dprintf(2, "");
+//				ft_dprintf(2, "error: cannot execute %s\n", simple(cmd)->args[0]);
 		exit(ret);
 	}
 	else

@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:04:38 by emartin-          #+#    #+#             */
-/*   Updated: 2021/07/13 17:49:21 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/15 22:12:03 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ char	*ft_cat_rel_path(char *path, char *arg)
 		return (NULL);
 	while (*path)
 		ret[i++] = *path++;
-	arg += 2;
+	arg += 1;
 	while (*arg)
 		ret[i++] = *arg++;
 	ret[i++] = 0;
@@ -100,14 +100,26 @@ char	*ft_cat_rel_path(char *path, char *arg)
 int	check_relat(char *execpath, char *cwd, char **args, int *status)
 {
 	extern char	**environ;
+	int dir;
+	int i;
 
+	dir = 0;
+	i = 0;
+	while ((*args)[i])
+	{
+		if((*args)[i] == '/')
+			dir++;
+		i++;
+	}
 	if ((args[0][0] == '.' && args[0][1]
 		&& args[0][1] == '/') || ft_isalpha(args[0][0]))
 	{
 		if (args[0][0] == '.')
 			execpath = ft_cat_rel_path(cwd, args[0]);
-		else if (ft_isalpha(args[0][0]))
+		else if (ft_isalpha(args[0][0]) && dir)
 			execpath = ft_cat_path(cwd, args[0]);
+		else
+			execpath = ft_strdup("");
 		*status = execve(execpath, args, environ);
 		free(execpath);
 		return (1);
@@ -143,7 +155,7 @@ int	check_path(char **args, char **path)
 		i++;
 	}
 	if (*status < 0 || !path[i])
-		printf("command not found: %s\n", args[0]);
+		printf("%s: command not found\n", args[0]);
 	i = *status;
 	free(status);
 	return (i);

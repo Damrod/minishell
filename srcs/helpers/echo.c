@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: emartin- <emartin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/22 19:32:51 by nazurmen          #+#    #+#             */
-/*   Updated: 2020/10/13 20:07:46 by emartin-         ###   ########.fr       */
+/*   Updated: 2021/07/15 22:16:49 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,7 @@ int	ft_echo(char **args)
 		if (args[++i])
 			ft_putchar_fd(' ', 1);
 	}
-	if (flag)
-		ft_putchar_fd('%', 1);
-	ft_putchar_fd('\n', 1);
+	if (!flag)
+		ft_putchar_fd('\n', 1);
 	return (0);
 }
