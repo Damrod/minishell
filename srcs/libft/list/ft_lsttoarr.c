@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/28 11:06:40 by aollero-          #+#    #+#             */
-/*   Updated: 2021/07/16 19:35:02 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/16 22:50:56 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,22 +24,17 @@ void	**ft_lsttoarr(t_list *list, int *size)
 			*size = i;
 	}
 	else
-	{
-printf("pillasizedeparam\n");
 		i = *size;
-	}
 	retr = malloc(sizeof(*retr) * (i + 1));
 	if (!(retr))
 		return (NULL);
 	ft_memset(retr, 0, (sizeof(*retr) * (i + 1)));
-	while (i)
+	i = 1;
+	while (i <= *size)
 	{
-printf("precrash3\n");
-printf("%icontent: %s\n", (*size) - i, (char *)list->content);
 		retr[i - 1] = list->content;
 		list = list->next;
-		i--;
-printf("postcrash3\n");
+		i++;
 	}
 	return (retr);
 }
