@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:29:03 by aollero           #+#    #+#             */
-/*   Updated: 2021/07/13 18:37:56 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/16 17:18:51 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,10 @@ int	main(int argc, char **argv)
 		g_term.lastpid = 0;
 		g_term.inputstring = readline("marishell% ");
 		if (!g_term.inputstring)
+		{
+			ft_putstr_fd("exit", 1);
 			break ;
+		}
 		if (ft_strlen(g_term.inputstring) > 0)
 			add_history(g_term.inputstring);
 		g_term.lineno++;
