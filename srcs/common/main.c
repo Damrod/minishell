@@ -22,10 +22,7 @@ void	*comp_dtor(t_dlist **compcmd, t_dlist **simplecmds, bool isprintsynerr);
 
 t_term	g_term = {
 	.environ = NULL,
-	.args = NULL,
 	.cmdtable = NULL,
-	.simplecmds = NULL,
-	.inputstring = NULL,
 	.lineno = 0,
 	.lastret = 0,
 	.lastpid = 0
@@ -101,6 +98,9 @@ int	main(int argc, char **argv)
 {
 	extern char		**environ;
 	t_dlist			*cmds;
+	t_dlist			*simplecmds;
+	char			*inputstring;
+	t_list			*args;
 
 	(void)argc;
 	(void)argv;
@@ -112,21 +112,21 @@ int	main(int argc, char **argv)
 	while (1)
 	{
 		g_term.lastpid = 0;
-		g_term.inputstring = readline("marishell% ");
-		if (!g_term.inputstring)
+		inputstring = readline("marishell% ");
+		if (!inputstring)
 		{
 			ft_putstr_fd("exit", 1);
 			break ;
 		}
-		if (ft_strlen(g_term.inputstring) > 0)
-			add_history(g_term.inputstring);
+		if (ft_strlen(inputstring) > 0)
+			add_history(inputstring);
 		g_term.lineno++;
-		g_term.args = get_args(g_term.inputstring);
-		free_and_nullify((void **)&g_term.inputstring, NULL, NULL, 1);
-		if (!g_term.args)
+		args = get_args(inputstring);
+		free_and_nullify((void **)&inputstring, NULL, NULL, 1);
+		if (!args)
 			continue ;
-		g_term.simplecmds = split_into_simple_cmds(g_term.args);
-		g_term.cmdtable = build_cmd_table(&g_term.simplecmds);
+		simplecmds = split_into_simple_cmds(args);
+		g_term.cmdtable = build_cmd_table(&simplecmds);
 		cmds = g_term.cmdtable;
 		while (cmds)
 		{
