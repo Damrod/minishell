@@ -83,7 +83,6 @@ int	ft_set_varval(char ***varval, char *arg)
 
 	if(arg[0] == '=')
 	{
-		printf("ENTRAENESTOnovar izquierda\n");
 		printf("bash: export: '%s': not a valid identifier\n", arg);
 		return (1);
 	}
@@ -92,7 +91,6 @@ int	ft_set_varval(char ***varval, char *arg)
 		i++;
 	if(arg[i] == '=' && !arg[i + 1])
 	{
-		printf("ENTRAENESTOnovar derecha\n");
 
 		(*varval) = malloc(sizeof(char *) * 2);
 		(*varval)[0] = malloc(ft_strlen(arg));
@@ -108,7 +106,6 @@ int	ft_set_varval(char ***varval, char *arg)
 	else
 	{
 		(*varval) = ft_split_ultimate(arg, "=");
-		printf("ENTRAENESTO\n");
 	}
 	return (0);
 }
@@ -118,7 +115,6 @@ int	add_var_env(char *arg, char ***env)
 	char	**varval;
 	int		i;
 
-	printf("nocrash\n");
 	if (ft_set_varval(&varval, arg))
 		return (1) ;
 	if (check_valid_env_var(varval, arg, env))
