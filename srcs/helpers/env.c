@@ -177,10 +177,8 @@ void	rm_env_var(char ***env, int i)
 	t_list	*todel;
 	t_list	*prev;
 
-printf("precrash2\n");
 	size = ft_dblptrlen((void **)*env);
 	lst = ft_arrtolst((void **)*env, size, NULL);
-printf("postcrash2\n");
 	todel = lst;
 	while (i--)
 	{
@@ -189,8 +187,10 @@ printf("postcrash2\n");
 	}
 	prev->next = todel->next;
 	ft_lstdelone(todel, free, free);
-	size -= 2;
+	size--;
+printf("precrash2\n");
 	*env = (char **)ft_lsttoarr(lst, &size);
+printf("postcrash2\n");
 }
 
 int	check_env_var(char *var, char ***env)
