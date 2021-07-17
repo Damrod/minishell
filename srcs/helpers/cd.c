@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <minishell.h>
+#include <env.h>
 
 int	ft_cd(char **args)
 {
@@ -20,7 +21,7 @@ int	ft_cd(char **args)
 	i = 1;
 	path = args[0];
 	if (!path)
-		chdir(getenv("HOME"));
+		chdir(ft_getenv("HOME"));
 	else if (-1 == chdir(path))
 	{
 		ft_putstr_fd("cd: no such file or directory: ", 1);

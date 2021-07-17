@@ -76,7 +76,6 @@ void	my_dup2(int oldfd, int newfd, int retstatus)
 
 int	handle_parent(t_dlist *cmd, bool pipe_open)
 {
-	extern char	**environ;
 	int			status;
 	int			ret;
 
@@ -91,7 +90,8 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 	if (cmd->prev && simple(cmd->prev)->type == TYPE_PIPE)
 		close(simple(cmd->prev)->pipes[SIDE_OUT]);
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
-		return (g_term.lastret = check_builtins(simple(cmd)->args, &environ));
+		return (g_term.lastret = check_builtins(simple(cmd)->args,
+				&g_term.environ));
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
 	return (ret);

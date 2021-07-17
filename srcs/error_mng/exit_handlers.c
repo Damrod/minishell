@@ -24,10 +24,6 @@ int	free_and_nullify(void **tofree0, void **tofree1, void **tofree2,
 
 void	handle_eot(int sig)
 {
-	extern char		**environ;
-
-	(void) environ;
-	(void) sig;
 	if (sig == SIGINT)
 	{
 		if (g_term.lastpid > 0)

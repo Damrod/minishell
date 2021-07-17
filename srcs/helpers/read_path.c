@@ -99,7 +99,6 @@ char	*ft_cat_rel_path(char *path, char *arg)
 
 int	check_relat(char *execpath, char *cwd, char **args, int *status)
 {
-	extern char	**environ;
 	int dir;
 	int i;
 
@@ -120,7 +119,7 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 			execpath = ft_cat_path(cwd, args[0]);
 		else
 			execpath = ft_strdup("");
-		*status = execve(execpath, args, environ);
+		*status = execve(execpath, args, g_term.environ);
 		free(execpath);
 		return (1);
 	}
@@ -133,7 +132,6 @@ int	check_path(char **args, char **path)
 	int			*status;
 	char		cwd[1024];
 	char		*execpath;
-	extern char	**environ;
 
 	getcwd(cwd, 1024);
 	i = 0;
@@ -145,12 +143,12 @@ int	check_path(char **args, char **path)
 			continue ;
 		if (args[0][0] == '/')
 		{
-			*status = execve(args[0], args, environ);
+			*status = execve(args[0], args, g_term.environ);
 			if (*status >= 0)
 				continue ;
 		}
 		execpath = ft_cat_path(path[i], args[0]);
-		*status = execve(execpath, args, environ);
+		*status = execve(execpath, args, g_term.environ);
 		free(execpath);
 		i++;
 	}
@@ -179,8 +177,8 @@ void	read_path(char **env, t_term *g_term)
 /* 	t_tab	tab; */
 /* 	char **strings; */
 
-/* 	read_path(&tab, environ); */
-/* 	strings = ft_split(getenv("PATH"), ':'); */
+/* 	read_path(&tab, g_term.environ); */
+/* 	strings = ft_split(ft_getenv("PATH"), ':'); */
 /* 	while (*tab.path) */
 /* 	{ */
 /* 		ft_printf("\"%s\"\n", *strings); */
