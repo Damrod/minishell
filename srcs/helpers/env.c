@@ -190,7 +190,9 @@ void	rm_env_var(char ***env, int i)
 		todel = todel->next;
 	}
 	prev->next = todel->next;
+printf("preerror\n");
 	ft_lstdelone(todel, free, free);
+printf("posterror\n");
 	size--;
 	*env = (char **)ft_lsttoarr(lst, &size);
 }
