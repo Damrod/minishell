@@ -50,15 +50,22 @@ int	miniexec(char **args)
 {
 	int			ret;
 	char		**path;
+	static char	*emptypath[2];
+	static char	*emptystr = "";
 
-	path = NULL;
+	emptypath[0] = emptystr;
+	emptypath[1] = NULL;
+	path = emptypath;
 	if((ret = (check_builtins(args, &g_term.environ))) == -1)
 	{
 		path = read_path(g_term.environ);
+		if (!path)
+			path = emptypath;
 		ret = check_path(args, path);
 	}
 	ft_dblptr_free((void **)g_term.environ);
-	ft_dblptr_free((void **)path);
+	if (emptypath != path)
+		ft_dblptr_free((void **)path);
 	return (ret);
 }
 

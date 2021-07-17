@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <minishell.h>
+#include <error_mng.h>
 
 /* void	check_path(t_tab *t, char **env) */
 /* { */
@@ -128,7 +129,7 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 
 int	check_path(char **args, char **path)
 {
-	int		i;
+	int			i;
 	int			*status;
 	char		cwd[1024];
 	char		*execpath;
@@ -153,7 +154,7 @@ int	check_path(char **args, char **path)
 		i++;
 	}
 	if (*status < 0 || !path[i])
-		printf("%s: command not found\n", args[0]);
+		error_custom(NULL, NULL, NULL, "command not found");
 	i = *status;
 	free(status);
 	return (i);
