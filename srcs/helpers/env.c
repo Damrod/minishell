@@ -166,7 +166,13 @@ int	add_var_env(char *arg, char ***env)
 		i++;
 	}
 	if (!(*env)[i])
+	{
+//leak export
+		char **tmp;
+		tmp = *env;
 		*env = add_env(env, varval);
+		ft_dblptr_free((void **)tmp);
+	}
 	ft_dblptr_free((void **)varval);
 	return (0);
 }
@@ -225,11 +231,14 @@ void	rm_env_var(char ***env, int i)
 		todel = todel->next;
 	}
 	prev->next = todel->next;
-printf("preerror\n");
 	ft_lstdelone(todel, free, free);
-printf("posterror\n");
 	size--;
+//leak
+	char **tmp;
+	tmp = *env;
 	*env = (char **)ft_lsttoarr(lst, &size);
+	ft_lstdelone(lst, free, free);
+	ft_dblptr_free((void **)tmp);
 }
 
 int	check_env_var(char *var, char ***env)
