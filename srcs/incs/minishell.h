@@ -33,7 +33,7 @@ typedef struct	s_tab
 
 char	*read_line(t_tab *t);
 //void	read_path(t_tab *t, char **env);
-void	read_path(char **env, t_term	*g_term);
+char	**read_path(char **env);
 //void	check_path(t_tab *t, char **env);
 int		check_path(char **args, char **path);
 char	**split_line(char *line);

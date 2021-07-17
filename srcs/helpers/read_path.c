@@ -159,7 +159,7 @@ int	check_path(char **args, char **path)
 	return (i);
 }
 
-void	read_path(char **env, t_term *g_term)
+char	**read_path(char **env)
 {
 	size_t	i;
 
@@ -167,9 +167,10 @@ void	read_path(char **env, t_term *g_term)
 	while (env[i])
 	{
 		if (ft_strncmp("PATH=", env[i], 5) == 0)
-			g_term->path = ft_split(&env[i][5], ':');
+			return (ft_split(&env[i][5], ':'));
 		i++;
 	}
+	return (NULL);
 }
 
 /* int main(int argc, char **argv, char **environ) */

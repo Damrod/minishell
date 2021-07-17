@@ -91,7 +91,6 @@ int	main(int argc, char **argv)
 	(void)argv;
 	rl_catch_signals = 0;
 	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
-	read_path(g_term.environ, &g_term);
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)

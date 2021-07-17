@@ -49,12 +49,16 @@ int	is_internal(char *arg)
 int	miniexec(char **args)
 {
 	int			ret;
+	char		**path;
 
+	path = NULL;
 	if((ret = (check_builtins(args, &g_term.environ))) == -1)
 	{
-		ret = check_path(args, g_term.path);
+		path = read_path(g_term.environ);
+		ret = check_path(args, path);
 	}
 	ft_dblptr_free((void **)g_term.environ);
+	ft_dblptr_free((void **)path);
 	return (ret);
 }
 
