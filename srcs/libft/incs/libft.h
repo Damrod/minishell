@@ -173,6 +173,7 @@ void	ft_putchar_fd(char c, int fd);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putendl_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
+int		ft_puts(char *str);
 
 // lists
 
@@ -246,6 +247,7 @@ void	*ft_arrbyte(t_array *a, void *key);
 char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep);
 size_t	ft_dblptrlen(void **data);
 void	*ft_dblptr_free(void **ptrs);
+void	ft_dblptr_foreach(char **data, void (*f)());
 off_t	ft_lseek(int fd, off_t offset, int whence);
 
 #endif

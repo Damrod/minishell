@@ -49,13 +49,12 @@ int	is_internal(char *arg)
 int	miniexec(char **args)
 {
 	int			ret;
-	extern char	**environ;
 
-	if((ret = (check_builtins(args, &environ))) == -1)
+	if((ret = (check_builtins(args, &g_term.environ))) == -1)
 	{
 		ret = check_path(args, g_term.path);
 	}
-	free (environ);
+	ft_dblptr_free((void **)g_term.environ);
 	return (ret);
 }
 
@@ -68,11 +67,9 @@ t_simplcmd *simple(t_dlist *cmd)
 
 void	my_dup2(int oldfd, int newfd, int retstatus)
 {
-	extern char	**environ;
-
 	if (dup2(oldfd, newfd) < 0)
 	{
-		free (environ);
+		ft_dblptr_free((void **)g_term.environ);
 		exit (retstatus);
 	}
 }
@@ -116,7 +113,6 @@ int handle_child(t_dlist *cmd)
 int exec_cmd(t_dlist *cmd)
 {
 	int			pipe_open;
-	extern char	**environ;
 	pid_t		pid;
 
 	g_term.lastret = EXIT_FAILURE;

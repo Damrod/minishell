@@ -33,21 +33,6 @@ void	print_dblptr(const char *input)
 	printf("%s\n", input);
 }
 
-void	ft_dblptr_foreach(char **data, void (*f)())
-{
-	size_t	len;
-
-	len = 0;
-	if (data)
-	{
-		while (data[len])
-		{
-			f(data[len]);
-			len++;
-		}
-	}
-}
-
 int	get_pipes(void *src, void *key)
 {
 	unsigned short	*a;
@@ -105,7 +90,7 @@ int	main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 	rl_catch_signals = 0;
-	environ = ft_dblptr_cpy((const char **)environ, NULL, 0);
+	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
 	read_path(environ, &g_term);
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
@@ -135,7 +120,7 @@ int	main(int argc, char **argv)
 		}
 		comp_dtor(&g_term.cmdtable, NULL, 0);
 	}
-	free(environ);
+	ft_dblptr_free((void **)g_term.environ);
 	environ = NULL;
 	ft_printf("\n");
 	return (0);
