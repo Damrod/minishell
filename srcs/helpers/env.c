@@ -17,17 +17,21 @@ void	ft_print_env_ordered(char **env)
 	size = ft_dblptrlen((void **)env);
 	sorted = ft_arrtolst((void **)tmp, size, NULL);
 	ft_list_sort(&sorted, ft_strcmp);
+	free(tmp);
 	tmp = (char **)ft_lsttoarr(sorted, &size);
 	while (size--)
 	{
 		tmp2 = ft_split_ultimate(tmp[size], "=");
 		tmp[size] = ft_strjoin_ult(2, (const char **) tmp2, "=\"");
+		ft_dblptr_free((void **)tmp2);
 	}
 	size = ft_dblptrlen((void **)env);
 	while (size--)
 	{
 		printf("declare -x %s\"\n", tmp[size]);
 	}
+	ft_dblptr_free((void **)tmp);
+	ft_lstclear(&sorted, NULL, free);
 }
 
 int	check_valid_env_var(char **varval, char *arg, char ***env)

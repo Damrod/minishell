@@ -63,8 +63,13 @@ t_simplcmd *simple(t_dlist *cmd)
 
 void	my_dup2(int oldfd, int newfd, int retstatus)
 {
+	extern char	**environ;
+
 	if (dup2(oldfd, newfd) < 0)
+	{
+		free (environ);
 		exit (retstatus);
+	}
 }
 
 int	handle_parent(t_dlist *cmd, bool pipe_open)
