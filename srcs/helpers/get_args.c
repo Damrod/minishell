@@ -1,5 +1,6 @@
 #include <minishell0.h>
 #include "libft.h"
+#include <env.h>
 
 char	*downcast_wstr(const unsigned short *str, char is_low);
 
@@ -286,7 +287,7 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 	if (ft_strlen(*var) == 1 && (*var)[0] == '?')
 		*var = ft_itoa(g_term.lastret);
 	else
-		(*var) = getenv((*var));
+		(*var) = ft_getenv((*var));
 	free(tmp); // fixed memleak
 	if (!(*var))
 		(*var) = ft_strdup("");

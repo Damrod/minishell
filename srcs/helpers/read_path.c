@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <minishell.h>
+#include <error_mng.h>
 
 /* void	check_path(t_tab *t, char **env) */
 /* { */
@@ -108,7 +109,6 @@ void	ft_makerelat(char **args)
 
 int	check_relat(char *execpath, char *cwd, char **args, int *status)
 {
-	extern char	**environ;
 	int dir;
 	int i;
 
@@ -132,7 +132,7 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 			execpath = ft_cat_path(cwd, args[0]);
 		else
 			execpath = ft_strdup("");
-		*status = execve(execpath, args, environ);
+		*status = execve(execpath, args, g_term.environ);
 		free(execpath);
 		return (1);
 	}
@@ -141,11 +141,10 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 
 int	check_path(char **args, char **path)
 {
-	int		i;
+	int			i;
 	int			*status;
 	char		cwd[1024];
 	char		*execpath;
-	extern char	**environ;
 
 	getcwd(cwd, 1024);
 	i = 0;
@@ -157,23 +156,23 @@ int	check_path(char **args, char **path)
 			continue ;
 		if (args[0][0] == '/')
 		{
-			*status = execve(args[0], args, environ);
+			*status = execve(args[0], args, g_term.environ);
 			if (*status >= 0)
 				continue ;
 		}
 		execpath = ft_cat_path(path[i], args[0]);
-		*status = execve(execpath, args, environ);
+		*status = execve(execpath, args, g_term.environ);
 		free(execpath);
 		i++;
 	}
 	if (*status < 0 || !path[i])
-		printf("%s: command not found\n", args[0]);
+		error_custom(NULL, NULL, NULL, "command not found");
 	i = *status;
 	free(status);
 	return (i);
 }
 
-void	read_path(char **env, t_term *g_term)
+char	**read_path(char **env)
 {
 	size_t	i;
 
@@ -181,9 +180,10 @@ void	read_path(char **env, t_term *g_term)
 	while (env[i])
 	{
 		if (ft_strncmp("PATH=", env[i], 5) == 0)
-			g_term->path = ft_split(&env[i][5], ':');
+			return (ft_split(&env[i][5], ':'));
 		i++;
 	}
+	return (NULL);
 }
 
 /* int main(int argc, char **argv, char **environ) */
@@ -191,8 +191,8 @@ void	read_path(char **env, t_term *g_term)
 /* 	t_tab	tab; */
 /* 	char **strings; */
 
-/* 	read_path(&tab, environ); */
-/* 	strings = ft_split(getenv("PATH"), ':'); */
+/* 	read_path(&tab, g_term.environ); */
+/* 	strings = ft_split(ft_getenv("PATH"), ':'); */
 /* 	while (*tab.path) */
 /* 	{ */
 /* 		ft_printf("\"%s\"\n", *strings); */

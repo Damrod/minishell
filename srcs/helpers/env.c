@@ -1,8 +1,41 @@
 #include <env.h>
 
-static int	ft_strcmp(char *s1, char *s2)
+static size_t	envlen(const char *var)
 {
-	return (ft_strncmp (s1, s2, ft_strlen(s2)));
+	const char	*orig;
+
+	orig = var;
+	while (*var && *var != '=')
+		var++;
+	if (*var == '=')
+		return ((size_t)(var - orig));
+	return (0);
+}
+
+static int	ft_strcmp(const char *s1, char *s2)
+{
+	size_t	len1;
+	size_t	len2;
+
+	len1 = ft_strlen(s1);
+	len2 = envlen(s2);
+	if (len1 < len2)
+		len1 = len2;
+	return (ft_strncmp(s1, s2, len1));
+}
+
+char	*ft_getenv(const char *name)
+{
+	size_t	i;
+
+	i = 0;
+	while (g_term.environ[i])
+	{
+		if (!ft_strcmp(name, g_term.environ[i]))
+			return (g_term.environ[i] + envlen(g_term.environ[i]) + 1);
+		i++;
+	}
+	return (NULL);
 }
 
 void	ft_print_env_ordered(char **env)

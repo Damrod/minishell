@@ -91,7 +91,6 @@ int	main(int argc, char **argv)
 	(void)argv;
 	rl_catch_signals = 0;
 	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
-	read_path(environ, &g_term);
 	signal(SIGINT, handle_eot);
 	signal(SIGQUIT, handle_eot);
 	while (1)
@@ -115,13 +114,12 @@ int	main(int argc, char **argv)
 		cmds = g_term.cmdtable;
 		while (cmds)
 		{
-			g_term.lastret = exec_cmd(cmds, environ);
+			g_term.lastret = exec_cmd(cmds, g_term.environ);
 			cmds = cmds->next;
 		}
 		comp_dtor(&g_term.cmdtable, NULL, 0);
 	}
 	ft_dblptr_free((void **)g_term.environ);
-	environ = NULL;
 	ft_printf("\n");
 	return (0);
 }
