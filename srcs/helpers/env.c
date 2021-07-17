@@ -10,6 +10,7 @@ void	ft_print_env_ordered(char **env)
 	char	**tmp;
 	char	**tmp2;
 	int		size;
+	int		i;
 	t_list	*sorted;
 
 	(void)sorted;
@@ -26,9 +27,10 @@ void	ft_print_env_ordered(char **env)
 		ft_dblptr_free((void **)tmp2);
 	}
 	size = ft_dblptrlen((void **)env);
-	while (size--)
+	i = 0;
+	while (i < size)
 	{
-		printf("declare -x %s\"\n", tmp[size]);
+		printf("declare -x %s\"\n", tmp[i++]);
 	}
 	ft_dblptr_free((void **)tmp);
 	ft_lstclear(&sorted, NULL, free);
