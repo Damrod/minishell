@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:04:38 by emartin-          #+#    #+#             */
-/*   Updated: 2021/07/16 17:02:46 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/17 19:35:05 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,15 @@ char	*ft_cat_rel_path(char *path, char *arg)
 	return (ret);
 }
 
+void	ft_makerelat(char **args)
+{
+	char *tmp;
+
+	tmp = args[0];
+	args[0] = ft_strjoin("./", args[0]);
+	free(tmp);
+}
+
 int	check_relat(char *execpath, char *cwd, char **args, int *status)
 {
 	extern char	**environ;
@@ -111,6 +120,9 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 			dir++;
 		i++;
 	}
+	if ((args[0][0] == '.' && args[0][1]
+		&& args[0][1] == '.' && args[0][2] == '/'))
+		ft_makerelat(args);
 	if ((args[0][0] == '.' && args[0][1]
 		&& args[0][1] == '/') || ft_isalpha(args[0][0]))
 	{
