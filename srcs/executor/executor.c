@@ -41,14 +41,16 @@ int	is_internal(char *arg)
 
 #include <stdbool.h>
 
-int	miniexec(char **args, char ***env)
+int	miniexec(char **args)
 {
-	int ret;
+	int			ret;
+	extern char	**environ;
 
-	if((ret = (check_builtins(args, env))) == -1)
+	if((ret = (check_builtins(args, &environ))) == -1)
 	{
 		ret = check_path(args, g_term.path);
 	}
+	free (environ);
 	return (ret);
 }
 
@@ -90,8 +92,6 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 
 int handle_child(t_dlist *cmd)
 {
-	extern char	**environ;
-
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
 		exit (0);
 	if (simple(cmd)->type == TYPE_PIPE)
@@ -100,7 +100,7 @@ int handle_child(t_dlist *cmd)
 		my_dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO, EXIT_FAILURE);
 	my_dup2(simple(cmd)->infd, STDIN_FILENO, EXIT_FAILURE);
 	my_dup2(simple(cmd)->outfd, STDOUT_FILENO, EXIT_FAILURE);
-	exit(miniexec(simple(cmd)->args, &environ));
+	exit(miniexec(simple(cmd)->args));
 }
 
 int exec_cmd(t_dlist *cmd)

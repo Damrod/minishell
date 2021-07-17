@@ -86,6 +86,8 @@ void	*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds, bool isprintsynerr)
 	t_dlist		*head;
 	t_dlist		*tmp;
 
+	if (!compcmd)
+		return (NULL);
 	head = *compcmd;
 	while (head)
 	{

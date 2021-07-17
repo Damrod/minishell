@@ -78,12 +78,8 @@ typedef struct s_compcmd {
 
 typedef struct s_term {
 	char		**path;
-	t_dlist		*cmds;
 	char		**environ;
-	t_list		*args;
-	t_dlist		*simplecmds;
 	t_dlist		*cmdtable;
-	char		*inputstring;
 	uint32_t	lineno;
 	uint8_t		lastret;
 	int			lastpid;
