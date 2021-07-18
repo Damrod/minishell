@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/23 19:04:47 by nazurmen          #+#    #+#             */
-/*   Updated: 2021/07/13 17:26:35 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/18 17:21:57 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,11 @@ int	ft_cd(char **args)
 
 	i = 1;
 	path = args[0];
+	if(path && args[1])
+	{
+		ft_putstr_fd("bash: cd: too many arguments\n", 1);
+		return (1);
+	}
 	if (!path)
 		chdir(ft_getenv("HOME"));
 	else if (-1 == chdir(path))

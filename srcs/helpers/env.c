@@ -168,10 +168,10 @@ int	add_var_env(char *arg, char ***env)
 	if (!(*env)[i])
 	{
 //leak export
-		char **tmp;
-		tmp = *env;
+//		char **tmp;
+//		tmp = *env;
 		*env = add_env(env, varval);
-		ft_dblptr_free((void **)tmp);
+//		ft_dblptr_free((void **)tmp);
 	}
 	ft_dblptr_free((void **)varval);
 	return (0);
@@ -233,12 +233,14 @@ void	rm_env_var(char ***env, int i)
 	prev->next = todel->next;
 	ft_lstdelone(todel, free, free);
 	size--;
-//leak
-	char **tmp;
-	tmp = *env;
+//leak unset
+//	char **tmp;
+//	tmp = *env;
 	*env = (char **)ft_lsttoarr(lst, &size);
-	ft_lstdelone(lst, free, free);
-	ft_dblptr_free((void **)tmp);
+//	ft_dblptr_free((void **)tmp);
+//	ft_lstclear(&lst, free, free);
+//	ft_lstdelone(lst, free, free);
+
 }
 
 int	check_env_var(char *var, char ***env)
