@@ -358,7 +358,9 @@ int	swap_var(unsigned short **bitmap, int i)
 	var[j] = 0;
 	if (!join_var(bitmap, i, &var))
 		return (1);
-	return (ft_strlen(var));
+	j = ft_strlen(var);
+	free(var);
+	return (j);
 }
 
 int	substitute_var(unsigned short **bitmap)
