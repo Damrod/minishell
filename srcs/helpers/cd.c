@@ -6,12 +6,13 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/23 19:04:47 by nazurmen          #+#    #+#             */
-/*   Updated: 2021/07/21 18:23:10 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/21 18:54:43 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <minishell.h>
 #include <env.h>
+#include <error_mng.h>
 
 static int	cd_error(char *path)
 {

@@ -14,6 +14,27 @@ int	warning_shell(char *token, uint32_t line)
 	return (1);
 }
 
+int	error_cmd(char *builtin, char *arg, char *msg, int nbr)
+{
+	char	*int_msg;
+	char	*optcolon;
+
+	optcolon = ": ";
+	if (!arg)
+	{
+		arg = "";
+		optcolon = "";
+	}
+	int_msg = "";
+	if (errno)
+		int_msg = strerror(errno);
+	if (msg)
+		int_msg = msg;
+	dprintf(2, "%s: %s: %s%s%s\n",
+		EXENAME, builtin, arg, optcolon, int_msg);
+	return (nbr);
+}
+
 int	error_file(char *file)
 {
 	int		error;
@@ -22,6 +43,12 @@ int	error_file(char *file)
 	ft_dprintf(2, "%s: %s: %s\n", EXENAME, file, strerror(error));
 	free(file);
 	return (1);
+}
+
+int selfassignment(int *retnbr, int nbr, int retval)
+{
+	*retnbr = nbr;
+	return (retval);
 }
 
 int	error_custom(void **freeme0, void **freeme1, void **freeme2, char *message)
