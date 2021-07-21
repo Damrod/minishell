@@ -25,7 +25,8 @@ t_term	g_term = {
 	.cmdtable = NULL,
 	.lineno = 0,
 	.lastret = 0,
-	.lastpid = 0
+	.lastpid = 0,
+	.waiting = 0
 };
 
 void	print_dblptr(const char *input)
@@ -91,7 +92,16 @@ int	main(int argc, char **argv)
 	(void)argv;
 	rl_catch_signals = 0;
 	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
-	signal(SIGINT, handle_eot);
+	if (ft_getenv("PPID") && !ft_strncmp(ft_getenv("PPID"), "minishell", 10))
+	{
+		ft_printf("child\n");
+		signal(SIGINT, handle_eot);
+	}
+	else
+	{
+		ft_printf("parent\n");
+		signal(SIGINT, handle_int);
+	}
 	signal(SIGQUIT, handle_eot);
 	while (1)
 	{

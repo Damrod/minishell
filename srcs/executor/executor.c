@@ -2,6 +2,7 @@
 #include <minishell0.h>
 #include <minishell.h>
 #include <sys/wait.h>
+#include <env.h>
 
 #define SIDE_OUT	0
 #define SIDE_IN		1
@@ -91,7 +92,10 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 	int			ret;
 
 	ret = EXIT_FAILURE;
-	waitpid(g_term.lastpid, &status, 0);
+	g_term.waiting = 1;
+	if (g_term.lastpid != waitpid(g_term.lastpid, &status, 0))
+		perror("");
+	g_term.waiting = 0;
 	if (pipe_open)
 	{
 		close(simple(cmd)->pipes[SIDE_IN]);
@@ -105,11 +109,23 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 				&g_term.environ));
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
+	if (WIFSIGNALED(status))
+	{
+		if (WCOREDUMP(status))
+		{
+			ft_printf("Quit (core dumped)\n");
+		}
+		ret = 1;
+	}
+	if (WIFEXITED(status))
+		ret = WEXITSTATUS(status);
 	return (ret);
 }
 
 int handle_child(t_dlist *cmd)
 {
+	char	**tmp;
+
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
 		exit (0);
 	if (simple(cmd)->type == TYPE_PIPE)
@@ -118,6 +134,13 @@ int handle_child(t_dlist *cmd)
 		my_dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO, EXIT_FAILURE);
 	my_dup2(simple(cmd)->infd, STDIN_FILENO, EXIT_FAILURE);
 	my_dup2(simple(cmd)->outfd, STDOUT_FILENO, EXIT_FAILURE);
+	if (!ft_getenv("PPID"))
+	{
+		tmp = g_term.environ;
+		g_term.environ = ft_dblptr_cpy((const char **)g_term.environ,
+				ft_strdup("PPID=minishell"), 0);
+		free (tmp);
+	}
 	exit(miniexec(simple(cmd)->args));
 }
 

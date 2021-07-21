@@ -8,6 +8,7 @@
 int		free_and_nullify(void **tofree0, void **tofree1, void **tofree2,
 			int retvalue);
 void	handle_eot(int sig);
+void	handle_int(int sig);
 int		error_syntax(char *token);
 int		warning_shell(char *token, uint32_t line);
 int		error_file(char *file);

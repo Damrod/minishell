@@ -111,9 +111,13 @@ int	ft_check_replace(char **varval, char ***env, int i)
 char	**add_env(char ***env, char **varval)
 {
 	char	*varvaltoenv;
+	char	**tmp;
 
+	tmp = *env;
 	varvaltoenv = ft_strjoin_ult(2, (const char **) varval, "=");
-	return (ft_dblptr_cpy((const char **)(*env), varvaltoenv, 0));
+	*env = ft_dblptr_cpy((const char **)(*env), varvaltoenv, 0);
+	free (tmp);
+	return (*env);
 }
 
 int	ft_set_varval(char ***varval, char *arg)

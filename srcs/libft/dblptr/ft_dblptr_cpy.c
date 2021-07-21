@@ -1,11 +1,8 @@
 #include <libft.h>
 
-static void	add_item(char **ret, const char *item, char is_deep, ssize_t *j)
+static void	add_item(char **ret, const char *item, ssize_t *j)
 {
-	if (is_deep)
-		ret[(*j)++] = ft_strdup(item);
-	else
-		ret[(*j)++] = (char *)item;
+	ret[(*j)++] = (char *)item;
 }
 
 static ssize_t	copy_dblptr2(const char **data, char **ret, char is_deep,
@@ -49,7 +46,7 @@ char	**ft_dblptr_cpy(const char **data, const char *item, char is_deep)
 	if (j < 0)
 		return (NULL);
 	if (item)
-		add_item(ret, item, is_deep, &j);
+		add_item(ret, item, &j);
 	ret[j] = NULL;
 	return (ret);
 }

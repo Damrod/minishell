@@ -83,6 +83,7 @@ typedef struct s_term {
 	uint32_t	lineno;
 	uint8_t		lastret;
 	int			lastpid;
+	int			waiting;
 }	t_term;
 
 t_list			*get_args(const char *arg);
