@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:29:03 by aollero           #+#    #+#             */
-/*   Updated: 2021/07/17 22:20:13 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/21 18:45:35 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,9 @@ t_dlist	*split_into_simple_cmds(t_list *compcmd)
 
 void	display(void *str, int i)
 {
-	char *arg;
+	char	*arg;
 
 	arg = downcast_wstr(str, 1);
-	/* ft_printf("%d, %s\n", i, str); */
 	ft_printf("%d, %s\n", i, arg);
 	free (arg);
 }
@@ -71,14 +70,14 @@ void	ft_dblptr_display(char **dblptr, void (*p)())
 	}
 }
 
-t_simplcmd *getcmds(t_dlist *cmd)
+t_simplcmd	*getcmds(t_dlist *cmd)
 {
 	return ((t_simplcmd *)cmd->content);
 }
 
-int exec_cmd(t_dlist *cmd, char **env);
-int	is_builtin(char *arg);
-int	check_builtins(char **args, char ***env);
+int		exec_cmd(t_dlist *cmd, char **env);
+int		is_builtin(char *arg);
+int		check_builtins(char **args, char ***env);
 
 int	main(int argc, char **argv)
 {

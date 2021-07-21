@@ -61,12 +61,12 @@ void	ft_print_env_ordered(char **env)
 
 int	check_valid_env_var(char **varval, char *arg, char ***env)
 {
-(void)env;
+	(void)env;
 	if (ft_isdigit(varval[0][0]))
 	{
 		printf("bash: export: \'%s:\' bit a valid identifier\n", arg);
 		ft_dblptr_free((void **)varval);
-//		g_term.status = 1;
+		g_term.lastret = 1;
 		return (1);
 	}
 	return (0);
@@ -110,25 +110,32 @@ char	**add_env(char ***env, char **varval)
 	return (*env);
 }
 
+static int	gotochar(char *arg, char a)
+{
+	int	i;
+
+	i = 0;
+	while (arg[i] != a)
+		i++;
+	return (i);
+}
+
 int	ft_set_varval(char ***varval, char *arg)
 {
-	int i;
+	int	i;
 
-	if(arg[0] == '=')
+	if (arg[0] == '=')
 	{
 		printf("bash: export: '%s': not a valid identifier\n", arg);
 		return (1);
 	}
-	i = 0;
-	while(arg[i] != '=')
-		i++;
-	if(arg[i] == '=' && !arg[i + 1])
+	i = gotochar(arg, '=');
+	if (arg[i] == '=' && !arg[i + 1])
 	{
-
 		(*varval) = malloc(sizeof(char *) * 2);
 		(*varval)[0] = malloc(ft_strlen(arg));
 		i = 0;
-		while(arg[i] != '=')
+		while (arg[i] != '=')
 		{
 			(*varval)[0][i] = arg[i];
 			i++;
@@ -137,9 +144,7 @@ int	ft_set_varval(char ***varval, char *arg)
 		(*varval)[1] = ft_strdup("");
 	}
 	else
-	{
 		(*varval) = ft_split_ultimate(arg, "=");
-	}
 	return (0);
 }
 
@@ -149,7 +154,7 @@ int	add_var_env(char *arg, char ***env)
 	int		i;
 
 	if (ft_set_varval(&varval, arg))
-		return (1) ;
+		return (1);
 	if (check_valid_env_var(varval, arg, env))
 		return (1);
 	i = 0;
@@ -160,13 +165,7 @@ int	add_var_env(char *arg, char ***env)
 		i++;
 	}
 	if (!(*env)[i])
-	{
-//leak export
-//		char **tmp;
-//		tmp = *env;
 		*env = add_env(env, varval);
-//		ft_dblptr_free((void **)tmp);
-	}
 	ft_dblptr_free((void **)varval);
 	return (0);
 }
@@ -301,7 +300,6 @@ int	ft_exit(char **args)
 		check_exit_arg(i, args);
 	}
 	else
-//exit con el estado actual, para hacer
-		exit (0);
+		exit (g_term.lastret);
 	return (0);
 }

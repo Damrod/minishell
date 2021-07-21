@@ -274,16 +274,12 @@ int	join_var2(int i, unsigned short **bitmap, char **var,
 	return (j);
 }
 
-int	join_var(unsigned short **bitmap, int i, char **var)
+static void	join_var_3(char **var, int *varsize)
 {
-	int				j;
-	int				lennew;
-	int				varsize;
-	unsigned short	*tempbitmap;
 	char			*tmp;
 
 	tmp = *var;
-	varsize = ft_strlen(*var);
+	*varsize = ft_strlen(*var);
 	if (ft_strlen(*var) == 1 && (*var)[0] == '?')
 		*var = ft_itoa(g_term.lastret);
 	else
@@ -294,6 +290,16 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 			*var = ft_strdup("");
 	}
 	free(tmp);
+}
+
+int	join_var(unsigned short **bitmap, int i, char **var)
+{
+	int				j;
+	int				lennew;
+	int				varsize;
+	unsigned short	*tempbitmap;
+
+	join_var_3(var, &varsize);
 	lennew = ft_wstrlen(*bitmap, UNTIL_END_OF_STRING) - (varsize + 1)
 		+ ft_strlen(*var);
 	if (!na_calloc(lennew + 1, sizeof(**bitmap), (void **)&tempbitmap))
@@ -319,11 +325,7 @@ int	check_quotes(unsigned short **var, int flags)
 	j = 0;
 	while ((char)(*var)[i])
 	{
-		if (((((*var)[i] >> 8) ^ flags))) // ((*var)[i] >> 8) ^ flags) ?
-			// Las parentesis no son necesarias por precedencia
-			// de operadores, pero creo que queda más claro.
-			// esto es como decir ((*var)[i] >> 8) != flags , No?
-			// si te digo la verdad esto no lo pillo
+		if (((((*var)[i] >> 8) ^ flags)))
 		{
 			if (!na_calloc(sizeof(*tmp), i + 1, (void **)&tmp))
 				return (-1);
@@ -332,7 +334,7 @@ int	check_quotes(unsigned short **var, int flags)
 				tmp[j] = (*var)[j];
 				j++;
 			}
-			free(*var); // fixed memleak
+			free(*var);
 			(*var) = tmp;
 			return (j);
 		}
@@ -375,12 +377,11 @@ int	substitute_var(unsigned short **bitmap)
 	{
 		if ((char)(*bitmap)[i] == '$' && !((*bitmap)[i] & FLAG_SNGQUOT))
 			i += swap_var(bitmap, i);
-		if ((*bitmap)[i]) // fixed memory error
+		if ((*bitmap)[i])
 			i++;
 	}
 	return (ft_wstrlen((*bitmap), UNTIL_END_OF_STRING));
 }
-///potato
 
 void	*get_args_fail(char *args)
 {
@@ -411,13 +412,7 @@ t_list	*get_args(const char *arg)
 		return (NULL);
 	free(bitmap);
 	bitmap = tmp;
-
-	///potato
-
 	len = substitute_var(&bitmap);
-
-	///potato
-
 	retreal = ft_wstrsplit(bitmap);
 	free (bitmap);
 	return (retreal);

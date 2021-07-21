@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <env.h>
 #include <error_mng.h>
+#include <stdbool.h>
 
 #define SIDE_OUT	0
 #define SIDE_IN		1
@@ -46,7 +47,10 @@ int	is_internal(char *arg)
 	return (0);
 }
 
-#include <stdbool.h>
+static int	miniexec_control_assign(int *ret, char **args)
+{
+	return ((((*ret) = (check_builtins(args, &g_term.environ))) == -1));
+}
 
 int	miniexec(char **args)
 {
@@ -61,7 +65,7 @@ int	miniexec(char **args)
 	emptypath[0] = "";
 	emptypath[1] = NULL;
 	path = emptypath;
-	if((ret = (check_builtins(args, &g_term.environ))) == -1)
+	if (miniexec_control_assign(&ret, args))
 	{
 		path = read_path(g_term.environ);
 		if (!path)
@@ -76,7 +80,7 @@ int	miniexec(char **args)
 	return (ret);
 }
 
-t_simplcmd *simple(t_dlist *cmd)
+t_simplcmd	*simple(t_dlist *cmd)
 {
 	if (cmd)
 		return ((t_simplcmd *)cmd->content);
@@ -89,6 +93,16 @@ void	my_dup2(int oldfd, int newfd, int retstatus)
 	{
 		ft_dblptr_free((void **)g_term.environ);
 		exit (retstatus);
+	}
+}
+
+static void	handle_parent2(int status, int *ret)
+{
+	if (WIFSIGNALED(status))
+	{
+		if (WCOREDUMP(status))
+			ft_printf("Quit (core dumped)\n");
+		*ret = 1;
 	}
 }
 
@@ -113,14 +127,7 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 				&g_term.environ));
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
-	if (WIFSIGNALED(status))
-	{
-		if (WCOREDUMP(status))
-		{
-			ft_printf("Quit (core dumped)\n");
-		}
-		ret = 1;
-	}
+	handle_parent2(status, &ret);
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
 	return (ret);
