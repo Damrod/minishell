@@ -3,6 +3,7 @@
 #include <minishell.h>
 #include <sys/wait.h>
 #include <env.h>
+#include <error_mng.h>
 
 #define SIDE_OUT	0
 #define SIDE_IN		1
@@ -97,10 +98,8 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 	int			ret;
 
 	ret = EXIT_FAILURE;
-	g_term.waiting = 1;
 	if (g_term.lastpid != waitpid(g_term.lastpid, &status, 0))
-		perror("");
-	g_term.waiting = 0;
+		exit(error_custom(NULL, NULL, NULL, "waitpid failed"));
 	if (pipe_open)
 	{
 		close(simple(cmd)->pipes[SIDE_IN]);
@@ -109,7 +108,7 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 	}
 	if (cmd->prev && simple(cmd->prev)->type == TYPE_PIPE)
 		close(simple(cmd->prev)->pipes[SIDE_OUT]);
-	if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
+	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
 		return (g_term.lastret = check_builtins(simple(cmd)->args,
 				&g_term.environ));
 	if (WIFEXITED(status))
@@ -129,7 +128,7 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 
 int handle_child(t_dlist *cmd)
 {
-	if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
+	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
 		exit (0);
 	if (simple(cmd)->type == TYPE_PIPE)
 		my_dup2(simple(cmd)->pipes[SIDE_IN], STDOUT_FILENO, EXIT_FAILURE);
