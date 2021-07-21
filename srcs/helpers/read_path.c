@@ -178,8 +178,12 @@ int	check_path(char **args, char **path)
 		free(execpath);
 		i++;
 	}
+<<<<<<< HEAD
 //	return (check_path2(status, path, i));
 	if (selfassignment(&status, 127, 1) && (status < 0 || !path[i]))
+=======
+	if (selfassignment(&status, 127, status < 0 || !path[i]))
+>>>>>>> 882b94a9727a73ff3b183d92906c1c6c9f25e91c
 		ft_dprintf(2, "%s: %s\n", args[0], "command not found");
 	return (status);
 }
