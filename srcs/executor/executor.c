@@ -52,9 +52,12 @@ int	miniexec(char **args)
 	int			ret;
 	char		**path;
 	static char	*emptypath[2];
-	static char	*emptystr = "";
+	static char	*childenv[3];
 
-	emptypath[0] = emptystr;
+	childenv[0] = "export";
+	childenv[1] = "PPID=minishell";
+	childenv[2] = NULL;
+	emptypath[0] = "";
 	emptypath[1] = NULL;
 	path = emptypath;
 	if((ret = (check_builtins(args, &g_term.environ))) == -1)
@@ -62,6 +65,8 @@ int	miniexec(char **args)
 		path = read_path(g_term.environ);
 		if (!path)
 			path = emptypath;
+		if (!ft_getenv("PPID"))
+			ft_export(&g_term.environ, childenv);
 		ret = check_path(args, path);
 	}
 	ft_dblptr_free((void **)g_term.environ);
@@ -124,8 +129,6 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 
 int handle_child(t_dlist *cmd)
 {
-	char	**tmp;
-
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev)
 		exit (0);
 	if (simple(cmd)->type == TYPE_PIPE)
@@ -134,13 +137,6 @@ int handle_child(t_dlist *cmd)
 		my_dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO, EXIT_FAILURE);
 	my_dup2(simple(cmd)->infd, STDIN_FILENO, EXIT_FAILURE);
 	my_dup2(simple(cmd)->outfd, STDOUT_FILENO, EXIT_FAILURE);
-	if (!ft_getenv("PPID"))
-	{
-		tmp = g_term.environ;
-		g_term.environ = ft_dblptr_cpy((const char **)g_term.environ,
-				ft_strdup("PPID=minishell"), 0);
-		free (tmp);
-	}
 	exit(miniexec(simple(cmd)->args));
 }
 
