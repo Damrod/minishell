@@ -211,30 +211,23 @@ int	ft_env(char **env)
 
 void	rm_env_var(char ***env, int i)
 {
-	int		size;
 	t_list	*lst;
-	t_list	*todel;
-	t_list	*prev;
+	int		len;
+	char	*pattmask;
+	char	**tmp;
 
-	size = ft_dblptrlen((void **)*env);
-	lst = ft_arrtolst((void **)*env, size, NULL);
-	todel = lst;
-	while (i--)
-	{
-		prev = todel;
-		todel = todel->next;
-	}
-	prev->next = todel->next;
-	ft_lstdelone(todel, free, free);
-	size--;
-//leak unset
-//	char **tmp;
-//	tmp = *env;
-	*env = (char **)ft_lsttoarr(lst, &size);
-//	ft_dblptr_free((void **)tmp);
-//	ft_lstclear(&lst, free, free);
-//	ft_lstdelone(lst, free, free);
-
+	len = ft_dblptrlen((void **)*env);
+	if (!na_calloc(len, sizeof(char), (void **)&pattmask))
+		return ;
+	ft_memset(pattmask, '\0', len);
+	lst = ft_arrtolst((void **)*env, -1, NULL);
+	pattmask[i] = 1;
+	ft_lstcullpat(&lst, pattmask, free, free);
+	tmp = *env;
+	*env = (char **)ft_lsttoarr(lst, NULL);
+	free (pattmask);
+	ft_lstclear(&lst, NULL, free);
+	free (tmp);
 }
 
 int	check_env_var(char *var, char ***env)

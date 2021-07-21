@@ -16,6 +16,7 @@ void	**ft_lsttoarr(t_list *list, int *size)
 {
 	int		i;
 	void	**retr;
+	int		len;
 
 	if (!size || *size < 0)
 	{
@@ -25,12 +26,13 @@ void	**ft_lsttoarr(t_list *list, int *size)
 	}
 	else
 		i = *size;
+	len = i;
 	retr = malloc(sizeof(*retr) * (i + 1));
 	if (!(retr))
 		return (NULL);
 	ft_memset(retr, 0, (sizeof(*retr) * (i + 1)));
 	i = 1;
-	while (i <= *size)
+	while (i <= len)
 	{
 		retr[i - 1] = list->content;
 		list = list->next;
