@@ -12,6 +12,7 @@
 
 #include <minishell.h>
 #include <env.h>
+#include <error_mng.h>
 
 int	ft_cd(char **args)
 {
@@ -20,20 +21,12 @@ int	ft_cd(char **args)
 
 	i = 1;
 	path = args[0];
-	if(path && args[1])
-	{
-		ft_putstr_fd("bash: cd: too many arguments\n", 1);
-		return (1);
-	}
+	if (path && args[1])
+		return (error_cmd("cd", NULL, "too many arguments", 1));
 	if (!path)
 		chdir(ft_getenv("HOME"));
 	else if (-1 == chdir(path))
-	{
-		ft_putstr_fd("cd: no such file or directory: ", 1);
-		ft_putstr_fd(path, 1);
-		ft_putchar_fd('\n', 1);
-		return (1);
-	}
+		return (error_cmd("cd", path, NULL, 1));
 	else
 	{
 		while (args[i])

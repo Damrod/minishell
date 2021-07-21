@@ -14,6 +14,27 @@ int	warning_shell(char *token, uint32_t line)
 	return (1);
 }
 
+int	error_cmd(char *builtin, char *arg, char *msg, int nbr)
+{
+	char	*int_msg;
+	char	*optcolon;
+
+	optcolon = ": ";
+	if (!arg)
+	{
+		arg = "";
+		optcolon = "";
+	}
+	int_msg = "";
+	if (errno)
+		int_msg = strerror(errno);
+	if (msg)
+		int_msg = msg;
+	dprintf(2, "%s: %s: %s%s%s\n",
+		EXENAME, builtin, arg, optcolon, int_msg);
+	return (nbr);
+}
+
 int	error_file(char *file)
 {
 	int		error;
