@@ -142,38 +142,30 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 int	check_path(char **args, char **path)
 {
 	int			i;
-	int			*status;
 	char		cwd[1024];
 	char		*execpath;
+	int			status;
 
 	getcwd(cwd, 1024);
 	i = 0;
-	status = malloc(sizeof(int));
-	*status = -1;
 	while (path[i])
 	{
-		if (!check_relat(execpath, cwd, args, status) && *status >= 0)
+		if (!check_relat(execpath, cwd, args, &status) && status >= 0)
 			continue ;
 		if (args[0][0] == '/')
 		{
-			*status = execve(args[0], args, g_term.environ);
-			if (*status >= 0)
+			status = execve(args[0], args, g_term.environ);
+			if (status >= 0)
 				continue ;
 		}
 		execpath = ft_cat_path(path[i], args[0]);
-		*status = execve(execpath, args, g_term.environ);
+		status = execve(execpath, args, g_term.environ);
 		free(execpath);
 		i++;
 	}
-	if (*status < 0 || !path[i])
-	{
+	if (selfassignment(&status, 127, 1) && (status < 0 || !path[i]))
 		ft_dprintf(2, "%s: %s\n", args[0], "command not found");
-		free (status);
-		return (127);
-	}
-	i = *status;
-	free(status);
-	return (i);
+	return (status);
 }
 
 char	**read_path(char **env)

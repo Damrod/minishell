@@ -117,7 +117,7 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 	{
 		if (WCOREDUMP(status))
 		{
-			ft_printf("Quit (core dumped)\n");
+			ft_dprintf(2, "Quit (core dumped)\n");
 		}
 		ret = 1;
 	}

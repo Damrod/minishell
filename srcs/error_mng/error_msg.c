@@ -45,6 +45,12 @@ int	error_file(char *file)
 	return (1);
 }
 
+int selfassignment(int *retnbr, int nbr, int retval)
+{
+	*retnbr = nbr;
+	return (retval);
+}
+
 int	error_custom(void **freeme0, void **freeme1, void **freeme2, char *message)
 {
 	free_and_nullify(freeme0, freeme1, freeme2, 1);

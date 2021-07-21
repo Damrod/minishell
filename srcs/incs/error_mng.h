@@ -14,5 +14,6 @@ int		warning_shell(char *token, uint32_t line);
 int		error_file(char *file);
 int		error_cmd(char *builtin, char *arg, char *msg, int nbr);
 int		error_custom(void **freeme0, void **freeme1, void **freeme2, char *msg);
+int		selfassignment(int *retnbr, int nbr, int retval);
 
 #endif
