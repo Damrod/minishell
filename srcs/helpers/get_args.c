@@ -287,10 +287,13 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 	if (ft_strlen(*var) == 1 && (*var)[0] == '?')
 		*var = ft_itoa(g_term.lastret);
 	else
-		(*var) = ft_strdup(ft_getenv(*var));
+	{
+		if (ft_getenv(*var))
+			*var = ft_strdup(ft_getenv(*var));
+		else
+			*var = ft_strdup("");
+	}
 	free(tmp); // fixed memleak
-	if (!(*var))
-		(*var) = ft_strdup("");
 	lennew = ft_wstrlen(*bitmap, UNTIL_END_OF_STRING) - (varsize + 1)
 		+ ft_strlen(*var);
 	if (!na_calloc(lennew + 1, sizeof(**bitmap), (void **)&tempbitmap))
