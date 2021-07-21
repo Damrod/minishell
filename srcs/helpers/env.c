@@ -1,17 +1,5 @@
 #include <env.h>
 
-static size_t	envlen(const char *var)
-{
-	const char	*orig;
-
-	orig = var;
-	while (*var && *var != '=')
-		var++;
-	if (*var == '=')
-		return ((size_t)(var - orig));
-	return (0);
-}
-
 static int	ft_strcmp(const char *s1, char *s2)
 {
 	size_t	len1;
@@ -20,7 +8,7 @@ static int	ft_strcmp(const char *s1, char *s2)
 	if (!ft_strchr(s2, '='))
 		return (-1);
 	len1 = ft_strlen(s1);
-	len2 = envlen(s2);
+	len2 = ft_strchr(s2, '=') - s2;
 	if (len1 < len2)
 		len1 = len2;
 	return (ft_strncmp(s1, s2, len1));
@@ -34,7 +22,7 @@ char	*ft_getenv(const char *name)
 	while (g_term.environ[i])
 	{
 		if (ft_strcmp(name, g_term.environ[i]) == 0)
-			return (g_term.environ[i] + envlen(g_term.environ[i]) + 1);
+			return (ft_strchr(g_term.environ[i], '=') + 1);
 		i++;
 	}
 	return (NULL);
