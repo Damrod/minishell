@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:04:38 by emartin-          #+#    #+#             */
-/*   Updated: 2021/07/17 19:35:05 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/21 17:15:46 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,26 +100,33 @@ char	*ft_cat_rel_path(char *path, char *arg)
 
 void	ft_makerelat(char **args)
 {
-	char *tmp;
+	char	*tmp;
 
 	tmp = args[0];
 	args[0] = ft_strjoin("./", args[0]);
 	free(tmp);
 }
 
-int	check_relat(char *execpath, char *cwd, char **args, int *status)
+static int	is_dir(char **args)
 {
-	int dir;
-	int i;
+	int	i;
+	int	dir;
 
-	dir = 0;
 	i = 0;
 	while ((*args)[i])
 	{
-		if((*args)[i] == '/')
+		if ((*args)[i] == '/')
 			dir++;
 		i++;
 	}
+	return (dir);
+}
+
+int	check_relat(char *execpath, char *cwd, char **args, int *status)
+{
+	int	dir;
+
+	dir = is_dir(args);
 	if ((args[0][0] == '.' && args[0][1]
 		&& args[0][1] == '.' && args[0][2] == '/'))
 		ft_makerelat(args);
@@ -139,37 +146,40 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 	return (0);
 }
 
+int	check_path2(int status, char **path, int i)
+{
+	if (status < 0 || !path[i])
+		error_custom(NULL, NULL, NULL, "command not found");
+	i = status;
+	return (i);
+}
+
 int	check_path(char **args, char **path)
 {
 	int			i;
-	int			*status;
+	int			status;
 	char		cwd[1024];
 	char		*execpath;
 
 	getcwd(cwd, 1024);
 	i = 0;
-	status = malloc(sizeof(int));
-	*status = -1;
+	status = -1;
 	while (path[i])
 	{
-		if (!check_relat(execpath, cwd, args, status) && *status >= 0)
+		if (!check_relat(execpath, cwd, args, &status) && status >= 0)
 			continue ;
 		if (args[0][0] == '/')
 		{
-			*status = execve(args[0], args, g_term.environ);
-			if (*status >= 0)
+			status = execve(args[0], args, g_term.environ);
+			if (status >= 0)
 				continue ;
 		}
 		execpath = ft_cat_path(path[i], args[0]);
-		*status = execve(execpath, args, g_term.environ);
+		status = execve(execpath, args, g_term.environ);
 		free(execpath);
 		i++;
 	}
-	if (*status < 0 || !path[i])
-		error_custom(NULL, NULL, NULL, "command not found");
-	i = *status;
-	free(status);
-	return (i);
+	return (check_path2(status, path, i));
 }
 
 char	**read_path(char **env)

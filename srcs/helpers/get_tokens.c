@@ -2,7 +2,7 @@
 #include <minishell0.h>
 #include <wstrcmp.h>
 
-char is_redir(unsigned short *arg)
+char	is_redir(unsigned short *arg)
 {
 	if (ft_wstrncmp(arg, ">", CHECK_NOTQUOTE, 2) == 0
 		|| ft_wstrncmp(arg, "<", CHECK_NOTQUOTE, 2) == 0
@@ -12,14 +12,14 @@ char is_redir(unsigned short *arg)
 	return (0);
 }
 
-char is_pipe(unsigned short *arg)
+char	is_pipe(unsigned short *arg)
 {
 	if (ft_wstrncmp(arg, "|", CHECK_NOTQUOTE, 2) == 0)
 		return (1);
 	return (0);
 }
 
-char is_symbol(unsigned short *arg)
+char	is_symbol(unsigned short *arg)
 {
 	return (is_pipe(arg) || is_redir(arg));
 }

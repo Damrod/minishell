@@ -116,7 +116,7 @@ unsigned short	*get_token(unsigned short *bitmap)
 /* 	i = 0; */
 /* 	while (bitmap[i]) */
 /* 	{ */
-/* 		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp)); */
+/* 		tmp = ft_realloc(ret, size * sizeof(*tmp), (size + 1) * sizeof(*tmp));*/
 /* 		if (!tmp) */
 /* 			return (ft_dblptr_free((void **)ret)); */
 /* 		ret = tmp; */
@@ -293,7 +293,7 @@ int	join_var(unsigned short **bitmap, int i, char **var)
 		else
 			*var = ft_strdup("");
 	}
-	free(tmp); // fixed memleak
+	free(tmp);
 	lennew = ft_wstrlen(*bitmap, UNTIL_END_OF_STRING) - (varsize + 1)
 		+ ft_strlen(*var);
 	if (!na_calloc(lennew + 1, sizeof(**bitmap), (void **)&tempbitmap))
