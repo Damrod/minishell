@@ -166,7 +166,11 @@ int	check_path(char **args, char **path)
 		i++;
 	}
 	if (*status < 0 || !path[i])
-		error_custom(NULL, NULL, NULL, "command not found");
+	{
+		ft_dprintf(2, "%s: %s\n", args[0], "command not found");
+		free (status);
+		return (127);
+	}
 	i = *status;
 	free(status);
 	return (i);
