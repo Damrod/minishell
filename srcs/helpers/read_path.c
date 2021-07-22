@@ -112,6 +112,7 @@ static int	is_dir(char **args)
 	int	i;
 	int	dir;
 
+	dir = 0;
 	i = 0;
 	while ((*args)[i])
 	{
@@ -178,8 +179,7 @@ int	check_path(char **args, char **path)
 		free(execpath);
 		i++;
 	}
-//	return (check_path2(status, path, i));
-	if (selfassignment(&status, 127, 1) && (status < 0 || !path[i]))
+	if (selfassignment(&status, 127, status < 0 || !path[i]))
 		ft_dprintf(2, "%s: %s\n", args[0], "command not found");
 	return (status);
 }

@@ -1,6 +1,6 @@
 #include <env.h>
 
-static int	ft_strcmp(const char *s1, char *s2)
+static int	ft_getvalue(const char *s1, char *s2)
 {
 	size_t	len1;
 	size_t	len2;
@@ -21,7 +21,7 @@ char	*ft_getenv(const char *name)
 	i = 0;
 	while (g_term.environ[i])
 	{
-		if (ft_strcmp(name, g_term.environ[i]) == 0)
+		if (ft_getvalue(name, g_term.environ[i]) == 0)
 			return (ft_strchr(g_term.environ[i], '=') + 1);
 		i++;
 	}

@@ -9,17 +9,6 @@
 #define SIDE_OUT	0
 #define SIDE_IN		1
 
-//esto a libft o common(?)
-static int	ft_strcmp(char *s1, char *s2)
-{
-	while (*s2 == *s1 && *s1)
-	{
-		s2++;
-		s1++;
-	}
-	return (*(unsigned char *)s1 - *(unsigned char *)s2);
-}
-
 int	check_builtins(char **args, char ***env)
 {
 	if (ft_strcmp(args[0], "export") == 0)

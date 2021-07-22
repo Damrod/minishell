@@ -14,18 +14,18 @@
 
 int	ft_echo(char **args)
 {
-	int	i;
-	int	flag;
+	int			i;
+	int			flag;
 
 	flag = 0;
 	i = 0;
+	if (ft_strncmp("-n", args[0], 3) == 0)
+	{
+		flag = 1;
+		++i;
+	}
 	while (args[i])
 	{
-		if (ft_strncmp("-n", args[i], 3) == 0)
-		{
-			i++;
-			flag++;
-		}
 		ft_putstr_fd(args[i], 1);
 		if (args[++i])
 			ft_putchar_fd(' ', 1);
