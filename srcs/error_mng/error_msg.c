@@ -30,7 +30,7 @@ int	error_cmd(char *builtin, char *arg, char *msg, int nbr)
 		int_msg = strerror(errno);
 	if (msg)
 		int_msg = msg;
-	dprintf(2, "%s: %s: %s%s%s\n",
+	ft_dprintf(2, "%s: %s: %s%s%s\n",
 		EXENAME, builtin, arg, optcolon, int_msg);
 	return (nbr);
 }

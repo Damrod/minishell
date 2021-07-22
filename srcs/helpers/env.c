@@ -176,6 +176,7 @@ int	ft_export(char ***env, char **args)
 	int	j;
 	int	ret;
 
+	ret = 0;
 	if (!args[1])
 		ft_print_env_ordered(*env);
 	else
@@ -274,9 +275,9 @@ void	check_exit_arg(int num, char **args)
 	{
 		if (ft_isdigit(args[1][i]) != 1)
 		{
-			printf("bash: exit: %s: numeric argument required\n",
+			ft_dprintf(2, "%s: exit: %s: numeric argument required\n", EXENAME,
 				args[1]);
-			exit(255);
+			exit(2);
 		}
 		i++;
 	}
@@ -284,7 +285,7 @@ void	check_exit_arg(int num, char **args)
 	while (args[++i])
 		;
 	if (i > 2)
-		printf("bash: exit: too many arguments\n");
+		ft_dprintf(2, "%s: exit: too many arguments\n", EXENAME);
 	else
 		exit (num);
 }
