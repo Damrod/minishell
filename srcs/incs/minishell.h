@@ -42,7 +42,6 @@ typedef struct s_compcmd {
 }	t_simplcmd;
 
 typedef struct s_term {
-	char		**path;
 	char		**environ;
 	uint32_t	lineno;
 	uint8_t		lastret;
