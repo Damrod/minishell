@@ -1,4 +1,4 @@
-#include <minishell0.h>
+#include <minishell.h>
 #include <wstrcmp.h>
 
 void	print_dblptr(const char *input)

@@ -65,15 +65,19 @@ int	heredoc_get_fd(char *result, int *input, char *file)
 		return (error_custom((void **)&file, NULL, NULL,
 				"here-doc couldn't create file"));
 	if (*input > STDIN_FILENO)
-		close(*input);
+		if (close(*input))
+			return (error_file(file));
 	*input = open(filepath, O_CREAT | O_WRONLY, S_IRUSR
 			| S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 	if (*input == -1)
 		return (error_file(file));
 	if (result)
 		write(*input, result, ft_strlen(result));
-	close(*input);
+	if (close(*input))
+		return (error_file(file));
 	*input = open(filepath, O_RDONLY);
+	if (*input == -1)
+		return (error_file(file));
 	unlink(filepath);
 	free(result);
 	return (0);

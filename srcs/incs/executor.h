@@ -1,7 +1,7 @@
 #ifndef EXECUTOR_H
 # define EXECUTOR_H
 
-# include <minishell0.h>
+# include <minishell.h>
 # include <sys/wait.h>
 # include <env.h>
 # include <misc.h>

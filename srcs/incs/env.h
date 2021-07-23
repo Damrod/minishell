@@ -1,13 +1,14 @@
 #ifndef ENV_H
 # define ENV_H
 
-# include "minishell.h"
+# include <builtins.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-# include <minishell0.h>
+# include <minishell.h>
 # include <libft.h>
 
+void	print_dblptr(const char *input);
 void	ft_print_env_ordered(char **env);
 int		check_valid_env_var(char **varval, char *arg, char ***env);
 int		ft_check_replace(char **varval, char ***env, int i);

@@ -1,8 +1,10 @@
 #ifndef GET_REDIRS2_H
 # define GET_REDIRS2_H
 
-# include <libft.h>
 # include <stdbool.h>
+# include <wstrcmp.h>
+# include <get_tokens.h>
+# include <heredoc.h>
 
 int	to_input(int *input, char *file, bool is_last);
 int	to_append(int *output, char *file, bool is_last);

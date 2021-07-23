@@ -25,27 +25,44 @@ LIBFTD = libft/noassign libft/memory libft/polyarray libft/btree			   \
 	   libft/string libft/list/dllist libft/dblptr
 DIRS = common helpers error_mng input_output executor
 DIRS += $(LIBFTD)
+LIBFTDSRC = $(foreach dir, $(LIBFTD), $(addprefix $(SOURCEDIR)/, $(dir)))
+LIBFTSRC = $(foreach dir,$(LIBFTDSRC),$(wildcard $(dir)/*.c))
+LIBFTO := $(subst $(SOURCEDIR),$(BUILDDIR),$(LIBFTSRC:%.c=%.o))
 SOURCEDIRS = $(foreach dir, $(DIRS), $(addprefix $(SOURCEDIR)/, $(dir)))
 TARGETDIRS = $(foreach dir, $(DIRS), $(addprefix $(BUILDDIR)/, $(dir)))
-# glob sources from sourcedirs. Eventually we should hardcode this
-SOURCES = $(foreach dir,$(SOURCEDIRS),$(wildcard $(dir)/*.c))
+SOURCES = $(SOURCEDIR)/executor/make_cmd_table.c							   \
+		  $(SOURCEDIR)/executor/executor.c									   \
+		  $(SOURCEDIR)/executor/executor2.c									   \
+		  $(SOURCEDIR)/error_mng/error_msg.c								   \
+		  $(SOURCEDIR)/error_mng/exit_handlers.c							   \
+		  $(SOURCEDIR)/helpers/get_vars.c $(SOURCEDIR)/common/main.c		   \
+		  $(SOURCEDIR)/helpers/get_tokens.c $(SOURCEDIR)/helpers/env.c		   \
+		  $(SOURCEDIR)/helpers/pwd.c $(SOURCEDIR)/helpers/misc.c			   \
+		  $(SOURCEDIR)/helpers/cd.c $(SOURCEDIR)/helpers/wstrcmp.c			   \
+		  $(SOURCEDIR)/helpers/get_args.c $(SOURCEDIR)/helpers/ft_wstr2.c	   \
+		  $(SOURCEDIR)/helpers/read_path.c									   \
+		  $(SOURCEDIR)/helpers/get_quotes.c $(SOURCEDIR)/helpers/echo.c		   \
+		  $(SOURCEDIR)/input_output/heredoc.c								   \
+		  $(SOURCEDIR)/input_output/get_redirs2.c							   \
+		  $(SOURCEDIR)/input_output/get_redirs.c							   \
+		  $(SOURCEDIR)/helpers/exit.c										   \
+		  $(SOURCEDIR)/helpers/export.c										   \
+		  $(SOURCEDIR)/helpers/get_env.c									   \
+		  $(SOURCEDIR)/helpers/read_path2.c									   \
+		  $(SOURCEDIR)/helpers/unset.c
 OBJS := $(subst $(SOURCEDIR),$(BUILDDIR),$(SOURCES:%.c=%.o))
 DEPS = $(OBJS:%.o=%.d)
-# look for includes in the source dirs
-# INCLUDES = $(foreach dir, $(SOURCEDIRS), $(addprefix -I, $(dir)))
-# hardcoded include paths
 INCLUDES += -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft/incs					   \
 			-I $(SOURCEDIR)/libft/ft_printf/incs
 VPATH = $(SOURCEDIRS)
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g # -fsanitize=address
-LDLIBS = -lreadline
+CC = clang
+CFLAGS = -Wall -Wextra -Werror # -g -fsanitize=address
+LDLIBS_LINK = -lreadline -lft
 
 RM = rm -rf
 MKDIR = mkdir -p
 VERBOSE = TRUE
 ERRIGNORE = 2>/dev/null
-
 # Hide or not the calls depending of VERBOSE
 ifeq ($(VERBOSE),TRUE)
 	HIDE =
@@ -55,12 +72,15 @@ endif
 
 all: $(NAME)
 
+$(BUILDDIR)/libft.a: $(TARGETDIRS) $(LIBFTO)
+	ar rc -o $@ $(LIBFTO)
+
 # Generate directory rules
 $(foreach targetdir, $(TARGETDIRS), $(eval $(call generateDirs, $(targetdir))))
 
-$(NAME): $(TARGETDIRS) $(OBJS)
-	$(HIDE)echo Linking $@
-	$(HIDE)$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDLIBS)
+$(NAME): $(TARGETDIRS) $(OBJS) $(BUILDDIR)/libft.a
+	$(HIDE)$(CC) $(CFLAGS) $(OBJS) $(BUILDDIR)/libft.a -o $(NAME) \
+	-Lbld $(LDLIBS_LINK)
 
 # Include dependencies
 -include $(DEPS)
@@ -69,10 +89,9 @@ $(NAME): $(TARGETDIRS) $(OBJS)
 $(foreach targetdir, $(TARGETDIRS), $(eval $(call generateRules, $(targetdir))))
 
 clean:
-	$(HIDE)$(RM) $(OBJS) $(ERRIGNORE)
+	$(HIDE)$(RM) $(BUILDDIR)
 
 fclean: clean
-	$(HIDE)$(RM) $(BUILDDIR)
 	$(HIDE)$(RM) $(NAME)
 
 re: fclean all

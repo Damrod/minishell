@@ -1,7 +1,10 @@
 #ifndef ERROR_MNG_H
 # define ERROR_MNG_H
 
-# include <minishell0.h>
+# include <minishell.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <signal.h>
 
 int		free_and_nullify(void **tofree0, void **tofree1, void **tofree2,
 			int retvalue);

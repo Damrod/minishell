@@ -1,54 +1,55 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/20 18:44:16 by hellnhell         #+#    #+#             */
-/*   Updated: 2021/07/23 12:23:09 by nazurmen         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include	<minishell0.h>
-# include	<libft.h>
-# include	<stdio.h>
-# include	<unistd.h>
-# include	<string.h>
-# include	<stdlib.h>
-# include	<errno.h>
+# include <libft.h>
+# include <stdbool.h>
 
-typedef struct s_tab
-{
-	char		*line;
-	char		**tokens;
-	char		**our_env;
+# define EXENAME "minishell"
+
+# define FLAG_ESCAPED (0b0100000000000000)
+# define FLAG_SNGQUOT (0b0010000000000000)
+# define FLAG_DBLQUOT (0b0001000000000000)
+# define FLAG_NOTSPCE (0b0000100000000000)
+# define FLAG_CIGNORE (0b0000010000000000)
+
+# define UNTIL_END_OF_STRING 0
+# define UNTIL_NON_QUOTED_SPACE 1
+# define UNTIL_ANY_SPACE 2
+# define UNTIL_ANY_ENDOFTOKEN 3
+
+# define CHECK_ONLY_LOW 0
+# define CHECK_SNGQUOTE 1
+# define CHECK_DBLQUOTE 2
+# define CHECK_ANYQUOTE 3
+# define CHECK_NOTQUOTE 4
+
+enum e_type {
+	TYPE_NO = -1,
+	TYPE_OUT = 0,
+	TYPE_IN	 = 1,
+	TYPE_APP = 2,
+	TYPE_HEREDOC = 3,
+	TYPE_END = 4,
+	TYPE_PIPE = 5,
+};
+
+typedef struct s_compcmd {
+	char			**args;
+	char			type;
+	int				pipes[2];
+	int				outfd;
+	int				infd;
+}	t_simplcmd;
+
+typedef struct s_term {
 	char		**path;
-	char		**path_token;
-	char		**orders;
-}				t_tab;
+	char		**environ;
+	uint32_t	lineno;
+	uint8_t		lastret;
+}	t_term;
 
-char	*read_line(t_tab *t);
-//void	read_path(t_tab *t, char **env);
-char	**read_path(char **env);
-//void	check_path(t_tab *t, char **env);
-int		check_path(char **args, char **path);
-char	**split_line(char *line);
-void	*ft_realloc(void *ptr, size_t originalsize, size_t newsize);
-char	*ft_strtok(char *str, char *sepa);
-char	*ft_strjoin_sl(const char *s1, const char *s2);
-int		ft_echo(char **args);
-int		ft_pwd(void);
-int		ft_cd(char **args);
-int		ft_env(char **g_term);
-int		ft_export(char ***env, char **args);
-int		ft_unset(char ***env, char **args);
-int		ft_exit(char **args);
+t_list			*get_args(const char *arg);
 
-char	**ft_split_com(char const *s, char c, t_tab *t);
-int		check_our_implement(t_tab *t);
+extern t_term	g_term;
 
 #endif

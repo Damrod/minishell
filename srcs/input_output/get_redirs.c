@@ -1,14 +1,4 @@
-#include <libft.h>
-#include <minishell0.h>
-#include <sys/stat.h>
-#include <stdbool.h>
-#include <error_mng.h>
-#include <wstrcmp.h>
-#include <get_tokens.h>
-#include <heredoc.h>
 #include <get_redirs.h>
-#include <get_redirs2.h>
-#include <stdint.h>
 
 static int	get_redirs2(t_list **list, int *input, int *output, char **clpatt)
 {
@@ -46,9 +36,11 @@ static int	get_redirs3(t_list **args, char *clptt, int *input, int *output)
 	if (!*args)
 	{
 		if (*input > STDIN_FILENO)
-			close(*input);
+			if (close(*input))
+				return (1);
 		if (*output > STDOUT_FILENO)
-			close(*output);
+			if (close(*output))
+				return (1);
 		return (1);
 	}
 	return (0);
@@ -79,8 +71,3 @@ int	get_redirs(t_list **args, int *input, int *output)
 	}
 	return (get_redirs3(args, clptt, input, output));
 }
-
-/* int	get_redirs0(t_list **args, int *input, int *output) */
-/* { */
-/* 	return 1; */
-/* } */

@@ -1,36 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/22 19:32:51 by nazurmen          #+#    #+#             */
-/*   Updated: 2021/07/15 22:16:49 by nazurmen         ###   ########.fr       */
+/*   Created: 2020/09/20 18:44:16 by hellnhell         #+#    #+#             */
+/*   Updated: 2021/07/23 12:23:09 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <builtins.h>
+#ifndef BUILTINS_H
+# define BUILTINS_H
 
-int	ft_echo(char **args)
-{
-	int			i;
-	int			flag;
+# include	<minishell.h>
+# include	<libft.h>
 
-	flag = 0;
-	i = 0;
-	if (args[0] && ft_strncmp("-n", args[0], 3) == 0)
-	{
-		flag = 1;
-		++i;
-	}
-	while (args[i])
-	{
-		ft_putstr_fd(args[i], 1);
-		if (args[++i])
-			ft_putchar_fd(' ', 1);
-	}
-	if (!flag)
-		ft_putchar_fd('\n', 1);
-	return (0);
-}
+char	**read_path(char **env);
+int		check_path(char **args, char **path);
+int		ft_echo(char **args);
+int		ft_pwd(void);
+int		ft_cd(char **args);
+int		ft_env(char **g_term);
+int		ft_export(char ***env, char **args);
+int		ft_unset(char ***env, char **args);
+int		ft_exit(char **args);
+
+#endif

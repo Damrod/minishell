@@ -1,5 +1,5 @@
 #include <libft.h>
-#include <minishell0.h>
+#include <minishell.h>
 #include <wstrcmp.h>
 
 char	is_redir(unsigned short *arg)

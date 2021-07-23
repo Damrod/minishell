@@ -1,6 +1,4 @@
-#include <libft.h>
-#include <minishell0.h>
-#include <stdbool.h>
+#include <wstrcmp.h>
 
 char	*downcast_wstr(const unsigned short *str, char is_low)
 {

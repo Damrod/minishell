@@ -1,8 +1,7 @@
 #ifndef WSTRCMP_H
 # define WSTRCMP_H
 
-# include <stdlib.h>
-# include <libft.h>
+# include <minishell.h>
 
 char			is_anytoken(unsigned short str);
 unsigned short	cmp_space(const unsigned short str, char is_untilspace);
