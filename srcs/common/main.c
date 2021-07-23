@@ -9,13 +9,7 @@
 /*   Updated: 2021/07/23 12:22:26 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include <minishell0.h>
-#include <libft.h>
-#include <error_mng.h>
-#include <wstrcmp.h>
-#include <get_redirs.h>
-#include <env.h>
+#include <common.h>
 
 t_term	g_term = {
 	.environ = NULL,
@@ -73,10 +67,10 @@ int	main(int argc, char **argv)
 	rl_catch_signals = 0;
 	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
 	if (ft_getenv("PPID") && !ft_strncmp(ft_getenv("PPID"), "minishell", 10))
-		signal(SIGINT, handle_eot);
+		signal(SIGINT, handle_noop);
 	else
 		signal(SIGINT, handle_int);
-	signal(SIGQUIT, handle_eot);
+	signal(SIGQUIT, handle_noop);
 	prompt_loop();
 	ft_dblptr_free((void **)g_term.environ);
 	ft_printf("\n");
