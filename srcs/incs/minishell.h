@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:44:16 by hellnhell         #+#    #+#             */
-/*   Updated: 2021/07/13 17:50:13 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/23 12:23:09 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include	<stdlib.h>
 # include	<errno.h>
 
-typedef struct	s_tab
+typedef struct s_tab
 {
 	char		*line;
 	char		**tokens;
@@ -29,7 +29,7 @@ typedef struct	s_tab
 	char		**path;
 	char		**path_token;
 	char		**orders;
-}					t_tab;
+}				t_tab;
 
 char	*read_line(t_tab *t);
 //void	read_path(t_tab *t, char **env);

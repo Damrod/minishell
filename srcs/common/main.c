@@ -6,7 +6,7 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/20 18:29:03 by aollero           #+#    #+#             */
-/*   Updated: 2021/07/21 18:45:35 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/23 12:22:26 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,23 +79,27 @@ int		exec_cmd(t_dlist *cmd, char **env);
 int		is_builtin(char *arg);
 int		check_builtins(char **args, char ***env);
 
-int	main(int argc, char **argv)
+static void	loop_commands(t_list *args)
 {
-	extern char		**environ;
-	t_dlist			*cmds;
 	t_dlist			*simplecmds;
+	t_dlist			*cmds;
+
+	simplecmds = split_into_simple_cmds(args);
+	g_term.cmdtable = build_cmd_table(&simplecmds);
+	cmds = g_term.cmdtable;
+	while (cmds)
+	{
+		g_term.lastret = exec_cmd(cmds, g_term.environ);
+		cmds = cmds->next;
+	}
+	comp_dtor(&g_term.cmdtable, NULL, 0);
+}
+
+static void	prompt_loop(void)
+{
 	char			*inputstring;
 	t_list			*args;
 
-	(void)argc;
-	(void)argv;
-	rl_catch_signals = 0;
-	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
-	if (ft_getenv("PPID") && !ft_strncmp(ft_getenv("PPID"), "minishell", 10))
-		signal(SIGINT, handle_eot);
-	else
-		signal(SIGINT, handle_int);
-	signal(SIGQUIT, handle_eot);
 	while (1)
 	{
 		g_term.lastpid = 0;
@@ -112,16 +116,24 @@ int	main(int argc, char **argv)
 		free_and_nullify((void **)&inputstring, NULL, NULL, 1);
 		if (!args)
 			continue ;
-		simplecmds = split_into_simple_cmds(args);
-		g_term.cmdtable = build_cmd_table(&simplecmds);
-		cmds = g_term.cmdtable;
-		while (cmds)
-		{
-			g_term.lastret = exec_cmd(cmds, g_term.environ);
-			cmds = cmds->next;
-		}
-		comp_dtor(&g_term.cmdtable, NULL, 0);
+		loop_commands(args);
 	}
+}
+
+int	main(int argc, char **argv)
+{
+	extern char		**environ;
+
+	(void)argc;
+	(void)argv;
+	rl_catch_signals = 0;
+	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
+	if (ft_getenv("PPID") && !ft_strncmp(ft_getenv("PPID"), "minishell", 10))
+		signal(SIGINT, handle_eot);
+	else
+		signal(SIGINT, handle_int);
+	signal(SIGQUIT, handle_eot);
+	prompt_loop();
 	ft_dblptr_free((void **)g_term.environ);
 	ft_printf("\n");
 	return (0);

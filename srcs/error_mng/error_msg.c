@@ -45,7 +45,7 @@ int	error_file(char *file)
 	return (1);
 }
 
-int selfassignment(int *retnbr, int nbr, int retval)
+int	selfassignment(int *retnbr, int nbr, int retval)
 {
 	if (!retval)
 		return (0);

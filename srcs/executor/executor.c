@@ -122,7 +122,7 @@ int	handle_parent(t_dlist *cmd, bool pipe_open)
 	return (ret);
 }
 
-int handle_child(t_dlist *cmd)
+int	handle_child(t_dlist *cmd)
 {
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
 		exit (0);
@@ -135,7 +135,7 @@ int handle_child(t_dlist *cmd)
 	exit(miniexec(simple(cmd)->args));
 }
 
-int exec_cmd(t_dlist *cmd)
+int	exec_cmd(t_dlist *cmd)
 {
 	int			pipe_open;
 	pid_t		pid;

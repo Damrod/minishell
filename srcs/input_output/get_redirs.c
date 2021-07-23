@@ -39,6 +39,21 @@ static int	get_redirs2(t_list **list, int *input, int *output, char **clpatt)
 	return (0);
 }
 
+static int	get_redirs3(t_list **args, char *clptt, int *input, int *output)
+{
+	ft_lstcullpat(args, clptt, free, free);
+	free(clptt);
+	if (!*args)
+	{
+		if (*input > STDIN_FILENO)
+			close(*input);
+		if (*output > STDOUT_FILENO)
+			close(*output);
+		return (1);
+	}
+	return (0);
+}
+
 int	get_redirs(t_list **args, int *input, int *output)
 {
 	char	*clpatt;
@@ -62,17 +77,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 			list = list->next;
 		}
 	}
-	ft_lstcullpat(args, clptt, free, free);
-	free(clptt);
-	if (!*args)
-	{
-		if (*input > STDIN_FILENO)
-			close(*input);
-		if (*output > STDOUT_FILENO)
-			close(*output);
-		return (1);
-	}
-	return (0);
+	return (get_redirs3(args, clptt, input, output));
 }
 
 /* int	get_redirs0(t_list **args, int *input, int *output) */

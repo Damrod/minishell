@@ -97,7 +97,7 @@ int	heredoc_getline(char *file, char **result)
 			setup_buffer(array, NULL, line, 2);
 		else
 			setup_buffer(array, *result, line, 3);
-		tmp0 = ft_strjoin_ult(-1, (const char **)array, ""); // unprot malloc
+		tmp0 = ft_strjoin_ult(-1, (const char **)array, "");
 		free(*result);
 		free(line);
 		*result = tmp0;

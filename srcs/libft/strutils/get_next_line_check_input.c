@@ -27,7 +27,7 @@ static char	*ft_straddchr(char *str, char c)
 
 typedef struct s_char_set {
 	const char	*charset;
-	uint16_t		size;
+	uint16_t	size;
 }	t_charset;
 
 static void	makeunion(t_charset *charset)
