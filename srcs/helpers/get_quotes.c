@@ -1,6 +1,6 @@
-# include <libft.h>
-# include <minishell0.h>
-# include <wstrcmp.h>
+#include <libft.h>
+#include <minishell0.h>
+#include <wstrcmp.h>
 
 unsigned short	*get_token(unsigned short *bitmap)
 {
@@ -35,7 +35,7 @@ char	isquote_not_nested_not_escaped(unsigned short c, char is_dblquotes)
 		flag = FLAG_DBLQUOT;
 	}
 	if ((((c & 0xFF00) == (FLAG_NOTSPCE | flag))
-		|| ((c & 0xFF00) == FLAG_NOTSPCE)) && ((c & 0xFF) == (short)cmp))
+			|| ((c & 0xFF00) == FLAG_NOTSPCE)) && ((c & 0xFF) == (short)cmp))
 		return (1);
 	return (0);
 }

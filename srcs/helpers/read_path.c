@@ -6,106 +6,13 @@
 /*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:04:38 by emartin-          #+#    #+#             */
-/*   Updated: 2021/07/21 19:08:46 by nazurmen         ###   ########.fr       */
+/*   Updated: 2021/07/23 22:36:01 by nazurmen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <minishell.h>
 #include <error_mng.h>
-
-/* void	check_path(t_tab *t, char **env) */
-/* { */
-/* 	int		i; */
-/* 	int		j; */
-/* 	char	*aux; */
-/* 	char	*tmp; */
-
-/* 	i = 0; */
-
-/* 	//exit q hay q gestionar con errno */
-/* 	while (t->path[i]) */
-/* 	{ */
-/* 		if (g_term->args[0] == NULL) */
-/* 			break ; */
-/* 		else */
-/* 		{ */
-/* 			//aux = ft_strjoin(t->path[i], g_term->args[0]); */
-/* 			aux = ft_strjoin_sl(t->path[i], g_term->args[0]); */
-/* 			tmp = aux; */
-/* 			//printf("valor de aux=    %s\n", aux); */
-/* 			//printf("valor de tokens=    %s\n", g_term->args[0]); */
-/* 			j = execve(tmp, g_term->args, env); */
-/* 			/\* if (j < 0) *\/ */
-/* 				//printf("%s\n", strerror(errno)); */
-/* 			(void) j; */
-/* 			free(aux); */
-/* 			i++; */
-/* 		} */
-/* 	} */
-/* } */
-
-/*
-void	read_path(t_tab *t, char **env)
-{
-	int		i;
-//	char *test;
-
-	i = 0;
-	while (env[i])
-	{
-		//t->our_env[i] = ft_strdup(env[i]);
-		if (ft_strncmp("PATH=", env[i], 5) == 0)
-			t->path = ft_split(&env[i][5], ':');
-		i++;
-	}
-	//free(t->path);
-}
-*/
-
-char	*ft_cat_path(char *path, char *arg)
-{
-	char	*ret;
-	size_t	i;
-
-	i = 0;
-	if (!na_calloc((ft_strlen(path) + ft_strlen(arg) + 2),
-			sizeof (char*), (void **)&ret))
-		return (NULL);
-	while (*path)
-		ret[i++] = *path++;
-	ret[i++] = '/';
-	while (*arg)
-		ret[i++] = *arg++;
-	ret[i++] = 0;
-	return (ret);
-}
-
-char	*ft_cat_rel_path(char *path, char *arg)
-{
-	char	*ret;
-	size_t	i;
-
-	i = 0;
-	if (!na_calloc((ft_strlen(path) + ft_strlen(arg)),
-			sizeof(char*), (void **)&ret))
-		return (NULL);
-	while (*path)
-		ret[i++] = *path++;
-	arg += 1;
-	while (*arg)
-		ret[i++] = *arg++;
-	ret[i++] = 0;
-	return (ret);
-}
-
-void	ft_makerelat(char **args)
-{
-	char	*tmp;
-
-	tmp = args[0];
-	args[0] = ft_strjoin("./", args[0]);
-	free(tmp);
-}
+#include <read_path.h>
 
 static int	is_dir(char **args)
 {
@@ -197,19 +104,3 @@ char	**read_path(char **env)
 	}
 	return (NULL);
 }
-
-/* int main(int argc, char **argv, char **environ) */
-/* { */
-/* 	t_tab	tab; */
-/* 	char **strings; */
-
-/* 	read_path(&tab, g_term.environ); */
-/* 	strings = ft_split(ft_getenv("PATH"), ':'); */
-/* 	while (*tab.path) */
-/* 	{ */
-/* 		ft_printf("\"%s\"\n", *strings); */
-/* 		ft_printf("\"%s\"\n", *tab.path); */
-/* 		tab.path++; */
-/* 		strings++; */
-/* 	} */
-/* } */
