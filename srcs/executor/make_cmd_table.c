@@ -1,14 +1,6 @@
-#include <minishell0.h>
-#include <wstrcmp.h>
-#include <libft.h>
-#include <get_redirs.h>
-#include <error_mng.h>
+#include <executor.h>
 
-void	ft_dblptr_display(char **dblptr, void (*p)());
-void	print_dblptr(const char *input);
-void	display(void *str, int i);
-
-void	lstoflst_clear(t_dlist **list)
+static void	lstoflst_clear(t_dlist **list)
 {
 	t_dlist	*head;
 
@@ -21,29 +13,7 @@ void	lstoflst_clear(t_dlist **list)
 	ft_lstclear((t_list **)list, NULL, free);
 }
 
-char	**downcast_dblwstr(t_dlist **args)
-{
-	t_dlist	*head;
-	char	**ret;
-	size_t	i;
-
-	head = *args;
-	if (!na_calloc(ft_lstsize((t_list *)head) + 1, sizeof(*ret),
-			(void **)&ret))
-		return (NULL);
-	i = 0;
-	while (head)
-	{
-		ret[i] = downcast_wstr(head->content, 1);
-		head = head->next;
-		i++;
-	}
-	ret[i] = NULL;
-	ft_lstclear((t_list **)args, free, free);
-	return (ret);
-}
-
-t_simplcmd	*simple_ctor(t_dlist *head)
+static t_simplcmd	*simple_ctor(t_dlist *head)
 {
 	t_simplcmd	*simple;
 
@@ -69,7 +39,7 @@ t_simplcmd	*simple_ctor(t_dlist *head)
 	return (simple);
 }
 
-void	simple_dtor(t_simplcmd *simple)
+static void	simple_dtor(t_simplcmd *simple)
 {
 	if (!simple)
 		return ;

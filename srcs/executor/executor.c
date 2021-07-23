@@ -1,64 +1,6 @@
-#include <libft.h>
-#include <minishell0.h>
-#include <minishell.h>
-#include <sys/wait.h>
-#include <env.h>
-#include <error_mng.h>
-#include <stdbool.h>
+#include <executor.h>
 
-#define SIDE_OUT	0
-#define SIDE_IN		1
-
-int	quit_exec(int retstatus, char *sysc, t_dlist *cmds)
-{
-	ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", EXENAME, sysc, strerror(errno));
-	ft_dlstrewind(&cmds);
-	ft_lstclear((t_list **)&cmds, free, free);
-	ft_dblptr_free((void **)g_term.environ);
-	return (retstatus);
-}
-
-int	check_builtins(char **args, char ***env, int *ret)
-{
-	if (ft_strcmp(args[0], "export") == 0)
-		return (*ret = ft_export(env, args));
-	else if (ft_strcmp(args[0], "echo") == 0)
-		return (*ret = ft_echo(&args[1]));
-	else if (ft_strcmp(args[0], "env") == 0)
-		return (*ret = ft_env(*env));
-	else if (ft_strcmp(args[0], "unset") == 0)
-		return (*ret = ft_unset(env, args));
-	else if (ft_strcmp(args[0], "exit") == 0)
-		return (*ret = ft_exit(args));
-	else if (ft_strcmp(args[0], "cd") == 0)
-		return (*ret = ft_cd(&args[1]));
-	else if (ft_strcmp(args[0], "pwd") == 0)
-		return (*ret = ft_pwd());
-	return (*ret = -1);
-}
-
-int	is_internal(char *arg)
-{
-	if (ft_strcmp(arg, "export") == 0 || ft_strcmp(arg, "unset") == 0
-		|| ft_strcmp(arg, "exit") == 0 || ft_strcmp(arg, "cd") == 0)
-		return (1);
-	return (0);
-}
-
-t_simplcmd	*simple(t_dlist *cmd)
-{
-	if (cmd)
-		return ((t_simplcmd *)cmd->content);
-	return (NULL);
-}
-
-void	my_dup2(int oldfd, int newfd, int retstatus, t_dlist *cmds)
-{
-	if (dup2(oldfd, newfd) < 0)
-		exit(quit_exec(retstatus, "dup2", cmds));
-}
-
-int	miniexec(char **args)
+static int	miniexec(char **args)
 {
 	int			ret;
 	char		**path;
@@ -104,7 +46,7 @@ static int	handle_parent2(int status)
 	return (ret);
 }
 
-int	handle_parent(t_dlist *cmd, pid_t pid, bool pipe_open)
+static int	handle_parent(t_dlist *cmd, pid_t pid, bool pipe_open)
 {
 	int			status;
 	int			ret;
@@ -128,7 +70,7 @@ int	handle_parent(t_dlist *cmd, pid_t pid, bool pipe_open)
 	return (handle_parent2(status));
 }
 
-int	handle_child(t_dlist *cmd)
+static int	handle_child(t_dlist *cmd)
 {
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
 		exit (0);
@@ -158,15 +100,13 @@ int	exec_cmd(t_dlist *cmd)
 	}
 	pid = fork();
 	if (pid < 0)
-		exit(EXIT_FAILURE);
+		exit(quit_exec(EXIT_FAILURE, "fork", cmd));
 	else
 	{
 		if (pid == 0)
 			g_term.lastret = handle_child(cmd);
-		else if (pid != -1)
-			g_term.lastret = handle_parent(cmd, pid, pipe_open);
 		else
-			exit(quit_exec(EXIT_FAILURE, "fork", cmd));
+			g_term.lastret = handle_parent(cmd, pid, pipe_open);
 	}
 	return (g_term.lastret);
 }

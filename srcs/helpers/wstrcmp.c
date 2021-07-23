@@ -24,6 +24,28 @@ char	*downcast_wstr(const unsigned short *str, char is_low)
 	return (result);
 }
 
+char	**downcast_dblwstr(t_dlist **args)
+{
+	t_dlist	*head;
+	char	**ret;
+	size_t	i;
+
+	head = *args;
+	if (!na_calloc(ft_lstsize((t_list *)head) + 1, sizeof(*ret),
+			(void **)&ret))
+		return (NULL);
+	i = 0;
+	while (head)
+	{
+		ret[i] = downcast_wstr(head->content, 1);
+		head = head->next;
+		i++;
+	}
+	ret[i] = NULL;
+	ft_lstclear((t_list **)args, free, free);
+	return (ret);
+}
+
 static void	config_bitmasks(unsigned short *bitmask, unsigned short *bitmask2,
 			char checkdepth)
 {
