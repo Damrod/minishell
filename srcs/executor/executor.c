@@ -9,23 +9,32 @@
 #define SIDE_OUT	0
 #define SIDE_IN		1
 
-int	check_builtins(char **args, char ***env)
+int	quit_exec(int retstatus, char *sysc, t_dlist *cmds)
+{
+	ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", EXENAME, sysc, strerror(errno));
+	ft_dlstrewind(&cmds);
+	ft_lstclear((t_list **)&cmds, free, free);
+	ft_dblptr_free((void **)g_term.environ);
+	return (retstatus);
+}
+
+int	check_builtins(char **args, char ***env, int *ret)
 {
 	if (ft_strcmp(args[0], "export") == 0)
-		return (ft_export(env, args));
+		return (*ret = ft_export(env, args));
 	else if (ft_strcmp(args[0], "echo") == 0)
-		return (ft_echo(&args[1]));
+		return (*ret = ft_echo(&args[1]));
 	else if (ft_strcmp(args[0], "env") == 0)
-		return (ft_env(*env));
+		return (*ret = ft_env(*env));
 	else if (ft_strcmp(args[0], "unset") == 0)
-		return (ft_unset(env, args));
+		return (*ret = ft_unset(env, args));
 	else if (ft_strcmp(args[0], "exit") == 0)
-		return (ft_exit(args));
+		return (*ret = ft_exit(args));
 	else if (ft_strcmp(args[0], "cd") == 0)
-		return (ft_cd(&args[1]));
+		return (*ret = ft_cd(&args[1]));
 	else if (ft_strcmp(args[0], "pwd") == 0)
-		return (ft_pwd());
-	return (-1);
+		return (*ret = ft_pwd());
+	return (*ret = -1);
 }
 
 int	is_internal(char *arg)
@@ -36,9 +45,17 @@ int	is_internal(char *arg)
 	return (0);
 }
 
-static int	miniexec_control_assign(int *ret, char **args)
+t_simplcmd	*simple(t_dlist *cmd)
 {
-	return ((((*ret) = (check_builtins(args, &g_term.environ))) == -1));
+	if (cmd)
+		return ((t_simplcmd *)cmd->content);
+	return (NULL);
+}
+
+void	my_dup2(int oldfd, int newfd, int retstatus, t_dlist *cmds)
+{
+	if (dup2(oldfd, newfd) < 0)
+		exit(quit_exec(retstatus, "dup2", cmds));
 }
 
 int	miniexec(char **args)
@@ -54,7 +71,7 @@ int	miniexec(char **args)
 	emptypath[0] = "";
 	emptypath[1] = NULL;
 	path = emptypath;
-	if (miniexec_control_assign(&ret, args))
+	if (check_builtins(args, &g_term.environ, &ret) == -1)
 	{
 		path = read_path(g_term.environ);
 		if (!path)
@@ -69,57 +86,46 @@ int	miniexec(char **args)
 	return (ret);
 }
 
-t_simplcmd	*simple(t_dlist *cmd)
+static int	handle_parent2(int status)
 {
-	if (cmd)
-		return ((t_simplcmd *)cmd->content);
-	return (NULL);
-}
+	int	ret;
 
-void	my_dup2(int oldfd, int newfd, int retstatus)
-{
-	if (dup2(oldfd, newfd) < 0)
-	{
-		ft_dblptr_free((void **)g_term.environ);
-		exit (retstatus);
-	}
-}
-
-static void	handle_parent2(int status, int *ret)
-{
+	ret = EXIT_FAILURE;
+	if (WIFEXITED(status))
+		ret = WEXITSTATUS(status);
 	if (WIFSIGNALED(status))
 	{
 		if (WCOREDUMP(status))
-			ft_printf("Quit (core dumped)\n");
-		*ret = 1;
+			ft_dprintf(2, "Quit (core dumped)\n");
+		ret = 1;
 	}
+	if (WIFEXITED(status))
+		ret = WEXITSTATUS(status);
+	return (ret);
 }
 
-int	handle_parent(t_dlist *cmd, bool pipe_open)
+int	handle_parent(t_dlist *cmd, pid_t pid, bool pipe_open)
 {
 	int			status;
 	int			ret;
 
-	ret = EXIT_FAILURE;
-	if (g_term.lastpid != waitpid(g_term.lastpid, &status, 0))
-		exit(error_custom(NULL, NULL, NULL, "waitpid failed"));
+	if (pid != waitpid(pid, &status, 0))
+		exit(quit_exec(EXIT_FAILURE, "waitpid", cmd));
 	if (pipe_open)
 	{
-		close(simple(cmd)->pipes[SIDE_IN]);
+		if (close(simple(cmd)->pipes[SIDE_IN]))
+			exit(quit_exec(EXIT_FAILURE, "close", cmd));
 		if (!simple(cmd->next))
-			close(simple(cmd)->pipes[SIDE_OUT]);
+			if (close(simple(cmd)->pipes[SIDE_OUT]))
+				exit(quit_exec(EXIT_FAILURE, "close", cmd));
 	}
 	if (cmd->prev && simple(cmd->prev)->type == TYPE_PIPE)
-		close(simple(cmd->prev)->pipes[SIDE_OUT]);
+		if (close(simple(cmd->prev)->pipes[SIDE_OUT]))
+			exit(quit_exec(EXIT_FAILURE, "close", cmd));
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
-		return (g_term.lastret = check_builtins(simple(cmd)->args,
-				&g_term.environ));
-	if (WIFEXITED(status))
-		ret = WEXITSTATUS(status);
-	handle_parent2(status, &ret);
-	if (WIFEXITED(status))
-		ret = WEXITSTATUS(status);
-	return (ret);
+		return (check_builtins(simple(cmd)->args,
+				&g_term.environ, &ret));
+	return (handle_parent2(status));
 }
 
 int	handle_child(t_dlist *cmd)
@@ -127,11 +133,12 @@ int	handle_child(t_dlist *cmd)
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
 		exit (0);
 	if (simple(cmd)->type == TYPE_PIPE)
-		my_dup2(simple(cmd)->pipes[SIDE_IN], STDOUT_FILENO, EXIT_FAILURE);
+		my_dup2(simple(cmd)->pipes[SIDE_IN], STDOUT_FILENO, EXIT_FAILURE, cmd);
 	if (cmd->prev && simple(cmd->prev)->type == TYPE_PIPE)
-		my_dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO, EXIT_FAILURE);
-	my_dup2(simple(cmd)->infd, STDIN_FILENO, EXIT_FAILURE);
-	my_dup2(simple(cmd)->outfd, STDOUT_FILENO, EXIT_FAILURE);
+		my_dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO,
+			EXIT_FAILURE, cmd);
+	my_dup2(simple(cmd)->infd, STDIN_FILENO, EXIT_FAILURE, cmd);
+	my_dup2(simple(cmd)->outfd, STDOUT_FILENO, EXIT_FAILURE, cmd);
 	exit(miniexec(simple(cmd)->args));
 }
 
@@ -147,18 +154,19 @@ int	exec_cmd(t_dlist *cmd)
 	{
 		pipe_open = 1;
 		if (pipe(simple(cmd)->pipes))
-			exit(1);
+			exit(quit_exec(EXIT_FAILURE, "pipe", cmd));
 	}
 	pid = fork();
-	g_term.lastpid = pid;
 	if (pid < 0)
 		exit(EXIT_FAILURE);
 	else
 	{
 		if (pid == 0)
 			g_term.lastret = handle_child(cmd);
+		else if (pid != -1)
+			g_term.lastret = handle_parent(cmd, pid, pipe_open);
 		else
-			g_term.lastret = handle_parent(cmd, pipe_open);
+			exit(quit_exec(EXIT_FAILURE, "fork", cmd));
 	}
 	return (g_term.lastret);
 }

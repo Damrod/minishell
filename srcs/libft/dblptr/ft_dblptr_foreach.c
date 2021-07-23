@@ -9,7 +9,7 @@ void	ft_dblptr_foreach(char **data, void (*f)())
 	{
 		while (data[len])
 		{
-			f(data[len]);
+			f(data[len], len);
 			len++;
 		}
 	}

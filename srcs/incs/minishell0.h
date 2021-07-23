@@ -5,6 +5,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <signal.h>
+# include <stdbool.h>
 
 # define EXENAME "minishell"
 
@@ -35,39 +36,6 @@ enum e_type {
 	TYPE_PIPE = 5,
 };
 
-# define NUL 0x00
-# define SOH 0x01
-# define STX 0x02
-# define ETX 0x03
-# define EOT 0x04
-# define ENQ 0x05
-# define ACK 0x06
-# define BEL 0x07
-# define BS 0x08
-# define HT 0x09
-# define LF 0x0A
-# define VT 0x0B
-# define FF 0x0C
-# define CR 0x0D
-# define SO 0x0E
-# define SI 0x0F
-# define DLE 0x10
-# define DC1 0x11
-# define DC2 0x12
-# define DC3 0x13
-# define DC4 0x14
-# define NAK 0x15
-# define SYN 0x16
-# define ETB 0x17
-# define CAN 0x18
-# define EM 0x19
-# define SUB 0x1A
-# define FS 0x1C
-# define GS 0x1D
-# define RS 0x1E
-# define US 0x1F
-# define DEL 0x7F
-
 typedef struct s_compcmd {
 	char			**args;
 	char			type;
@@ -79,11 +47,8 @@ typedef struct s_compcmd {
 typedef struct s_term {
 	char		**path;
 	char		**environ;
-	t_dlist		*cmdtable;
 	uint32_t	lineno;
 	uint8_t		lastret;
-	int			lastpid;
-	int			waiting;
 }	t_term;
 
 t_list			*get_args(const char *arg);
@@ -94,6 +59,11 @@ void			print_dblptr(const char *input);
 void			apply_dblptr(char **data, void (*f)());
 char			**ft_dblptr_cpy(const char **data,
 					const char *item, char is_deep);
+t_dlist			*build_cmd_table(t_dlist **simplecmds);
+void			*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds,
+					bool isprintsynerr);
+int				exec_cmd(t_dlist *cmd);
+int				get_pipes(void *src, void *key);
 
 extern t_term	g_term;
 
