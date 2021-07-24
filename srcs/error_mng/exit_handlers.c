@@ -56,15 +56,20 @@ void	handle_int(int sig)
 	{
 		if (g_term.lastpid > 0)
 		{
+			rl_replace_line("^C", 0);
+			rl_redisplay();
 			ft_printf("\n");
+			rl_on_new_line();
+			rl_replace_line("", 0);
 			g_term.lastpid = 0;
-			g_term.lastret = 130;
-			return ;
 		}
-		ft_printf("^C\n");
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
+		else
+		{
+			ft_printf("^C\n");
+			rl_on_new_line();
+			rl_replace_line("", 0);
+			rl_redisplay();
+		}
 		g_term.lastret = 130;
 		return ;
 	}
