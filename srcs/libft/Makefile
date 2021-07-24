@@ -1,15 +1,3 @@
-#******************************************************************************#
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: aollero- <aollero@gmail.com>               +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/06/29 18:09:31 by aollero-          #+#    #+#              #
-#    Updated: 2020/10/13 14:29:30 by aollero-         ###   ########.fr        #
-#                                                                              #
-#******************************************************************************#
-
 NAME	= libft.a
 SRCS	= noassign/na_malloc.c memory/ft_bzero.c memory/ft_memcmp.c			   \
 		  memory/ft_memset.c memory/ft_memcpy.c memory/ft_memchr.c			   \

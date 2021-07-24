@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   read_path.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nazurmen <nazurmen@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/21 18:04:38 by emartin-          #+#    #+#             */
-/*   Updated: 2021/07/23 22:36:01 by nazurmen         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <builtins.h>
 #include <error_mng.h>
 #include <read_path.h>
@@ -54,12 +42,10 @@ int	check_relat(char *execpath, char *cwd, char **args, int *status)
 	return (0);
 }
 
-int	check_path2(int status, char **path, int i)
+static void	check_path2(int *status, int *i)
 {
-	if (status < 0 || !path[i])
-		error_custom(NULL, NULL, NULL, "command not found");
-	i = status;
-	return (i);
+	*i = 0;
+	*status = -1;
 }
 
 int	check_path(char **args, char **path)
@@ -70,8 +56,7 @@ int	check_path(char **args, char **path)
 	int			status;
 
 	getcwd(cwd, 1024);
-	i = 0;
-	status = -1;
+	check_path2(&status, &i);
 	while (path[i])
 	{
 		if (!check_relat(execpath, cwd, args, &status) && status >= 0)

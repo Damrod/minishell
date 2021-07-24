@@ -37,6 +37,10 @@ int	substitute_var(unsigned short **bitmap)
 	i = 0;
 	while ((*bitmap)[i])
 	{
+		if ((char)(*bitmap)[i] == '$' && ((((*bitmap)[i] & FLAG_DBLQUOT) &&
+			!((*bitmap)[1 + i] & FLAG_DBLQUOT)) ||
+			!(char)(*bitmap)[i + 1]))
+			break ;
 		if ((char)(*bitmap)[i] == '$' && !((*bitmap)[i] & FLAG_SNGQUOT))
 			i += swap_var(bitmap, i);
 		if ((*bitmap)[i])
