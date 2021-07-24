@@ -15,6 +15,7 @@ t_term	g_term = {
 	.environ = NULL,
 	.lineno = 0,
 	.lastret = 0,
+	.lastpid = 0
 };
 
 static void	loop_commands(t_list *args)

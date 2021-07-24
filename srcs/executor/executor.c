@@ -39,7 +39,7 @@ static int	handle_parent2(int status)
 	{
 		if (WCOREDUMP(status))
 			ft_dprintf(2, "Quit (core dumped)\n");
-		ret = 1;
+		ret = 131;
 	}
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
@@ -99,6 +99,7 @@ int	exec_cmd(t_dlist *cmd)
 			exit(quit_exec(EXIT_FAILURE, "pipe", cmd));
 	}
 	pid = fork();
+	g_term.lastpid = pid;
 	if (pid < 0)
 		exit(quit_exec(EXIT_FAILURE, "fork", cmd));
 	else

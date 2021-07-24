@@ -71,6 +71,7 @@ int	check_path(char **args, char **path)
 
 	getcwd(cwd, 1024);
 	i = 0;
+	status = -1;
 	while (path[i])
 	{
 		if (!check_relat(execpath, cwd, args, &status) && status >= 0)
