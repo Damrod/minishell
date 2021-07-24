@@ -38,8 +38,12 @@ static int	handle_parent2(int status)
 	if (WIFSIGNALED(status))
 	{
 		if (WCOREDUMP(status))
+		{
 			ft_dprintf(2, "Quit (core dumped)\n");
-		ret = 131;
+			ret = 131;
+		}
+		if (WTERMSIG(status) == SIGINT)
+			ret = 130;
 	}
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);

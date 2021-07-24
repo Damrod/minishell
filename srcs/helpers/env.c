@@ -33,7 +33,7 @@ int	check_valid_env_var(char *arg)
 {
 	if (ft_isdigit(arg[0]))
 	{
-		ft_dprintf(STDERR_FILENO, "%s: export: `%s:' not a valid"
+		ft_dprintf(STDERR_FILENO, "%s: export: `%s': not a valid"
 			" identifier\n", EXENAME, arg);
 		g_term.lastret = 1;
 		return (1);
