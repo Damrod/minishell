@@ -56,7 +56,7 @@ INCLUDES += -I $(SOURCEDIR)/incs -I $(SOURCEDIR)/libft/incs					   \
 			-I $(SOURCEDIR)/libft/ft_printf/incs
 VPATH = $(SOURCEDIRS)
 CC = clang
-CFLAGS = -Wall -Wextra -Werror # -g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -g # -fsanitize=address
 LDLIBS_LINK = -lreadline -lft
 
 RM = rm -rf

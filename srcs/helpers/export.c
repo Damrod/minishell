@@ -28,7 +28,8 @@ int	ft_set_varval(char ***varval, char *arg)
 
 	if (arg[0] == '=')
 	{
-		printf("bash: export: '%s': not a valid identifier\n", arg);
+		ft_dprintf(STDERR_FILENO, "%s: export: `%s': not a valid identifier\n",
+			EXENAME, arg);
 		return (1);
 	}
 	i = gotochar(arg, '=');
@@ -55,26 +56,29 @@ int	add_var_env(char *arg, char ***env)
 	char	**varval;
 	int		i;
 
-	if (ft_set_varval(&varval, arg))
+	if (check_valid_env_var(arg))
 		return (1);
-	if (check_valid_env_var(varval, arg, env))
-		return (1);
-	i = 0;
-	while ((*env)[i] != NULL)
+	if (ft_strchr(arg, '='))
 	{
-		if (ft_check_replace(varval, env, i))
-			break ;
-		i++;
+		if (ft_set_varval(&varval, arg))
+			return (1);
+		i = 0;
+		while ((*env)[i] != NULL)
+		{
+			if (ft_check_replace(varval, env, i))
+				break ;
+			i++;
+		}
+		if (!(*env)[i])
+			*env = add_env(env, varval);
+		ft_dblptr_free((void **)varval);
+		return (0);
 	}
-	if (!(*env)[i])
-		*env = add_env(env, varval);
-	ft_dblptr_free((void **)varval);
-	return (0);
+	return (1);
 }
 
 int	ft_export(char ***env, char **args)
 {
-	int	i;
 	int	j;
 	int	ret;
 
@@ -86,15 +90,7 @@ int	ft_export(char ***env, char **args)
 		j = 0;
 		while (args[j])
 		{
-			i = 0;
-			while (args[j][i])
-			{
-				if (args[j][i] == '=')
-				{
-					ret = add_var_env(args[j], env);
-				}
-				i++;
-			}
+			ret = add_var_env(args[j], env);
 			j++;
 		}
 	}

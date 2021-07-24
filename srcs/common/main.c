@@ -44,7 +44,7 @@ static void	prompt_loop(void)
 		inputstring = readline("marishell% ");
 		if (!inputstring)
 		{
-			ft_putstr_fd("exit", 1);
+			ft_putstr_fd("exit", STDERR_FILENO);
 			break ;
 		}
 		if (ft_strlen(inputstring) > 0)

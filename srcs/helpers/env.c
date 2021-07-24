@@ -29,13 +29,12 @@ void	ft_print_env_ordered(char **env)
 	ft_lstclear(&sorted, NULL, free);
 }
 
-int	check_valid_env_var(char **varval, char *arg, char ***env)
+int	check_valid_env_var(char *arg)
 {
-	(void)env;
-	if (ft_isdigit(varval[0][0]))
+	if (ft_isdigit(arg[0]))
 	{
-		printf("bash: export: \'%s:\' bit a valid identifier\n", arg);
-		ft_dblptr_free((void **)varval);
+		ft_dprintf(STDERR_FILENO, "%s: export: `%s:' not a valid"
+			" identifier\n", EXENAME, arg);
 		g_term.lastret = 1;
 		return (1);
 	}
@@ -67,8 +66,6 @@ int	ft_check_replace(char **varval, char ***env, int i)
 	}
 	return (0);
 }
-
-void	ft_dblptr_foreach(char **data, void (*f)());
 
 int	ft_env(char **env)
 {
