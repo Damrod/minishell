@@ -4,7 +4,6 @@ t_term	g_term = {
 	.environ = NULL,
 	.lineno = 0,
 	.lastret = 0,
-	.lastpid = 0
 };
 
 static void	loop_commands(t_list *args)
@@ -56,10 +55,7 @@ int	main(int argc, char **argv)
 	(void)argv;
 	rl_catch_signals = 0;
 	g_term.environ = ft_dblptr_cpy((const char **)environ, NULL, 1);
-	if (ft_getenv("PPID") && !ft_strncmp(ft_getenv("PPID"), "minishell", 10))
-		signal(SIGINT, handle_noop);
-	else
-		signal(SIGINT, handle_int);
+	signal(SIGINT, handle_int);
 	signal(SIGQUIT, handle_noop);
 	prompt_loop();
 	ft_dblptr_free((void **)g_term.environ);

@@ -5,11 +5,7 @@ static int	miniexec(char **args)
 	int			ret;
 	char		**path;
 	static char	*emptypath[2];
-	static char	*childenv[3];
 
-	childenv[0] = "export";
-	childenv[1] = "PPID=minishell";
-	childenv[2] = NULL;
 	emptypath[0] = "";
 	emptypath[1] = NULL;
 	path = emptypath;
@@ -18,8 +14,6 @@ static int	miniexec(char **args)
 		path = read_path(g_term.environ);
 		if (!path)
 			path = emptypath;
-		if (!ft_getenv("PPID"))
-			ft_export(&g_term.environ, childenv);
 		ret = check_path(args, path);
 	}
 	ft_dblptr_free((void **)g_term.environ);
@@ -43,7 +37,10 @@ static int	handle_parent2(int status)
 			ret = 131;
 		}
 		if (WTERMSIG(status) == SIGINT)
+		{
+			ft_printf("\n");
 			ret = 130;
+		}
 	}
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
@@ -55,8 +52,10 @@ static int	handle_parent(t_dlist *cmd, pid_t pid, bool pipe_open)
 	int			status;
 	int			ret;
 
+	signal(SIGINT, handle_noop);
 	if (pid != waitpid(pid, &status, 0))
 		exit(quit_exec(EXIT_FAILURE, "waitpid", cmd));
+	signal(SIGINT, handle_int);
 	if (pipe_open)
 	{
 		if (close(simple(cmd)->pipes[SIDE_IN]))
@@ -103,7 +102,6 @@ int	exec_cmd(t_dlist *cmd)
 			exit(quit_exec(EXIT_FAILURE, "pipe", cmd));
 	}
 	pid = fork();
-	g_term.lastpid = pid;
 	if (pid < 0)
 		exit(quit_exec(EXIT_FAILURE, "fork", cmd));
 	else

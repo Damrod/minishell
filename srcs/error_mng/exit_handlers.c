@@ -44,32 +44,16 @@ int	free_and_nullify(void **tofree0, void **tofree1, void **tofree2,
 void	handle_noop(int sig)
 {
 	(void) sig;
-	if (sig == SIGQUIT)
-		g_term.lastret = 131;
-	if (sig == SIGINT)
-		g_term.lastret = 130;
 }
 
 void	handle_int(int sig)
 {
 	if (sig == SIGINT)
 	{
-		if (g_term.lastpid > 0)
-		{
-			rl_replace_line("^C", 0);
-			rl_redisplay();
-			ft_printf("\n");
-			rl_on_new_line();
-			rl_replace_line("", 0);
-			g_term.lastpid = 0;
-		}
-		else
-		{
-			ft_printf("^C\n");
-			rl_on_new_line();
-			rl_replace_line("", 0);
-			rl_redisplay();
-		}
+		ft_printf("^C\n");
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
 		g_term.lastret = 130;
 		return ;
 	}
