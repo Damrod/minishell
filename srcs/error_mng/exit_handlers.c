@@ -44,6 +44,7 @@ int	free_and_nullify(void **tofree0, void **tofree1, void **tofree2,
 void	handle_noop(int sig)
 {
 	(void) sig;
+	g_term.lastret = 130;
 }
 
 void	handle_int(int sig)
@@ -54,7 +55,7 @@ void	handle_int(int sig)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
-		g_term.lastret = 1;
+		g_term.lastret = 130;
 		return ;
 	}
 }
