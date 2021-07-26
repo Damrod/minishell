@@ -44,6 +44,6 @@ int	ft_exit(char **args)
 		return (check_exit_arg(i, args));
 	}
 	else
-		exit (g_term.lastret);
+		exit (EXIT_SUCCESS);
 	return (0);
 }

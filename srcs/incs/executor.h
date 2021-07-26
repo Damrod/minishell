@@ -19,6 +19,6 @@ int			check_builtins(char **args, char ***env, int *ret);
 t_simplcmd	*simple(t_dlist *cmd);
 void		*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds,
 				bool isprintsynerr);
-t_dlist		*build_cmd_table(t_dlist **simplecmds);
+t_dlist		*build_cmd_table(t_dlist **simplecmds, uint32_t *lineno);
 
 #endif

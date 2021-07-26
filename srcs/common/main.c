@@ -2,18 +2,17 @@
 
 t_term	g_term = {
 	.environ = NULL,
-	.lineno = 0,
 	.lastret = 0,
 };
 
-static void	loop_commands(t_list *args)
+static void	loop_commands(t_list *args, uint32_t *lineno)
 {
 	t_dlist			*simplecmds;
 	t_dlist			*cmds;
 	t_dlist			*cmdtable;
 
 	simplecmds = ft_lstsplit(args, "|", get_pipes);
-	cmdtable = build_cmd_table(&simplecmds);
+	cmdtable = build_cmd_table(&simplecmds, lineno);
 	cmds = cmdtable;
 	while (cmds)
 	{
@@ -27,7 +26,9 @@ static void	prompt_loop(void)
 {
 	char			*inputstring;
 	t_list			*args;
+	uint32_t		lineno;
 
+	lineno = 0;
 	while (1)
 	{
 		inputstring = readline("marishell% ");
@@ -38,12 +39,12 @@ static void	prompt_loop(void)
 		}
 		if (ft_strlen(inputstring) > 0)
 			add_history(inputstring);
-		g_term.lineno++;
+		lineno++;
 		args = get_args(inputstring);
 		free_and_nullify((void **)&inputstring, NULL, NULL, 1);
 		if (!args)
 			continue ;
-		loop_commands(args);
+		loop_commands(args, &lineno);
 	}
 }
 

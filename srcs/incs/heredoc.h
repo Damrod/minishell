@@ -7,6 +7,6 @@
 # include <minishell.h>
 
 int	heredoc_get_fd(char *result, int *input, char *file);
-int	heredoc_getline(char *file, char **result);
+int	heredoc_getline(char *file, char **result, uint32_t *lineno);
 
 #endif

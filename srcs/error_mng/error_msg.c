@@ -37,10 +37,18 @@ int	error_cmd(char *builtin, char *arg, char *msg, int nbr)
 
 int	error_file(char *file)
 {
-	int		error;
+	int				error;
+	char			*filestr;
+	static char		*optcolon = ": ";
 
+	filestr = file;
+	if (!file)
+	{
+		filestr = "";
+		optcolon = "";
+	}
 	error = errno;
-	ft_dprintf(2, "%s: %s: %s\n", EXENAME, file, strerror(error));
+	ft_dprintf(2, "%s: %s%s%s\n", EXENAME, filestr, optcolon, strerror(error));
 	free(file);
 	return (1);
 }

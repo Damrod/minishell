@@ -4,6 +4,6 @@
 # include <minishell.h>
 # include <get_redirs2.h>
 
-int	get_redirs(t_list **args, int *input, int *output);
+int	get_redirs(t_list **args, t_simplcmd *simple, uint32_t *lineno);
 
 #endif

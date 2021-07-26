@@ -50,7 +50,7 @@ void	handle_int(int sig)
 {
 	if (sig == SIGINT)
 	{
-		ft_printf("^C\n");
+		write(1, "^C\n", 3);
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();

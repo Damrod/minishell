@@ -83,20 +83,20 @@ int	heredoc_get_fd(char *result, int *input, char *file)
 	return (0);
 }
 
-int	heredoc_getline(char *file, char **result)
+int	heredoc_getline(char *file, char **result, uint32_t *lineno)
 {
 	char		*line;
 	char		*tmp0;
 	char		*array[4];
 	uint32_t	heredocatline;
 
-	heredocatline = g_term.lineno;
+	heredocatline = *lineno;
 	*result = NULL;
 	ft_memset(array, '\0', sizeof(void *) * 4);
 	while (get_next_line(0, &line) > 0
 		&& ft_strncmp(line, file, ft_strlen(file) + 1))
 	{
-		g_term.lineno++;
+		(*lineno)++;
 		if (!*result)
 			setup_buffer(array, NULL, line, 2);
 		else

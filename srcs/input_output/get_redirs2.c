@@ -50,13 +50,13 @@ int	to_output(int *output, char *file, bool is_last)
 		return (error_syntax("newline"));
 }
 
-int	to_heredoc(int *input, char *file, bool is_last)
+int	to_heredoc(int *input, char *file, bool is_last, uint32_t *lineno)
 {
 	char	*result;
 
 	if (!is_last)
 	{
-		heredoc_getline(file, &result);
+		heredoc_getline(file, &result, lineno);
 		if (heredoc_get_fd(result, input, file))
 		{
 			free (result);

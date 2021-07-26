@@ -13,7 +13,7 @@ static void	lstoflst_clear(t_dlist **list)
 	ft_lstclear((t_list **)list, NULL, free);
 }
 
-static t_simplcmd	*simple_ctor(t_dlist *head)
+static t_simplcmd	*simple_ctor(t_dlist *head, uint32_t *lineno)
 {
 	t_simplcmd	*simple;
 
@@ -22,7 +22,7 @@ static t_simplcmd	*simple_ctor(t_dlist *head)
 	simple->type = TYPE_END;
 	simple->infd = STDIN_FILENO;
 	simple->outfd = STDOUT_FILENO;
-	if (get_redirs((t_list **)&head->content, &simple->infd, &simple->outfd))
+	if (get_redirs((t_list **)&head->content, simple, lineno))
 	{
 		ft_lstclear((t_list **)&head->content, free, free);
 		free (simple);
@@ -73,7 +73,7 @@ void	*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds, bool isprintsynerr)
 	return (NULL);
 }
 
-t_dlist	*build_cmd_table(t_dlist **simplecmds)
+t_dlist	*build_cmd_table(t_dlist **simplecmds, uint32_t *lineno)
 {
 	t_dlist		*cmdtable;
 	t_dlist		*head;
@@ -83,7 +83,7 @@ t_dlist	*build_cmd_table(t_dlist **simplecmds)
 	cmdtable = NULL;
 	while (head && head->content)
 	{
-		simplecmd = simple_ctor(head);
+		simplecmd = simple_ctor(head, lineno);
 		if (!simplecmd || (!ft_dblptrlen((void **)simplecmd->args)
 				&& simplecmd->type == TYPE_PIPE))
 			return (comp_dtor(&cmdtable, *simplecmds, simplecmd

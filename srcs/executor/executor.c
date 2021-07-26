@@ -22,25 +22,28 @@ static int	miniexec(char **args)
 	return (ret);
 }
 
-static int	handle_parent2(int status)
+static int	handle_signals(int status)
 {
 	int	ret;
 
 	ret = EXIT_FAILURE;
-	if (WIFEXITED(status))
-		ret = WEXITSTATUS(status);
 	if (WIFSIGNALED(status))
 	{
-		if (WCOREDUMP(status))
+		ret = 130;
+		if (WTERMSIG(status) == SIGINT)
+			ft_printf("\n");
+		if (WTERMSIG(status) == SIGQUIT)
 		{
-			ft_dprintf(2, "Quit (core dumped)\n");
+			ft_dprintf(2, "Quit ");
 			ret = 131;
 		}
-		if (WTERMSIG(status) == SIGINT)
+		if (WTERMSIG(status) == SIGKILL)
 		{
-			ft_printf("\n");
-			ret = 130;
+			ft_dprintf(2, "Killed\n");
+			ret = 137;
 		}
+		if (WCOREDUMP(status))
+			ft_dprintf(2, "(core dumped)\n");
 	}
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
@@ -70,7 +73,7 @@ static int	handle_parent(t_dlist *cmd, pid_t pid, bool pipe_open)
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
 		return (check_builtins(simple(cmd)->args,
 				&g_term.environ, &ret));
-	return (handle_parent2(status));
+	return (handle_signals(status));
 }
 
 static int	handle_child(t_dlist *cmd)

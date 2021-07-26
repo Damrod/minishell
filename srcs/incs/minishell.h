@@ -43,7 +43,6 @@ typedef struct s_compcmd {
 
 typedef struct s_term {
 	char		**environ;
-	uint32_t	lineno;
 	uint8_t		lastret;
 }	t_term;
 

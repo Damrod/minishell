@@ -1,6 +1,7 @@
 #include <get_redirs.h>
 
-static int	get_redirs2(t_list **list, int *input, int *output, char **clpatt)
+static int	get_redirs2(t_list **list, t_simplcmd *simple, char **clpatt,
+			uint32_t *lineno)
 {
 	bool			is_last;
 	unsigned char	type;
@@ -12,16 +13,16 @@ static int	get_redirs2(t_list **list, int *input, int *output, char **clpatt)
 		if (get_io_file(&file, (*list)->next->content, &is_last))
 			return (1);
 	if (type == TYPE_IN)
-		if (to_input(input, file, is_last))
+		if (to_input(&simple->infd, file, is_last))
 			return (1);
 	if (type == TYPE_HEREDOC)
-		if (to_heredoc(input, file, is_last))
+		if (to_heredoc(&simple->infd, file, is_last, lineno))
 			return (1);
 	if (type == TYPE_APP)
-		if (to_append(output, file, is_last))
+		if (to_append(&simple->outfd, file, is_last))
 			return (1);
 	if (type == TYPE_OUT)
-		if (to_output(output, file, is_last))
+		if (to_output(&simple->outfd, file, is_last))
 			return (1);
 	free(file);
 	*clpatt = ft_memset(*clpatt, 1, sizeof(**clpatt) * 2) + 2;
@@ -29,24 +30,24 @@ static int	get_redirs2(t_list **list, int *input, int *output, char **clpatt)
 	return (0);
 }
 
-static int	get_redirs3(t_list **args, char *clptt, int *input, int *output)
+static int	get_redirs3(t_list **args, char *clptt, t_simplcmd *simple)
 {
 	ft_lstcullpat(args, clptt, free, free);
 	free(clptt);
 	if (!*args)
 	{
-		if (*input > STDIN_FILENO)
-			if (close(*input))
-				return (1);
-		if (*output > STDOUT_FILENO)
-			if (close(*output))
-				return (1);
+		if (simple->infd > STDIN_FILENO)
+			if (close(simple->infd))
+				return (error_file(NULL));
+		if (simple->outfd > STDOUT_FILENO)
+			if (close(simple->outfd))
+				return (error_file(NULL));
 		return (1);
 	}
 	return (0);
 }
 
-int	get_redirs(t_list **args, int *input, int *output)
+int	get_redirs(t_list **args, t_simplcmd *simple, uint32_t *lineno)
 {
 	char	*clpatt;
 	char	*clptt;
@@ -60,7 +61,7 @@ int	get_redirs(t_list **args, int *input, int *output)
 	{
 		if (is_redir((unsigned short *)list->content))
 		{
-			if (get_redirs2(&list, input, output, &clpatt))
+			if (get_redirs2(&list, simple, &clpatt, lineno))
 				return (free_and_nullify((void **)&clptt, NULL, NULL, 1));
 		}
 		else
@@ -69,5 +70,5 @@ int	get_redirs(t_list **args, int *input, int *output)
 			list = list->next;
 		}
 	}
-	return (get_redirs3(args, clptt, input, output));
+	return (get_redirs3(args, clptt, simple));
 }
