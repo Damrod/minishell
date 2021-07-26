@@ -59,5 +59,5 @@ int	main(int argc, char **argv)
 	prompt_loop(&env);
 	ft_dblptr_free((void **)env);
 	ft_printf("\n");
-	return (0);
+	return (g_lastret);
 }
