@@ -1,6 +1,6 @@
 #include "env.h"
 
-int cleanup_exit(char ***env, t_dlist *cmd, int num)
+int	cleanup_exit(char ***env, t_dlist *cmd, int num)
 {
 	ft_dblptr_free((void **)*env);
 	ft_dlstrewind(&cmd);
