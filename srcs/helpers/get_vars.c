@@ -34,7 +34,7 @@ static void	join_var_3(char **var, int *varsize, char **env)
 	tmp = *var;
 	*varsize = ft_strlen(*var);
 	if (ft_strlen(*var) == 1 && (*var)[0] == '?')
-		*var = ft_itoa(g_term.lastret);
+		*var = ft_itoa(g_lastret);
 	else
 	{
 		if (ft_getenv(*var, env))

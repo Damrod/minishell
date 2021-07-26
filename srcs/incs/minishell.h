@@ -41,12 +41,8 @@ typedef struct s_compcmd {
 	int				infd;
 }	t_simplcmd;
 
-typedef struct s_term {
-	uint8_t		lastret;
-}	t_term;
-
 t_list			*get_args(const char *arg, char **env);
 
-extern t_term	g_term;
+extern uint8_t		g_lastret;
 
 #endif

@@ -35,7 +35,7 @@ int	check_valid_env_var(char *arg)
 	{
 		ft_dprintf(STDERR_FILENO, "%s: export: `%s': not a valid"
 			" identifier\n", EXENAME, arg);
-		g_term.lastret = 1;
+		g_lastret = 1;
 		return (1);
 	}
 	return (0);

@@ -1,8 +1,6 @@
 #include <common.h>
 
-t_term	g_term = {
-	.lastret = 0,
-};
+uint8_t	g_lastret = 0;
 
 static void	loop_commands(t_list *args, uint32_t *lineno, char ***env)
 {
@@ -15,7 +13,7 @@ static void	loop_commands(t_list *args, uint32_t *lineno, char ***env)
 	cmds = cmdtable;
 	while (cmds)
 	{
-		g_term.lastret = exec_cmd(cmds, env);
+		g_lastret = exec_cmd(cmds, env);
 		cmds = cmds->next;
 	}
 	comp_dtor(&cmdtable, NULL, 0);

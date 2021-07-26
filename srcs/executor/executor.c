@@ -95,7 +95,7 @@ int	exec_cmd(t_dlist *cmd, char ***env)
 	int			pipe_open;
 	pid_t		pid;
 
-	g_term.lastret = EXIT_FAILURE;
+	g_lastret = EXIT_FAILURE;
 	pipe_open = 0;
 	if (simple(cmd)->type == TYPE_PIPE || (simple(cmd->prev)
 			&& simple(cmd->prev)->type == TYPE_PIPE))
@@ -110,9 +110,9 @@ int	exec_cmd(t_dlist *cmd, char ***env)
 	else
 	{
 		if (pid == 0)
-			g_term.lastret = handle_child(cmd, env);
+			g_lastret = handle_child(cmd, env);
 		else
-			g_term.lastret = handle_parent(cmd, pid, pipe_open, env);
+			g_lastret = handle_parent(cmd, pid, pipe_open, env);
 	}
-	return (g_term.lastret);
+	return (g_lastret);
 }

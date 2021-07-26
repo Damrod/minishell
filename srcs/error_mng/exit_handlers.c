@@ -54,7 +54,7 @@ void	handle_int(int sig)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
-		g_term.lastret = 130;
+		g_lastret = 130;
 		return ;
 	}
 }
