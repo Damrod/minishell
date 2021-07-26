@@ -30,7 +30,7 @@ t_list	*ft_wstrsplit(unsigned short *bitmap)
 	return (ret);
 }
 
-int	substitute_var(unsigned short **bitmap)
+int	substitute_var(unsigned short **bitmap, char **env)
 {
 	int	i;
 
@@ -42,14 +42,14 @@ int	substitute_var(unsigned short **bitmap)
 			!(char)(*bitmap)[i + 1]))
 			break ;
 		if ((char)(*bitmap)[i] == '$' && !((*bitmap)[i] & FLAG_SNGQUOT))
-			i += swap_var(bitmap, i);
+			i += swap_var(bitmap, i, env);
 		if ((*bitmap)[i])
 			i++;
 	}
 	return (ft_wstrlen((*bitmap), UNTIL_END_OF_STRING));
 }
 
-t_list	*get_args(const char *arg)
+t_list	*get_args(const char *arg, char **env)
 {
 	size_t			len;
 	unsigned short	*bitmap;
@@ -72,7 +72,7 @@ t_list	*get_args(const char *arg)
 		return (NULL);
 	free(bitmap);
 	bitmap = tmp;
-	len = substitute_var(&bitmap);
+	len = substitute_var(&bitmap, env);
 	retreal = ft_wstrsplit(bitmap);
 	free (bitmap);
 	return (retreal);

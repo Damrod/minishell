@@ -27,7 +27,7 @@ static int	join_var2(int i, unsigned short **bitmap, char **var,
 	return (j);
 }
 
-static void	join_var_3(char **var, int *varsize)
+static void	join_var_3(char **var, int *varsize, char **env)
 {
 	char			*tmp;
 
@@ -37,22 +37,22 @@ static void	join_var_3(char **var, int *varsize)
 		*var = ft_itoa(g_term.lastret);
 	else
 	{
-		if (ft_getenv(*var))
-			*var = ft_strdup(ft_getenv(*var));
+		if (ft_getenv(*var, env))
+			*var = ft_strdup(ft_getenv(*var, env));
 		else
 			*var = ft_strdup("");
 	}
 	free(tmp);
 }
 
-static int	join_var(unsigned short **bitmap, int i, char **var)
+static int	join_var(unsigned short **bitmap, int i, char **var, char **env)
 {
 	int				j;
 	int				lennew;
 	int				varsize;
 	unsigned short	*tempbitmap;
 
-	join_var_3(var, &varsize);
+	join_var_3(var, &varsize, env);
 	lennew = ft_wstrlen(*bitmap, UNTIL_END_OF_STRING) - (varsize + 1)
 		+ ft_strlen(*var);
 	if (!na_calloc(lennew + 1, sizeof(**bitmap), (void **)&tempbitmap))
@@ -96,7 +96,7 @@ static int	check_quotes(unsigned short **var, int flags)
 	return (i);
 }
 
-int	swap_var(unsigned short **bitmap, int i)
+int	swap_var(unsigned short **bitmap, int i, char **env)
 {
 	unsigned short	*tmp;
 	char			*var;
@@ -114,7 +114,7 @@ int	swap_var(unsigned short **bitmap, int i)
 	}
 	free(tmp);
 	var[j] = 0;
-	if (!join_var(bitmap, i, &var))
+	if (!join_var(bitmap, i, &var, env))
 		return (1);
 	j = ft_strlen(var);
 	free(var);

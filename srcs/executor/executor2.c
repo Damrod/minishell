@@ -13,7 +13,7 @@ int	check_builtins(char **args, char ***env, int *ret)
 	else if (ft_strcmp(args[0], "exit") == 0)
 		return (*ret = ft_exit(args));
 	else if (ft_strcmp(args[0], "cd") == 0)
-		return (*ret = ft_cd(&args[1]));
+		return (*ret = ft_cd(&args[1], env));
 	else if (ft_strcmp(args[0], "pwd") == 0)
 		return (*ret = ft_pwd());
 	return (*ret = -1);

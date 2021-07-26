@@ -22,6 +22,6 @@ int		check_env_var(char *var, char ***env);
 int		ft_unset(char ***env, char **args);
 int		check_exit_arg(int num, char **args);
 int		ft_exit(char **args);
-char	*ft_getenv(const char *name);
+char	*ft_getenv(const char *name, char **env);
 
 #endif

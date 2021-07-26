@@ -14,7 +14,7 @@ enum e_pipesides {
 	SIDE_IN = 1
 };
 
-int			exec_cmd(t_dlist *cmd);
+int			exec_cmd(t_dlist *cmd, char ***env);
 int			check_builtins(char **args, char ***env, int *ret);
 t_simplcmd	*simple(t_dlist *cmd);
 void		*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds,

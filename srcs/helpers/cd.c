@@ -2,7 +2,7 @@
 #include <env.h>
 #include <error_mng.h>
 
-int	ft_cd(char **args)
+int	ft_cd(char **args, char ***env)
 {
 	char	*path;
 
@@ -10,7 +10,7 @@ int	ft_cd(char **args)
 	if (path && args[1])
 		return (error_cmd("cd", NULL, "too many arguments", 1));
 	if (!path)
-		chdir(ft_getenv("HOME"));
+		chdir(ft_getenv("HOME", *env));
 	else
 	{
 		if (-1 == chdir(path))

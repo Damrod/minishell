@@ -14,15 +14,15 @@ static int	ft_getvalue(const char *s1, char *s2)
 	return (ft_strncmp(s1, s2, len1));
 }
 
-char	*ft_getenv(const char *name)
+char	*ft_getenv(const char *name, char **env)
 {
 	size_t	i;
 
 	i = 0;
-	while (g_term.environ[i])
+	while (env[i])
 	{
-		if (ft_getvalue(name, g_term.environ[i]) == 0)
-			return (ft_strchr(g_term.environ[i], '=') + 1);
+		if (ft_getvalue(name, env[i]) == 0)
+			return (ft_strchr(env[i], '=') + 1);
 		i++;
 	}
 	return (NULL);
