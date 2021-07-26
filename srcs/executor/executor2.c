@@ -1,6 +1,6 @@
 #include <env.h>
 
-int	check_builtins(char **args, char ***env, int *ret)
+int	check_builtins(char **args, char ***env, int *ret, t_dlist *cmd)
 {
 	if (ft_strcmp(args[0], "export") == 0)
 		return (*ret = ft_export(env, args));
@@ -11,7 +11,7 @@ int	check_builtins(char **args, char ***env, int *ret)
 	else if (ft_strcmp(args[0], "unset") == 0)
 		return (*ret = ft_unset(env, args));
 	else if (ft_strcmp(args[0], "exit") == 0)
-		return (*ret = ft_exit(args));
+		return (*ret = ft_exit(args, env, cmd));
 	else if (ft_strcmp(args[0], "cd") == 0)
 		return (*ret = ft_cd(&args[1], env));
 	else if (ft_strcmp(args[0], "pwd") == 0)

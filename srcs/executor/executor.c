@@ -1,6 +1,6 @@
 #include <executor.h>
 
-static int	miniexec(char **args, char ***env)
+static int	miniexec(char **args, char ***env, t_dlist *cmd)
 {
 	int			ret;
 	char		**path;
@@ -9,7 +9,7 @@ static int	miniexec(char **args, char ***env)
 	emptypath[0] = "";
 	emptypath[1] = NULL;
 	path = emptypath;
-	if (check_builtins(args, env, &ret) == -1)
+	if (check_builtins(args, env, &ret, cmd) == -1)
 	{
 		path = read_path(*env);
 		if (!path)
@@ -19,6 +19,8 @@ static int	miniexec(char **args, char ***env)
 	ft_dblptr_free((void **)*env);
 	if (emptypath != path)
 		ft_dblptr_free((void **)path);
+	ft_dlstrewind(&cmd);
+	comp_dtor(&cmd, NULL, 0);
 	return (ret);
 }
 
@@ -71,21 +73,21 @@ static int	handle_parent(t_dlist *cmd, pid_t pid, bool pipe_open, char ***env)
 		if (close(simple(cmd->prev)->pipes[SIDE_OUT]))
 			exit(quit_exec(EXIT_FAILURE, "close", cmd, env));
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
-		return (check_builtins(simple(cmd)->args, env, &ret));
+		return (check_builtins(simple(cmd)->args, env, &ret, cmd));
 	return (handle_signals(status));
 }
 
 static int	handle_child(t_dlist *cmd, char ***env)
 {
 	if (is_internal(simple(cmd)->args[0]) && !cmd->prev && !cmd->next)
-		exit (0);
+		cleanup_exit(env, cmd, EXIT_SUCCESS);
 	if (simple(cmd)->type == TYPE_PIPE)
 		my_dup2(simple(cmd)->pipes[SIDE_IN], STDOUT_FILENO, cmd);
 	if (cmd->prev && simple(cmd->prev)->type == TYPE_PIPE)
 		my_dup2(simple(cmd->prev)->pipes[SIDE_OUT], STDIN_FILENO, cmd);
 	my_dup2(simple(cmd)->infd, STDIN_FILENO, cmd);
 	my_dup2(simple(cmd)->outfd, STDOUT_FILENO, cmd);
-	exit(miniexec(simple(cmd)->args, env));
+	exit(miniexec(simple(cmd)->args, env, cmd));
 }
 
 int	exec_cmd(t_dlist *cmd, char ***env)

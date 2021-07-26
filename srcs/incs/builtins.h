@@ -12,6 +12,6 @@ int		ft_cd(char **args, char ***env);
 int		ft_env(char **g_term);
 int		ft_export(char ***env, char **args);
 int		ft_unset(char ***env, char **args);
-int		ft_exit(char **args);
+int		ft_exit(char **args, char ***env, t_dlist *cmd);
 
 #endif

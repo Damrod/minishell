@@ -8,6 +8,7 @@
 # include <minishell.h>
 # include <libft.h>
 
+int		cleanup_exit(char ***env, t_dlist *cmd, int num);
 void	print_dblptr(const char *input);
 void	ft_print_env_ordered(char **env);
 int		check_valid_env_var(char *arg);
@@ -20,8 +21,10 @@ int		ft_env(char **env);
 void	rm_env_var(char ***env, int i);
 int		check_env_var(char *var, char ***env);
 int		ft_unset(char ***env, char **args);
-int		check_exit_arg(int num, char **args);
-int		ft_exit(char **args);
+int		check_exit_arg(int num, char **args, char ***env, t_dlist *cmd);
+int		ft_exit(char **args, char ***env, t_dlist *cmd);
 char	*ft_getenv(const char *name, char **env);
+void	*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds,
+			bool isprintsynerr);
 
 #endif
