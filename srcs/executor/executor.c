@@ -95,7 +95,6 @@ int	exec_cmd(t_dlist *cmd, char ***env)
 	int			pipe_open;
 	pid_t		pid;
 
-	g_lastret = EXIT_FAILURE;
 	pipe_open = 0;
 	if (simple(cmd)->type == TYPE_PIPE || (simple(cmd->prev)
 			&& simple(cmd->prev)->type == TYPE_PIPE))

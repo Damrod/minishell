@@ -1,6 +1,6 @@
 #include <common.h>
 
-uint8_t	g_lastret = 0;
+uint8_t	g_lastret = EXIT_SUCCESS;
 
 static void	loop_commands(t_list *args, uint32_t *lineno, char ***env)
 {

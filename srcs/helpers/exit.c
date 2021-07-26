@@ -52,6 +52,6 @@ int	ft_exit(char **args, char ***env, t_dlist *cmd)
 		return (check_exit_arg(i, args, env, cmd));
 	}
 	else
-		cleanup_exit(env, cmd, EXIT_SUCCESS);
+		cleanup_exit(env, cmd, g_lastret);
 	return (0);
 }
