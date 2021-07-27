@@ -109,9 +109,8 @@ int	exec_cmd(t_dlist *cmd, char ***env)
 	else
 	{
 		if (pid == 0)
-			g_lastret = handle_child(cmd, env);
+			return (handle_child(cmd, env));
 		else
-			g_lastret = handle_parent(cmd, pid, pipe_open, env);
+			return (handle_parent(cmd, pid, pipe_open, env));
 	}
-	return (g_lastret);
 }

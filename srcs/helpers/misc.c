@@ -20,7 +20,7 @@ int	quit_exec(int retstatus, char *sysc, t_dlist *cmds, char ***env)
 {
 	ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", EXENAME, sysc, strerror(errno));
 	ft_dlstrewind(&cmds);
-	ft_lstclear((t_list **)&cmds, free, free);
+	comp_dtor(&cmds, NULL, 0);
 	ft_dblptr_free((void **)*env);
 	*env = NULL;
 	return (retstatus);
@@ -37,5 +37,5 @@ int	is_internal(char *arg)
 void	my_dup2(int oldfd, int newfd, t_dlist *cmds, char ***env)
 {
 	if (dup2(oldfd, newfd) < 0)
-		exit(quit_exec(1, "dup2", cmds, env));
+		exit(quit_exec(EXIT_FAILURE, "dup2", cmds, env));
 }

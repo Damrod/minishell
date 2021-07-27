@@ -12,5 +12,7 @@ int				ft_wstrncmp(unsigned short *s1, const char *str2,
 					char checkdepth, size_t n);
 unsigned short	*ft_wstrdup(const unsigned short *str, char is_untilspace);
 unsigned short	*upcast_str(const char *args);
+void			*comp_dtor(t_dlist **compcmd, t_dlist *simplecmds,
+					bool isprintsynerr);
 
 #endif
