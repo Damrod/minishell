@@ -24,6 +24,7 @@ static t_simplcmd	*simple_ctor(t_dlist *head, uint32_t *lineno)
 	simple->outfd = STDOUT_FILENO;
 	if (get_redirs((t_list **)&head->content, simple, lineno))
 	{
+		g_lastret = 1;
 		ft_lstclear((t_list **)&head->content, free, free);
 		free (simple);
 		return (NULL);
