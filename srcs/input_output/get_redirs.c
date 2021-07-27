@@ -54,7 +54,7 @@ int	get_redirs(t_list **args, t_simplcmd *simple, uint32_t *lineno)
 	t_list	*list;
 
 	if (!na_calloc(ft_lstsize(*args) + 1, sizeof(*clptt), (void **)&clptt))
-		return (1);
+		return (g_lastret = 1);
 	clpatt = clptt;
 	list = *args;
 	while (list)
@@ -62,7 +62,8 @@ int	get_redirs(t_list **args, t_simplcmd *simple, uint32_t *lineno)
 		if (is_redir((unsigned short *)list->content))
 		{
 			if (get_redirs2(&list, simple, &clpatt, lineno))
-				return (free_and_nullify((void **)&clptt, NULL, NULL, 1));
+				return (g_lastret = free_and_nullify((void **)&clptt, NULL,
+						NULL, 1));
 		}
 		else
 		{
@@ -70,5 +71,5 @@ int	get_redirs(t_list **args, t_simplcmd *simple, uint32_t *lineno)
 			list = list->next;
 		}
 	}
-	return (get_redirs3(args, clptt, simple));
+	return (g_lastret = get_redirs3(args, clptt, simple));
 }
