@@ -1,40 +1,47 @@
 NAME	= libft.a
-SRCS	= noassign/na_malloc.c memory/ft_bzero.c memory/ft_memcmp.c			   \
-		  memory/ft_memset.c memory/ft_memcpy.c memory/ft_memchr.c			   \
-		  memory/ft_memmove.c memory/ft_memccpy.c polyarray/ft_arrayshift.c	   \
-		  polyarray/ft_arrkey.c polyarray/ft_array.c polyarray/ft_arrkey2.c	   \
-		  polyarray/ft_alloc_matrix.c polyarray/ft_arrbyte.c				   \
-		  btree/btree_apply_by_level.c btree/btree_search_item.c			   \
-		  btree/btree_print.c btree/btree_level_count.c						   \
-		  btree/btree_insert_data.c btree/btree_apply_suffix.c				   \
-		  btree/btree_apply_prefix.c btree/btree_create_node.c				   \
-		  btree/btree_apply_infix.c list/ft_list_sort.c list/ft_lstpop_back.c  \
-		  list/ft_lstmerge.c list/ft_lstdisplay.c list/ft_lstclear.c		   \
-		  list/ft_lstpop_front.c list/ft_lst_reverse.c list/ft_lstpush_front.c \
-		  list/ft_lstsize.c list/ft_arrtolst.c list/ft_lstmap.c				   \
-		  list/ft_lstadd_front.c list/ft_lstdelmany.c list/ft_lstlast.c		   \
-		  list/ft_lstdup.c list/ft_lstpush_back.c list/ft_lsttoarr.c		   \
-		  list/ft_lstadd_back.c list/na_lstnew.c list/ft_lstsplit.c			   \
-		  list/ft_lstiter.c list/ft_lstcullpattern.c list/ft_lstdelone.c	   \
-		  list/ft_lstsortedmerge.c list/ft_lstnew.c list/ft_lst_intcmp.c	   \
-		  mytinygc/ft_advalloc.c mytinygc/ft_mperror.c mytinygc/ft_myalloc.c   \
-		  ctype/ft_isalpha.c ctype/ft_isprint.c ctype/ft_toupper.c			   \
-		  ctype/ft_isdigit.c ctype/ft_isascii.c ctype/ft_isalnum.c			   \
-		  ctype/ft_isspace.c ctype/ft_tolower.c allocstr/ft_strtrim.c		   \
-		  allocstr/ft_itoa.c allocstr/ft_calloc.c allocstr/ft_strjoin.c		   \
-		  allocstr/ft_strjoin_ult.c allocstr/ft_split.c allocstr/ft_strdup.c   \
-		  allocstr/ft_split_ultimate.c allocstr/ft_substr.c					   \
-		  strutils/ft_reverse_string.c strutils/ft_wrtptr.c					   \
-		  strutils/ft_alignright.c strutils/ft_findptrinarray.c				   \
-		  strutils/ft_isspace_adv.c strutils/ft_strmapi.c					   \
-		  strutils/get_next_line.c atoi/ft_atoi.c output/ft_putendl_fd.c	   \
-		  output/ft_putchar_fd.c output/ft_putstr_fd.c output/ft_putnbr_fd.c   \
-		  string/ft_strlcpy.c allocstr/ft_realloc.c dblptr/ft_dblptr_free.c	   \
-		  string/ft_strnstr.c string/ft_strchr.c string/ft_strlen.c			   \
-		  string/ft_strlcat.c string/ft_strncmp.c string/ft_strrchr.c		   \
-		  dblptr/ft_dblptr_cpy.c dblptr/ft_dblptrlen.c						   \
-		  strutils/ft_random.c dblptr/ft_dblptr_foreach.c output/ft_puts.c	   \
-		  string/ft_strcmp.c
+SRCS   =  strutils/ft_reverse_string.c strutils/get_next_line.c				   \
+		  strutils/ft_wrtptr.c strutils/ft_isspace_adv.c					   \
+		  strutils/ft_findptrinarray.c strutils/get_next_line_check_input.c	   \
+		  strutils/ft_strmapi.c strutils/ft_alignright.c					   \
+		  strutils/ft_random.c memory/ft_memset.c memory/ft_memchr.c		   \
+		  memory/ft_bzero.c memory/ft_memmove.c memory/ft_memccpy.c			   \
+		  memory/ft_memcmp.c memory/ft_memcpy.c ctype/ft_tolower.c			   \
+		  ctype/ft_isalnum.c ctype/ft_toupper.c ctype/ft_isascii.c			   \
+		  ctype/ft_isprint.c ctype/ft_isdigit.c ctype/ft_isalpha.c			   \
+		  ctype/ft_isspace.c list/ft_lst_intcmp.c list/ft_lstcullpattern.c	   \
+		  list/na_lstnew.c list/ft_lstdelmany.c list/ft_lsttoarr.c			   \
+		  list/ft_lstdelone.c list/ft_lstpush_back.c list/ft_lstmap.c		   \
+		  list/ft_lstpop_back.c list/ft_lstadd_back.c list/ft_arrtolst.c	   \
+		  list/ft_list_sort.c list/dllist/ft_dlstpush_front.c				   \
+		  list/dllist/ft_dlstadd_front.c list/dllist/na_listnew_dll.c		   \
+		  list/dllist/ft_dlstffwd.c list/dllist/ft_dlstlast.c				   \
+		  list/dllist/ft_dlstfirst.c list/dllist/ft_dlstpop_front.c			   \
+		  list/dllist/ft_dlstpush_back.c list/dllist/ft_dlstadd_back.c		   \
+		  list/dllist/ft_dlstpop_back.c list/dllist/ft_dlstrewind.c			   \
+		  list/dllist/ft_dlstsize.c list/ft_lst_reverse.c list/ft_lstdup.c	   \
+		  list/ft_lstpush_front.c list/ft_lstnew.c list/ft_lstclear.c		   \
+		  list/ft_lstadd_front.c list/ft_lstdisplay.c						   \
+		  list/ft_lstsortedmerge.c list/ft_lstsplit.c list/ft_lstlast.c		   \
+		  list/ft_lstmerge.c list/ft_lstsize.c list/ft_lstiter.c			   \
+		  list/ft_lstpop_front.c mytinygc/ft_mperror.c						   \
+		  mytinygc/ft_advalloc.c mytinygc/ft_myalloc.c						   \
+		  dblptr/ft_dblptr_foreach.c dblptr/ft_dblptr_cpy.c					   \
+		  dblptr/ft_dblptrlen.c dblptr/ft_dblptr_free.c string/ft_strlcat.c	   \
+		  string/ft_strchr.c string/ft_strrchr.c string/ft_strnstr.c		   \
+		  string/ft_strncmp.c string/ft_strlen.c string/ft_strcmp.c			   \
+		  string/ft_strlcpy.c allocstr/ft_realloc.c allocstr/ft_strjoin.c	   \
+		  allocstr/ft_substr.c allocstr/ft_split_ultimate.c					   \
+		  allocstr/ft_strtrim.c allocstr/ft_split.c allocstr/ft_calloc.c	   \
+		  allocstr/ft_itoa.c allocstr/ft_strjoin_ult.c allocstr/ft_strdup.c	   \
+		  atoi/ft_atoi.c polyarray/ft_arrbyte.c polyarray/ft_alloc_matrix.c	   \
+		  polyarray/ft_arrayshift.c polyarray/ft_array.c					   \
+		  polyarray/ft_arrkey.c polyarray/ft_arrkey2.c noassign/na_malloc.c	   \
+		  output/ft_puts.c output/ft_putendl_fd.c output/ft_putchar_fd.c	   \
+		  output/ft_putstr_fd.c output/ft_putnbr_fd.c btree/btree_print.c	   \
+		  btree/btree_level_count.c btree/btree_apply_by_level.c			   \
+		  btree/btree_create_node.c btree/btree_apply_prefix.c				   \
+		  btree/btree_insert_data.c btree/btree_search_item.c				   \
+		  btree/btree_apply_infix.c btree/btree_apply_suffix.c
 SRC_PFT	= ft_printf/srcs/ft_formattypes.c ft_printf/srcs/ft_float1.c		   \
 		  ft_printf/srcs/ft_nitoa_helpers.c ft_printf/srcs/ft_gettype1.c	   \
 		  ft_printf/srcs/ft_vprintf.c ft_printf/srcs/ft_gettype.c			   \

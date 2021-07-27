@@ -72,8 +72,9 @@ endif
 
 all: $(NAME)
 
-$(BUILDDIR)/libft.a: $(TARGETDIRS) $(LIBFTO)
-	ar rc -o $@ $(LIBFTO)
+$(BUILDDIR)/libft.a: $(TARGETDIRS) $(LIBFTSRC)
+	make -C srcs/libft
+	mv srcs/libft/libft.a bld/
 
 # Generate directory rules
 $(foreach targetdir, $(TARGETDIRS), $(eval $(call generateDirs, $(targetdir))))
