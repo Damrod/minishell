@@ -91,6 +91,7 @@ $(foreach targetdir, $(TARGETDIRS), $(eval $(call generateRules, $(targetdir))))
 
 clean:
 	$(HIDE)$(RM) $(BUILDDIR)
+	make clean -C srcs/libft
 
 fclean: clean
 	$(HIDE)$(RM) $(NAME)
